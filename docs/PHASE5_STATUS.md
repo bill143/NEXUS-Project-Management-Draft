@@ -25,7 +25,7 @@ This file is the live status of the consolidation matrix in §4 of the consolida
 | #4 | Validation/QA service merge (DDC #7 + #8) | ✅ Built | `7785f50c` | New rule pack `ddc_revit_ifc` in `app/core/validation/rules/` — 36 rules across 12 (category, parameter) pairs with IFC synonym matching. 10/10 tests. |
 | #5 | DDC QTO services (DDC #3 + #5) | ✅ Built | `8e168e54` | New module `ddc_qto` with `/summarize` + `/batch` endpoints. Pure-Python grouping/aggregation, no pandas at the public surface. 23/23 tests. |
 | #6 | Online3DViewer wrap (DDC #17) | ⏸️ Deferred | — | Frontend-only work. The npm `online-3d-viewer` package is published; integrating it requires the React build pipeline to be validated end-to-end (not exercised in this sweep). Recommended P1.5 sweep with frontend dev server up. |
-| #7 | AI/LLM pipeline rewrite (DDC #22) | ⏸️ Deferred | — | Substantial: replace n8n workflow with Celery/Prefect orchestration on top of the existing `ai` module. Treat as its own multi-day project. |
+| #7 | AI/LLM pipeline rewrite (DDC #22) | ✅ Foundation built (Sweep B) | `<sweep-b>` | Native LangGraph + Celery hybrid. Pipeline foundation (`app/core/pipelines/`), tier-dispatch LLM router, DDC subprocess wrapper, JobRun extension columns (`v2f0`), and one example pipeline (`text_to_cost_estimate`, port of DDC workflow #6.1). Other 5 DDC pipelines deferred to subsequent sweeps. See `docs/PIPELINES.md`. 27/27 tests. |
 | #8 | Streamlit profiling (DDC #14) | ✅ Built | `b6848549` | New module `ddc_profiling` with column-summary/histogram/categories/correlation/missing-map endpoints. Pandas + numpy lazy-imported. 8/8 tests. |
 | #9 | VisualBIM (DDC #13) | ⏸️ Deferred | — | Frontend visualization (Plotly.js / ECharts). Same rationale as #6 — recommended for the frontend sweep. |
 | #10 | Geometric grouping (DDC #10) | ⏸️ Deferred | — | Requires IfcOpenShell + a Collada writer. Both add non-trivial deps; recommended for a separate sweep with proper IFC test fixtures. |
@@ -66,8 +66,10 @@ The DataDrivenConstruction `OpenConstructionEstimate-DDC-CWICR` repo is sparse-c
 
 | Gate | Status |
 |---|---|
-| `alembic upgrade head` | ✅ Clean. Head is `v2d1_ml_price_prediction_tables`. |
+| `alembic upgrade head` | ✅ Clean. Head is `v2f0_pipeline_runs_extension` (Sweep B; chains v2e0 → v2f0). |
 | New-DDC integration tests | ✅ 74/74 pass across 8 test files (`test_my_module.py` + 7 new DDC tests). |
+| New Sweep A integration tests | ✅ 73/73 pass (viewer3d + visualbim modules). |
+| New Sweep B integration tests | ✅ 27/27 pass (Celery foundation, pipeline runtime, DDC subprocess wrapper, text_to_cost_estimate pipeline). |
 | `from app.main import create_app; create_app()` | ✅ Clean. Returns 32 mounted routes. |
 | Full upstream OCE 2,947-test suite | ⚠️ Pre-existing OCE auth-fixture failure surfaced (`test_dry_run_endpoint_boolean_mode` returns 401). Not introduced by NEXUS work. Triage in a separate sweep — NOT blocking this consolidation. |
 
@@ -80,3 +82,26 @@ The DataDrivenConstruction `OpenConstructionEstimate-DDC-CWICR` repo is sparse-c
 | `simpleeval` was imported by `app/modules/eac/engine/safe_eval.py` but missing from `pyproject.toml`. Caused 5 test files to fail collection. | ✅ Fixed in NEXUS — added `simpleeval>=1.0.0` to base deps. |
 | `backend/openestimate.db-wal` (51.85 MB SQLite WAL) was committed in OCE history at `abc1740b` and remains in the pack. | ✅ Mitigation: `.gitignore` patterns extended to prevent re-introduction. The historical blob still bloats the repo by ~52 MB; cleaning it requires `git filter-repo` or BFG (destructive history rewrite — not done here). |
 | `docs/media/full_preview.mp4` — 69.81 MB upstream OCE marketing asset, exceeds GitHub's 50 MB recommendation. | Noted, not actioned (under 100 MB hard limit). |
+
+---
+
+## Sweep B — AI/LLM pipeline foundation (P1 #7)
+
+Sweep B replaces DDC's n8n-based AI workflows with a native NEXUS pipeline architecture. Foundation + one example pipeline shipped; the other five DDC AI workflows deferred to subsequent sweeps.
+
+**What shipped:**
+
+- `app/core/pipelines/` — LangGraph runtime, manifest pattern (mirrors `ModuleManifest`), name → manifest registry, tier-dispatch LLM router, defaults config.
+- `app/core/tasks/pipeline_persistence.py` — pipeline-flavoured Celery handler `pipeline.persist`. The Celery transport itself was already shipped in `v260_jobs_runner`.
+- `app/core/converters/ddc_subprocess.py` — wrapper for the four DDC binary converters (`RvtExporter.exe`, `IfcExporter.exe`, `DwgExporter.exe`, `DgnExporter.exe`). Subprocess + timeout + clear missing-binary error. Binaries themselves never bundled.
+- `app/pipelines/text_to_cost_estimate/` — port of DDC n8n workflow #6.1 (Construction Price Estimation Pipeline for Revit/IFC with LLM). Four-node LangGraph: `parse_description` (HARD) → `classify_items` (CLASSIFY) → `search_cost_db` (deterministic) → `estimate_total` (HARD). Endpoint `POST /api/v1/pipelines/text_to_cost_estimate`.
+- Migration `v2f0_pipeline_runs_extension` — extends `oe_job_run` with `pipeline_name`, `llm_tier_used`, `total_tokens`, `total_cost_usd`. All four columns nullable.
+- `docs/PIPELINES.md` — architecture, LLM tier policy, Celery vs LangGraph decision tree, authoring guide.
+
+**What's deferred to subsequent sweeps:**
+
+- DDC workflows #1, #2, #3, #4, #5, #6.2, #7 (the other 6 AI pipelines beyond #6.1).
+- Excel/HTML report-generation pipeline.
+- Email/notification dispatch pipeline.
+- Async-by-job-id route variant (the foundation runs sync today; switching to dispatch-by-job-id is a route-only change).
+- Real Qdrant vector search inside `search_cost_db` (today: in-memory rate table for the demo).
