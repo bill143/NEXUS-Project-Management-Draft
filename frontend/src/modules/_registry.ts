@@ -56,6 +56,7 @@ import { manifest as ddcIfcConverter } from './ddc-ifc-converter/manifest';
 import { manifest as ddcRvtConverter } from './ddc-rvt-converter/manifest';
 import { manifest as myModule } from './my-module/manifest';
 import { manifest as viewer3d } from './viewer3d/manifest';
+import { manifest as visualbim } from './visualbim/manifest';
 
 /* ── Registry ──────────────────────────────────────────────────────── */
 
@@ -96,6 +97,7 @@ export const MODULE_REGISTRY: ModuleManifest[] = [
   ddcRvtConverter,
   myModule,
   viewer3d,
+  visualbim,
 ];
 
 /* ── Helper functions ──────────────────────────────────────────────── */
