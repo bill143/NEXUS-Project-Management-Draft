@@ -43,6 +43,7 @@ from app.modules.inspections import models as _inspections  # noqa: F401
 from app.modules.integrations import models as _integrations  # noqa: F401
 from app.modules.markups import models as _markups  # noqa: F401
 from app.modules.meetings import models as _meetings  # noqa: F401
+from app.modules.my_module import models as _my_module  # noqa: F401
 from app.modules.ncr import models as _ncr  # noqa: F401
 from app.modules.notifications import models as _notifications  # noqa: F401
 from app.modules.procurement import models as _procurement  # noqa: F401
