@@ -1542,6 +1542,18 @@ def create_app() -> FastAPI:
         except Exception:
             logger.debug("4D /api/v2 routers not available (non-fatal)")
 
+        # AI/LLM pipelines (Sweep B) — every package under app/pipelines/
+        # registers its manifest and exposes a router. The mount helper
+        # iterates the known list and bolts each one onto /api/v1/pipelines.
+        try:
+            from app.pipelines._mount import mount_pipeline_routers
+
+            mounted = mount_pipeline_routers(app)
+            if mounted:
+                logger.info("Mounted %d pipeline router(s)", mounted)
+        except Exception:
+            logger.debug("Pipeline routers not available (non-fatal)")
+
         # Register cross-module event handlers (dataflow wiring)
         from app.core.event_handlers import register_event_handlers
 
