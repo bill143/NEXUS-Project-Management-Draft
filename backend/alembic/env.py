@@ -43,6 +43,7 @@ from app.modules.inspections import models as _inspections  # noqa: F401
 from app.modules.integrations import models as _integrations  # noqa: F401
 from app.modules.markups import models as _markups  # noqa: F401
 from app.modules.meetings import models as _meetings  # noqa: F401
+from app.modules.ml_price_prediction import models as _mlpp  # noqa: F401
 from app.modules.my_module import models as _my_module  # noqa: F401
 from app.modules.ncr import models as _ncr  # noqa: F401
 from app.modules.notifications import models as _notifications  # noqa: F401
@@ -57,6 +58,7 @@ from app.modules.risk import models as _risk  # noqa: F401
 from app.modules.safety import models as _safety  # noqa: F401
 from app.modules.schedule import models as _sched  # noqa: F401
 from app.modules.submittals import models as _submittals  # noqa: F401
+from app.modules.sustainability import models as _sustainability  # noqa: F401
 from app.modules.takeoff import models as _takeoff  # noqa: F401
 from app.modules.tasks import models as _tasks  # noqa: F401
 from app.modules.teams import models as _teams  # noqa: F401

@@ -155,3 +155,16 @@ backend/*.log.err
 .claude/settings.local.json
 i18n_audit_report.md
 qa-report/
+
+# DDC CAD/BIM converters — EXTERNAL dependencies (closed-source DDC EULA + ODA pass-through).
+# NEVER redistribute in NEXUS. User installs them locally per docs/CONVERTERS.md.
+*.exe
+*.dll
+*.so
+datadrivenlibs/
+DDC_WINDOWS_Converters/
+DDC_LINUX_Converters/
+RvtExporter*
+IfcExporter*
+DwgExporter*
+DgnExporter*

@@ -1,7 +1,7 @@
 [project]
 name = "openconstructionerp"
 version = "2.6.40"
-description = "Open-source construction cost estimation — BOQ, 4D/5D, AI, CAD/BIM takeoff. After install, run: openestimate"
+description = "NEXUS-Project-Management-Draft — federal-pivot fork of OpenConstructionERP with DDC consolidation (CO₂ embodied carbon, ML price prediction, federal compliance). BOQ, 4D/5D, AI, CAD/BIM takeoff. After install, run: openestimate"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.12"
 authors = [
@@ -82,6 +82,12 @@ dependencies = [
     # Fuzzy autocomplete for attribute-value suggestions (T03). Small
     # wheel, no deps; much faster than pure-Python ratio loops.
     "rapidfuzz>=3.0.0",
+    # Sandboxed expression evaluator for the EAC compliance-rules engine
+    # (app/modules/eac/engine/safe_eval.py). Listed here in NEXUS after a
+    # missing-dep collection-failure was discovered upstream — the EAC
+    # engine and 5 test files import simpleeval but the OCE pyproject did
+    # not declare it.
+    "simpleeval>=1.0.0",
 ]
 
 [project.scripts]

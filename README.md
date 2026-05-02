@@ -1,6 +1,26 @@
 <div align="center">
 
-# OpenConstructionERP
+# NEXUS-Project-Management-Draft
+
+**Federal-pivot fork of [OpenConstructionERP](https://github.com/datadrivenconstruction/OpenConstructionERP) with the DataDrivenConstruction (DDC) reference toolchain consolidated in.**
+
+NEXUS extends the OCE shell with three federal-grade differentiators on top of OCE's existing 70+ modules:
+
+| Differentiator | Why it matters | Where it lives |
+|---|---|---|
+| **Sustainability / CO₂** | Embodied-carbon reporting aligned with **GSA P100** + **Buy Clean Act** | `backend/app/modules/sustainability/` |
+| **ML Price-Prediction** | Federal bid forecasting (pairs with SAM.gov + USAspending) | `backend/app/modules/ml_price_prediction/` |
+| **DDC Validation Pack** | Excel-driven Revit/IFC parameter validation merged into OCE's validation engine | `backend/app/core/validation/rules/ddc_*.py` |
+
+External CAD/BIM converters (DDC's `RvtExporter` / `IfcExporter` / `DwgExporter` / `DgnExporter`) are **not redistributed** here — see [`docs/CONVERTERS.md`](docs/CONVERTERS.md) for install guidance. The full audit/port matrix lives in [`docs/DDC_CONSOLIDATION_PLAN.md`](docs/DDC_CONSOLIDATION_PLAN.md).
+
+> **Upstream attribution.** This fork preserves OpenConstructionERP's AGPL-3.0 license, full attribution chain, and 100% of the upstream content below. Maintained by [Bill Asmar / O'Neill Contractors](https://github.com/bill143). Upstream maintainer: [Artem Boiko / DataDrivenConstruction](https://datadrivenconstruction.io).
+
+---
+
+<div align="center">
+
+# OpenConstructionERP _(upstream baseline)_
 
 **Open-source ERP for construction estimation and project management**
 
