@@ -156,6 +156,15 @@ backend/*.log.err
 i18n_audit_report.md
 qa-report/
 
+# SQLite runtime artifacts (dev databases, write-ahead logs, shared memory).
+# Already covered by the *.db / *.db-shm / *.db-wal / *.sqlite3 / openestimate.db*
+# patterns above, but listed explicitly here as a belt-and-braces guard
+# after a 51.85 MB .db-wal got into upstream OCE history once before.
+backend/openestimate.db
+backend/openestimate.db-wal
+backend/openestimate.db-shm
+*.db-journal
+
 # DDC CAD/BIM converters — EXTERNAL dependencies (closed-source DDC EULA + ODA pass-through).
 # NEVER redistribute in NEXUS. User installs them locally per docs/CONVERTERS.md.
 *.exe
