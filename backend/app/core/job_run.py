@@ -21,7 +21,9 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import JSON, DateTime, Index, Integer, String
+from decimal import Decimal
+
+from sqlalchemy import JSON, DateTime, Index, Integer, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import GUID, Base
@@ -113,6 +115,33 @@ class JobRun(Base):
         String(120),
         nullable=True,
         doc="Celery's own task UUID, recorded for cross-system debugging.",
+    )
+
+    # ── Pipeline tracking (Sweep B / migration v2f0) ──────────────────────
+    # All four columns are nullable so non-pipeline JobRun rows continue
+    # to round-trip without backfill. ``kind`` already carries the handler
+    # key; ``pipeline_name`` is a denormalised mirror so dashboards can
+    # filter by pipeline without parsing the kind string.
+    pipeline_name: Mapped[str | None] = mapped_column(
+        String(120),
+        nullable=True,
+        index=True,
+        doc="Pipeline manifest name (NULL for non-pipeline jobs).",
+    )
+    llm_tier_used: Mapped[str | None] = mapped_column(
+        String(20),
+        nullable=True,
+        doc="Last LLMTier hit on this run: 'hard' / 'classify' / 'fallback'.",
+    )
+    total_tokens: Mapped[int | None] = mapped_column(
+        Integer,
+        nullable=True,
+        doc="Sum of provider-reported tokens across LLM calls in the run.",
+    )
+    total_cost_usd: Mapped[Decimal | None] = mapped_column(
+        Numeric(12, 4),
+        nullable=True,
+        doc="Heuristic blended cost estimate (informational; not for billing).",
     )
 
     def __repr__(self) -> str:
