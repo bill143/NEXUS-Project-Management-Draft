@@ -55,6 +55,7 @@ import { manifest as krBoqExchange } from './kr-boq-exchange/manifest';
 import { manifest as ddcIfcConverter } from './ddc-ifc-converter/manifest';
 import { manifest as ddcRvtConverter } from './ddc-rvt-converter/manifest';
 import { manifest as myModule } from './my-module/manifest';
+import { manifest as viewer3d } from './viewer3d/manifest';
 
 /* ── Registry ──────────────────────────────────────────────────────── */
 
@@ -94,6 +95,7 @@ export const MODULE_REGISTRY: ModuleManifest[] = [
   ddcIfcConverter,
   ddcRvtConverter,
   myModule,
+  viewer3d,
 ];
 
 /* ── Helper functions ──────────────────────────────────────────────── */

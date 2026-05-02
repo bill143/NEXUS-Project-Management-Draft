@@ -70,6 +70,7 @@ from app.modules.transmittals import models as _transmittals  # noqa: F401
 # but we need it here for autogenerate to work.
 from app.modules.users import models as _users  # noqa: F401
 from app.modules.validation import models as _validation  # noqa: F401
+from app.modules.viewer3d import models as _viewer3d  # noqa: F401
 
 config = context.config
 settings = get_settings()
