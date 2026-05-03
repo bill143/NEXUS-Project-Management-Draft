@@ -844,6 +844,13 @@ def create_app() -> FastAPI:
 
     app.include_router(sidebar_badges_router)
 
+    # NEXUS Precon module — opportunity pipeline, RFQ invitations, bid leveling,
+    # federal-opportunity intake, and the atomic Award & Activate workflow.
+    # Wired in at Phase 7.1; routes mount under /api/precon/*.
+    from app.modules.precon.router import router as precon_router
+
+    app.include_router(precon_router, prefix="/api/precon", tags=["precon"])
+
     # Store startup time for uptime calculation
     _startup_time: float = time.time()
 
