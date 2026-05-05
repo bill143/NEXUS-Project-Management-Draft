@@ -56,7 +56,7 @@ RUN mkdir -p /frontend/dist \
     && touch /frontend/dist/.placeholder
 
 RUN pip install --upgrade pip \
-    && pip install --no-cache-dir ".[server]"
+    && pip install --no-cache-dir ".[server,vector]"
 
 
 # ── Stage 2: runtime ────────────────────────────────────────────────────────
