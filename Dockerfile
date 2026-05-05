@@ -86,7 +86,12 @@ COPY backend/app ./app
 COPY backend/alembic.ini ./alembic.ini
 COPY backend/alembic ./alembic
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
-RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+# Strip CRLF defensively — protects against build contexts assembled on
+# Windows hosts (e.g. `railway up`) where core.autocrlf may have rewritten
+# the file to CRLF in the working tree, breaking the shebang at runtime
+# with: /usr/bin/env: 'sh\r': No such file or directory
+RUN sed -i 's/\r$//' /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/docker-entrypoint.sh \
     && chown -R app:app /app
 
 USER app
