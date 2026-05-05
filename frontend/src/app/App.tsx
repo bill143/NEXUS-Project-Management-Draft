@@ -30,6 +30,8 @@ import { useKeyboardShortcuts } from '@/shared/hooks/useKeyboardShortcuts';
 import { useTranslation } from 'react-i18next';
 import { getLanguageByCode } from './i18n';
 import { initErrorLogger } from '@/shared/lib/errorLogger';
+// NEXUS Precon module — JSX route fragment with code-split pages (Phase 7.1).
+import { preconRoutes } from '@/features/precon/routes';
 
 // Lazy-loaded heavy pages — code-split into separate chunks
 const BOQEditorPage = lazy(() =>
@@ -501,6 +503,11 @@ export default function App() {
 
         {/* Plugin module routes — lazy-loaded */}
         {moduleRoutes}
+
+        {/* NEXUS Precon — opportunity pipeline, bid management, dashboard,
+            solicitation detail.  Auth-gated inside each page via
+            isPreconRole(useAuthStore.userRole). */}
+        {preconRoutes}
 
         {/* 404 — catch-all for unknown routes */}
         <Route path="*" element={isAuthenticated ? <P title="Not Found"><NotFoundPage /></P> : <Navigate to="/login" replace />} />

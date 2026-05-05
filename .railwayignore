@@ -1,0 +1,87 @@
+# Railway upload exclusions.
+#
+# Railway uploads the entire working directory unless paths match
+# .railwayignore.  The CLI does NOT reliably honor .gitignore on sub-path
+# patterns in v4.44.0 (a 360 MB upload of the local SQLite dev DB hit
+# Cloudflare's 100 MB ingress cap on first attempt).
+#
+# Strategy: blacklist-only.  We exclude the heavy local-only artefacts
+# explicitly and leave the rest of the repo to upload normally.  Pure
+# blacklist avoids the whitelist gitignore-semantics trap where
+# re-including a parent directory does NOT re-include its CONTENTS.
+
+# ── Local SQLite dev DB (the 727 MB offender from the first attempt) ────
+backend/openestimate.db
+backend/openestimate.db-wal
+backend/openestimate.db-shm
+backend/openestimate.db-journal
+backend/openestimate.db.cleanup-backup-*
+**/*.db
+**/*.db-wal
+**/*.db-shm
+**/*.db-journal
+**/*.sqlite
+**/*.sqlite3
+
+# ── Per-tenant runtime data + uploaded BIM/CAD blobs ────────────────────
+backend/storage/
+backend/data/
+backend/_frontend_dist/
+data/
+
+# ── Frontend (Vercel handles the React build; Railway is backend-only) ──
+frontend/
+
+# ── Heavy non-runtime trees ─────────────────────────────────────────────
+docs/
+website-marketing/
+desktop/
+.git/
+.github/
+.claude/
+.playwright-mcp/
+.vscode/
+.idea/
+
+# ── Python build / cache artefacts ──────────────────────────────────────
+**/__pycache__/
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/.pytest_cache/
+**/.ruff_cache/
+**/.mypy_cache/
+**/*.egg-info/
+**/build/
+**/dist/
+
+# ── Logs & dev scratch ──────────────────────────────────────────────────
+**/*.log
+**/logs/
+backend/audit_output.txt
+backend/qa_*.py
+backend/tmp_*.json
+qa-tests/
+qa-report/
+ux-review/
+
+# ── Secrets (defense in depth — Railway Secrets are the source of truth)
+.env
+.env.*
+**/credentials.json
+**/service-account*.json
+*.pem
+*.key
+
+# ── Archives ────────────────────────────────────────────────────────────
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+*.7z
+
+# ── Misc ────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
