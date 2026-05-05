@@ -1624,6 +1624,12 @@ def _parse_cost_rows_from_csv(content_bytes: bytes) -> list[dict[str, Any]]:
     except csv.Error:
         dialect = csv.excel  # type: ignore[assignment]
 
+    # Sniffer can only infer doublequote=True when the 4096-byte sample
+    # contains an escaped "" pair. Force it on so files where the escape
+    # only appears in later rows (e.g. CWICR descriptions with embedded ")
+    # don't get column-shifted at parse time.
+    dialect.doublequote = True
+
     reader = csv.reader(io.StringIO(text), dialect)
     raw_headers = next(reader, None)
     if not raw_headers:
