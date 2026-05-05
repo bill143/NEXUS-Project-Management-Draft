@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import {
   ArrowLeft,
   Coins,
@@ -27,6 +27,7 @@ import { useToastStore } from '@/stores/useToastStore';
 import { projectsApi, type Project, type ProjectFxRate } from './api';
 import { CURRENCY_GROUPS } from './CreateProjectPage';
 import { getVatRate } from '../boq/boqHelpers';
+import { TranslationSettingsTab } from '../translation';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Helpers
@@ -146,8 +147,8 @@ function FxRateModal({
         <div className="flex items-center justify-between px-6 pt-6 pb-2">
           <h3 className="text-lg font-semibold text-content-primary">
             {isEdit
-              ? t('project.settings.fx.edit_title', { defaultValue: 'Edit currency' })
-              : t('project.settings.fx.add_title', { defaultValue: 'Add currency' })}
+              ? t('project.settings.fx.edit_title', { defaultValue: 'Edit currency‌⁠‍' })
+              : t('project.settings.fx.add_title', { defaultValue: 'Add currency‌⁠‍' })}
           </h3>
           <button
             onClick={onCancel}
@@ -162,7 +163,7 @@ function FxRateModal({
           {/* Currency picker */}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-content-primary">
-              {t('project.settings.fx.currency', { defaultValue: 'Currency' })}
+              {t('project.settings.fx.currency', { defaultValue: 'Currency‌⁠‍' })}
             </label>
             <select
               value={code}
@@ -172,7 +173,7 @@ function FxRateModal({
             >
               <option value="" disabled>
                 {t('project.settings.fx.select_currency', {
-                  defaultValue: '-- Select currency --',
+                  defaultValue: '-- Select currency --‌⁠‍',
                 })}
               </option>
               {CURRENCY_GROUPS.map((g) => (
@@ -181,7 +182,7 @@ function FxRateModal({
                     o.value === '__custom__' ? (
                       <option key={o.value} value={o.value}>
                         {t('project.settings.fx.custom_code', {
-                          defaultValue: 'Custom code...',
+                          defaultValue: 'Custom code...‌⁠‍',
                         })}
                       </option>
                     ) : (
@@ -309,6 +310,28 @@ export function ProjectSettingsPage() {
     setVatInput(project.default_vat_rate ?? '');
     setCustomUnits(project.custom_units ?? []);
   }, [project]);
+
+  // Issue #105 — when navigated here with a hash (e.g. /settings#fx-rates),
+  // scroll the matching Card into view and pulse it briefly so the user
+  // immediately sees where the FX-rate setup lives. Uses requestAnimationFrame
+  // to wait for the page layout to settle (the project query may still be
+  // resolving, in which case the target Card hasn't rendered yet).
+  const location = useLocation();
+  useEffect(() => {
+    if (!location.hash) return;
+    if (!project) return;
+    const id = location.hash.replace(/^#/, '');
+    if (!id) return;
+    requestAnimationFrame(() => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      el.classList.add('ring-2', 'ring-oe-blue', 'ring-offset-2', 'transition-all');
+      window.setTimeout(() => {
+        el.classList.remove('ring-2', 'ring-oe-blue', 'ring-offset-2');
+      }, 2200);
+    });
+  }, [location.hash, project]);
 
   const updateMutation = useMutation({
     mutationFn: (payload: Partial<Project>) => projectsApi.update(projectId!, payload),
@@ -489,8 +512,11 @@ export function ProjectSettingsPage() {
         </div>
       </Card>
 
-      {/* ── Additional currencies (#88) ─────────────────────────────────── */}
-      <Card padding="lg">
+      {/* ── Additional currencies (#88, #105) ────────────────────────────── */}
+      {/* The id="fx-rates" anchor is the deep-link target for the BOQ
+          editor's "set FX" warning badge (Issue #105). Removing it would
+          break that quick-access flow. */}
+      <Card padding="lg" id="fx-rates">
         <CardHeader
           title={t('project.settings.fx.title', { defaultValue: 'Additional currencies' })}
           subtitle={t('project.settings.fx.subtitle', {
@@ -700,6 +726,13 @@ export function ProjectSettingsPage() {
           </form>
         </div>
       </Card>
+
+      {/* ── Translation (#translation deep-link) ─────────────────────────
+          Mounted as a Card section so the existing hash-pulse effect in
+          this page (originally introduced for #fx-rates) auto-scrolls and
+          highlights it on /projects/:id/settings#translation.  Linked
+          from the MatchSuggestionsPanel fallback hint. */}
+      <TranslationSettingsTab projectId={project.id} />
 
       {/* ── FX Modal ────────────────────────────────────────────────────── */}
       <FxRateModal

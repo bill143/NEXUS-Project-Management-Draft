@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import {
   Table, Table2, ArrowRight, Copy, Trash2, Plus,
   Search, ArrowUpDown, ChevronDown, GitCompareArrows, X, Loader2,
@@ -100,7 +100,7 @@ function CompareModal({ boqIdA, boqIdB, currencyA, currencyB, onClose }: Compare
         }
       })
       .catch(() => {
-        if (!cancelled) setError(t('boq.compare_load_error', { defaultValue: 'Failed to load BOQ data for comparison' }));
+        if (!cancelled) setError(t('boq.compare_load_error', { defaultValue: 'Failed to load BOQ data for comparison‌⁠‍' }));
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
@@ -148,8 +148,8 @@ function CompareModal({ boqIdA, boqIdB, currencyA, currencyB, onClose }: Compare
     if (ungroupedTotalA > 0 || ungroupedTotalB > 0) {
       paired.push({
         key: '__ungrouped__',
-        nameA: t('boq.ungrouped', { defaultValue: 'Ungrouped' }),
-        nameB: t('boq.ungrouped', { defaultValue: 'Ungrouped' }),
+        nameA: t('boq.ungrouped', { defaultValue: 'Ungrouped‌⁠‍' }),
+        nameB: t('boq.ungrouped', { defaultValue: 'Ungrouped‌⁠‍' }),
         totalA: ungroupedTotalA,
         totalB: ungroupedTotalB,
         countA: groupA.ungrouped.length,
@@ -181,7 +181,7 @@ function CompareModal({ boqIdA, boqIdB, currencyA, currencyB, onClose }: Compare
             <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-oe-blue-subtle text-oe-blue">
               <GitCompareArrows size={18} />
             </div>
-            <h2 className="text-lg font-bold text-content-primary">{t('boq.compare_title', { defaultValue: 'BOQ Comparison' })}</h2>
+            <h2 className="text-lg font-bold text-content-primary">{t('boq.compare_title', { defaultValue: 'BOQ Comparison‌⁠‍' })}</h2>
           </div>
           <button onClick={onClose} className="flex h-8 w-8 items-center justify-center rounded-lg text-content-tertiary hover:text-content-primary hover:bg-surface-secondary transition-colors">
             <X size={18} />
@@ -209,7 +209,7 @@ function CompareModal({ boqIdA, boqIdB, currencyA, currencyB, onClose }: Compare
                     <span className="text-xl font-bold text-content-primary tabular-nums">{currencyFmt.format(boqA.grand_total)}</span>
                     <span className="text-xs text-content-tertiary">{currency}</span>
                   </div>
-                  <div className="mt-1 text-xs text-content-tertiary">{boqA.positions.length} {t('boq.positions_label', { defaultValue: 'positions' })}</div>
+                  <div className="mt-1 text-xs text-content-tertiary">{boqA.positions.length} {t('boq.positions_label', { defaultValue: 'positions‌⁠‍' })}</div>
                 </div>
 
                 {/* BOQ B summary */}
@@ -300,6 +300,9 @@ export function BOQListPage() {
   const queryClient = useQueryClient();
   const addToast = useToastStore((s) => s.addToast);
   const activeProjectId = useProjectContextStore((s) => s.activeProjectId);
+  // /projects/:projectId/boq deep-link — pre-filter to that project so the
+  // list isn't a tour through every project's BOQs first.
+  const { projectId: projectIdFromUrl } = useParams<{ projectId?: string }>();
 
   // Create BOQ modal
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -325,6 +328,7 @@ export function BOQListPage() {
     } catch { return ''; }
   });
   const [projectFilter, setProjectFilter] = useState(() => {
+    if (projectIdFromUrl) return projectIdFromUrl;
     if (activeProjectId) return activeProjectId;
     try {
       const saved = JSON.parse(localStorage.getItem('oe_boq_filters') ?? '{}');
@@ -401,15 +405,20 @@ export function BOQListPage() {
     staleTime: 5 * 60_000,
   });
 
+  // When the URL pins a single project, only fetch that project's BOQs —
+  // not every project's. On prod with 50+ projects, the parallel fan-out
+  // was costing 1-2s of skeleton state for no reason.
+  const scopedProjects = projectIdFromUrl
+    ? projects?.filter((p) => p.id === projectIdFromUrl)
+    : projects;
+
   const { data: allBoqs, isLoading: boqLoading } = useQuery({
-    queryKey: ['all-boqs', projects?.map((p) => p.id).join(',')],
+    queryKey: ['all-boqs', scopedProjects?.map((p) => p.id).join(',')],
     queryFn: async () => {
-      if (!projects || projects.length === 0) return [];
+      if (!scopedProjects || scopedProjects.length === 0) return [];
 
       // Fetch all BOQs in parallel (one request per project, no N+1 for grand_total)
-      // projectMap available if per-project lookups are needed later
-      // const projectMap = new Map(projects.map((p) => [p.id, p]));
-      const fetches = projects.map(async (p) => {
+      const fetches = scopedProjects.map(async (p) => {
         try {
           const boqs = await apiGet<BOQ[]>(`/v1/boq/boqs/?project_id=${p.id}`);
           return boqs.map((b) => ({
@@ -429,7 +438,7 @@ export function BOQListPage() {
       const results = await Promise.all(fetches);
       return results.flat();
     },
-    enabled: !!projects && projects.length > 0,
+    enabled: !!scopedProjects && scopedProjects.length > 0,
   });
 
   // Seed demo presence when collaboration module is enabled and BOQs load

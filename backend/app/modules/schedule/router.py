@@ -1,4 +1,4 @@
-"""Schedule API routes.
+"""‌⁠‍Schedule API routes.
 
 Endpoints:
     POST   /schedules/                          — Create a new schedule
@@ -79,7 +79,7 @@ async def _verify_schedule_project_owner(
     user_id: str,
     payload: dict | None = None,
 ) -> None:
-    """Verify the current user owns the project. Admins bypass."""
+    """‌⁠‍Verify the current user owns the project. Admins bypass."""
     if payload and payload.get("role") == "admin":
         return
     from app.modules.projects.repository import ProjectRepository
@@ -99,7 +99,7 @@ async def _verify_schedule_owner(
     user_id: str,
     payload: dict | None = None,
 ) -> object:
-    """Load a schedule and verify the user owns its project. Admins bypass."""
+    """‌⁠‍Load a schedule and verify the user owns its project. Admins bypass."""
     if payload and payload.get("role") == "admin":
         return await service.get_schedule(schedule_id)
     schedule = await service.get_schedule(schedule_id)
@@ -394,8 +394,11 @@ async def generate_from_boq(
     except HTTPException:
         raise
     except Exception as exc:
-        logger.error("generate_from_boq failed: %s\n%s", exc, _tb.format_exc())
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        logger.exception("generate_from_boq failed: %s", exc)
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to generate schedule from BOQ. Check server logs for details.",
+        ) from exc
 
 
 @router.post(

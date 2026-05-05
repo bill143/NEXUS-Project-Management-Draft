@@ -2,7 +2,7 @@
 # CWICR Cost Database Engine · BOQ Module
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 # AGPL-3.0 License · DDC-CWICR-OE-2026
-"""BOQ service — business logic for Bill of Quantities management.
+"""‌⁠‍BOQ service — business logic for Bill of Quantities management.
 
 Stateless service layer. Handles:
 - BOQ CRUD with project scoping
@@ -62,7 +62,7 @@ def _stamp_variant_snapshot(
     unit_rate: float | str | Decimal | None,
     currency: str | None,
 ) -> dict[str, Any]:
-    """Add or refresh ``metadata.variant_snapshot`` when the metadata carries
+    """‌⁠‍Add or refresh ``metadata.variant_snapshot`` when the metadata carries
     a ``variant`` (user pick) or ``variant_default`` (auto-average) marker.
 
     Idempotent: when ``variant_snapshot`` already exists and matches the
@@ -137,7 +137,7 @@ def _stamp_resource_variant_snapshots(
     *,
     position_currency: str | None,
 ) -> dict[str, Any]:
-    """Walk ``metadata.resources`` and stamp ``variant_snapshot`` on every
+    """‌⁠‍Walk ``metadata.resources`` and stamp ``variant_snapshot`` on every
     resource entry that carries a per-resource ``variant`` or
     ``variant_default`` marker.
 
@@ -219,7 +219,7 @@ _logger_audit = logging.getLogger(__name__ + ".audit")
 async def _safe_publish(name: str, data: dict[str, Any], source_module: str = "oe_boq") -> None:
     """Publish event safely — ignores MissingGreenlet errors with SQLite async."""
     try:
-        await event_bus.publish(name, data, source_module=source_module)
+        event_bus.publish_detached(name, data, source_module=source_module)
     except Exception:
         logger_events.debug("Event publish skipped (SQLite async): %s", name)
 

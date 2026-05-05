@@ -1,4 +1,4 @@
-"""Meetings ORM models.
+"""‌⁠‍Meetings ORM models.
 
 Tables:
     oe_meetings_meeting — project meetings with agendas, attendees, and action items
@@ -6,16 +6,23 @@ Tables:
 
 import uuid
 
-from sqlalchemy import JSON, ForeignKey, String, Text
+from sqlalchemy import JSON, ForeignKey, Index, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import GUID, Base
 
 
 class Meeting(Base):
-    """A project meeting with agenda, attendees, and action items."""
+    """‌⁠‍A project meeting with agenda, attendees, and action items."""
 
     __tablename__ = "oe_meetings_meeting"
+    __table_args__ = (
+        Index(
+            "ix_oe_meetings_meeting_project_type",
+            "project_id",
+            "meeting_type",
+        ),
+    )
 
     project_id: Mapped[uuid.UUID] = mapped_column(
         GUID(),

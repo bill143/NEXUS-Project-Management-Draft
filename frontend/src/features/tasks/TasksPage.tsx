@@ -216,7 +216,7 @@ function AddTaskModal({
 
   const validate = (): boolean => {
     const e: Record<string, string> = {};
-    if (!form.title.trim()) e.title = t('validation.required', { defaultValue: 'This field is required' });
+    if (!form.title.trim()) e.title = t('validation.required', { defaultValue: 'This field is required‌⁠‍' });
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -236,17 +236,17 @@ function AddTaskModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-      <div className="w-full max-w-2xl bg-surface-elevated rounded-xl shadow-xl border border-border animate-card-in mx-4 max-h-[90vh] overflow-y-auto" role="dialog" aria-label={t('tasks.new_task', { defaultValue: 'New Task' })}>
+      <div className="w-full max-w-2xl bg-surface-elevated rounded-xl shadow-xl border border-border animate-card-in mx-4 max-h-[90vh] overflow-y-auto" role="dialog" aria-label={t('tasks.new_task', { defaultValue: 'New Task‌⁠‍' })}>
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
           <div>
             <h2 className="text-lg font-semibold text-content-primary">
-              {t('tasks.new_task', { defaultValue: 'New Task' })}
+              {t('tasks.new_task', { defaultValue: 'New Task‌⁠‍' })}
             </h2>
             {projectName && (
               <p className="text-xs text-content-tertiary mt-0.5">
                 {t('common.creating_in_project', {
-                  defaultValue: 'In {{project}}',
+                  defaultValue: 'In {{project}}‌⁠‍',
                   project: projectName,
                 })}
               </p>
@@ -322,7 +322,7 @@ function AddTaskModal({
           <div className="flex items-center gap-2 pt-2 pb-1">
             <ClipboardList size={14} className="text-content-tertiary" />
             <span className="text-xs font-semibold uppercase tracking-wider text-content-tertiary">
-              {t('tasks.section_details', { defaultValue: 'Task Details' })}
+              {t('tasks.section_details', { defaultValue: 'Task Details‌⁠‍' })}
             </span>
             <div className="flex-1 h-px bg-border-light" />
           </div>
@@ -1073,15 +1073,47 @@ export function TasksPage() {
     [deleteMut, confirm, t],
   );
 
+  // Status change with optimistic update so the dragged card moves to the
+  // target column INSTANTLY — without waiting for the backend roundtrip and
+  // the subsequent React-Query refetch. Without this the UX reads as
+  // "drag does nothing": the card stays put for ~150-400ms while the PATCH
+  // is in flight, and on a slow network the user gives up before they see
+  // the move land. Rollback restores the original state if the server
+  // rejects the change.
   const statusMut = useMutation({
-    mutationFn: ({ id, status }: { id: string; status: TaskStatus }) => updateTask(id, { status }),
-    onSuccess: () => {
+    mutationFn: ({ id, status }: { id: string; status: string }) =>
+      updateTask(id, { status: status as TaskStatus }),
+    onMutate: async ({ id, status }) => {
+      await qc.cancelQueries({ queryKey: ['tasks'] });
+      const snapshots = qc.getQueriesData<Task[]>({ queryKey: ['tasks'] });
+      for (const [key, list] of snapshots) {
+        if (!list) continue;
+        qc.setQueryData<Task[]>(
+          key,
+          list.map((t) => (t.id === id ? { ...t, status: status as TaskStatus } : t)),
+        );
+      }
+      return { snapshots };
+    },
+    onError: (_err, _vars, ctx) => {
+      // Rollback every cached query we touched.
+      if (ctx?.snapshots) {
+        for (const [key, snapshot] of ctx.snapshots) {
+          qc.setQueryData(key, snapshot);
+        }
+      }
+      addToast({
+        type: 'error',
+        title: t('tasks.status_update_failed', { defaultValue: 'Could not change status' }),
+      });
+    },
+    onSettled: () => {
       qc.invalidateQueries({ queryKey: ['tasks'] });
     },
   });
 
   const handleStatusChange = useCallback(
-    (id: string, status: TaskStatus) => {
+    (id: string, status: TaskStatus | string) => {
       if (status === 'completed') {
         handleComplete(id);
       } else {
@@ -1102,10 +1134,10 @@ export function TasksPage() {
   );
 
   const handleColumnDragOver = useCallback(
-    (e: React.DragEvent, status: TaskStatus) => {
+    (e: React.DragEvent, status: TaskStatus | string) => {
       e.preventDefault();
       e.dataTransfer.dropEffect = 'move';
-      setDropTargetStatus(status);
+      setDropTargetStatus(status as TaskStatus);
     },
     [],
   );
@@ -1115,7 +1147,7 @@ export function TasksPage() {
   }, []);
 
   const handleColumnDrop = useCallback(
-    (e: React.DragEvent, targetStatus: TaskStatus) => {
+    (e: React.DragEvent, targetStatus: TaskStatus | string) => {
       e.preventDefault();
       const taskId = e.dataTransfer.getData('text/plain');
       setDraggedTaskId(null);
@@ -1146,7 +1178,7 @@ export function TasksPage() {
       if (token) headers['Authorization'] = `Bearer ${token}`;
 
       const response = await fetch(
-        `/api/v1/tasks/import/file?project_id=${encodeURIComponent(projectId)}`,
+        `/api/v1/tasks/import/file/?project_id=${encodeURIComponent(projectId)}`,
         { method: 'POST', headers, body: formData },
       );
 

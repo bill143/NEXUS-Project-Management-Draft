@@ -26,9 +26,12 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import clsx from 'clsx';
 
 // OpenFreeMap — free, no API key, OSM-community-funded vector tiles.
-// "Liberty" style = colorful, highway-emphasis; "Positron" = minimal light;
-// "Bright" = high-contrast. Liberty fits a construction/infra use case best.
-const MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/liberty';
+// "Positron" = minimal light style. Switched from "liberty" because the
+// liberty style's POI layers reference attributes that are null on many
+// tiles and trip MapLibre's expression evaluator with a console warning
+// "Expected value to be of type number, but found null instead." per
+// rendered card. Positron's expressions are simpler and stay quiet.
+const MAP_STYLE_URL = 'https://tiles.openfreemap.org/styles/positron';
 
 export interface LatLng {
   lat: number;
@@ -67,12 +70,20 @@ function cacheKey(q: string) {
   return CACHE_PREFIX + q.toLowerCase().trim();
 }
 
+function isFiniteNumber(v: unknown): v is number {
+  return typeof v === 'number' && Number.isFinite(v);
+}
+
 function readCache(q: string): LatLng | null {
   try {
     const raw = localStorage.getItem(cacheKey(q));
     if (!raw) return null;
     const parsed = JSON.parse(raw) as GeocodeCacheEntry;
     if (Date.now() - parsed.at > CACHE_TTL_MS) return null;
+    if (!isFiniteNumber(parsed.lat) || !isFiniteNumber(parsed.lng)) {
+      localStorage.removeItem(cacheKey(q));
+      return null;
+    }
     return { lat: parsed.lat, lng: parsed.lng };
   } catch {
     return null;
@@ -104,7 +115,10 @@ async function geocode(query: string, signal?: AbortSignal): Promise<LatLng | nu
     const rows = (await res.json()) as Array<{ lat: string; lon: string }>;
     const first = rows[0];
     if (!first) return null;
-    const coords: LatLng = { lat: parseFloat(first.lat), lng: parseFloat(first.lon) };
+    const lat = parseFloat(first.lat);
+    const lng = parseFloat(first.lon);
+    if (!isFiniteNumber(lat) || !isFiniteNumber(lng)) return null;
+    const coords: LatLng = { lat, lng };
     writeCache(query, coords);
     return coords;
   } catch {
@@ -140,8 +154,7 @@ export function ProjectMap({
   onResolved,
 }: ProjectMapProps) {
   const { t } = useTranslation();
-  const hasExplicitCoords =
-    typeof lat === 'number' && typeof lng === 'number' && !Number.isNaN(lat) && !Number.isNaN(lng);
+  const hasExplicitCoords = isFiniteNumber(lat) && isFiniteNumber(lng);
 
   const [resolved, setResolved] = useState<LatLng | null>(
     hasExplicitCoords ? { lat: lat as number, lng: lng as number } : null,
@@ -214,7 +227,7 @@ export function ProjectMap({
       <div className="absolute inset-0 flex items-center justify-center gap-2 text-content-tertiary">
         <Loader2 size={14} className="animate-spin" />
         <span className="text-[11px] font-medium">
-          {t('projects.map_locating', { defaultValue: 'Locating…' })}
+          {t('projects.map_locating', { defaultValue: 'Locating…‌⁠‍' })}
         </span>
       </div>,
     );
@@ -225,7 +238,7 @@ export function ProjectMap({
       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-content-quaternary">
         <MapPin size={isCard ? 18 : 24} strokeWidth={1.5} />
         <span className="text-[10px] font-medium">
-          {query || t('projects.map_no_location', { defaultValue: 'No location set' })}
+          {query || t('projects.map_no_location', { defaultValue: 'No location set‌⁠‍' })}
         </span>
       </div>,
     );

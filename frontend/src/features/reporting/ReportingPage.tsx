@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   BarChart3,
@@ -196,17 +196,29 @@ export function ReportingPage() {
 
   const selectedProjectId = activeProjectId ?? '';
 
+  // Generation counter — bumped at the start of every loadProjectStats
+  // call so in-flight responses for an older pid get discarded if the
+  // user switches projects mid-fetch (otherwise stale data overwrites
+  // current data when the slow request finally resolves).
+  const statsGenRef = useRef(0);
+
   const loadProjectStats = useCallback(async (pid: string) => {
+    const gen = ++statsGenRef.current;
+    const guard = <T,>(setter: (v: T | null) => void) => (v: T) => {
+      if (statsGenRef.current === gen) setter(v);
+    };
     const results = await Promise.allSettled([
-      apiGet<FinanceDashboard>(`/v1/finance/dashboard/?project_id=${pid}`).then(setFinanceDash),
-      apiGet<SafetyStats>(`/v1/safety/stats/?project_id=${pid}`).then(setSafetyStats),
-      apiGet<TaskStats>(`/v1/tasks/stats/?project_id=${pid}`).then(setTaskStats),
-      apiGet<RFIStats>(`/v1/rfi/stats/?project_id=${pid}`).then(setRfiStats),
-      apiGet<ScheduleStats>(`/v1/schedule/stats/?project_id=${pid}`).then(setScheduleStats),
-      apiGet<ProcurementStats>(`/v1/procurement/stats/?project_id=${pid}`).then(setProcurementStats),
+      apiGet<FinanceDashboard>(`/v1/finance/dashboard/?project_id=${pid}`).then(guard(setFinanceDash)),
+      apiGet<SafetyStats>(`/v1/safety/stats/?project_id=${pid}`).then(guard(setSafetyStats)),
+      apiGet<TaskStats>(`/v1/tasks/stats/?project_id=${pid}`).then(guard(setTaskStats)),
+      apiGet<RFIStats>(`/v1/rfi/stats/?project_id=${pid}`).then(guard(setRfiStats)),
+      apiGet<ScheduleStats>(`/v1/schedule/stats/?project_id=${pid}`).then(guard(setScheduleStats)),
+      apiGet<ProcurementStats>(`/v1/procurement/stats/?project_id=${pid}`).then(guard(setProcurementStats)),
     ]);
 
-    // Clear data for rejected promises to avoid stale state
+    // Clear data for rejected promises to avoid stale state — but only
+    // if this fetch is still the current generation.
+    if (statsGenRef.current !== gen) return;
     if (results[0].status === 'rejected') setFinanceDash(null);
     if (results[1].status === 'rejected') setSafetyStats(null);
     if (results[2].status === 'rejected') setTaskStats(null);
@@ -290,11 +302,11 @@ export function ReportingPage() {
     <div className="w-full space-y-6 animate-fade-in">
       <Breadcrumb
         items={[
-          { label: t('nav.dashboard', { defaultValue: 'Dashboard' }), to: '/' },
+          { label: t('nav.dashboard', { defaultValue: 'Dashboard‌⁠‍' }), to: '/' },
           ...(activeProjectName
             ? [{ label: activeProjectName, to: `/projects/${activeProjectId}` }]
             : []),
-          { label: t('reporting.title', { defaultValue: 'Reporting Dashboards' }) },
+          { label: t('reporting.title', { defaultValue: 'Reporting Dashboards‌⁠‍' }) },
         ]}
         className="mb-4"
       />
@@ -303,11 +315,11 @@ export function ReportingPage() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-semibold text-content-primary">
-            {t('reporting.title', { defaultValue: 'Reporting Dashboards' })}
+            {t('reporting.title', { defaultValue: 'Reporting Dashboards‌⁠‍' })}
           </h1>
           <p className="mt-1 text-sm text-content-secondary">
             {t('reporting.subtitle', {
-              defaultValue: 'Role-based KPI dashboards with real-time project data',
+              defaultValue: 'Role-based KPI dashboards with real-time project data‌⁠‍',
             })}
           </p>
         </div>
@@ -317,7 +329,7 @@ export function ReportingPage() {
           className="inline-flex items-center gap-2 rounded-lg bg-oe-blue px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-oe-blue-hover disabled:opacity-50"
         >
           {recalculating ? <Loader2 size={16} className="animate-spin" /> : <RefreshCw size={16} />}
-          {t('reporting.recalculate', { defaultValue: 'Recalculate KPIs' })}
+          {t('reporting.recalculate', { defaultValue: 'Recalculate KPIs‌⁠‍' })}
         </button>
       </div>
 

@@ -1,6 +1,6 @@
 # DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
-"""``oe_job_run`` ORM model — RFC 34 §4 W0.1.
+"""‌⁠‍``oe_job_run`` ORM model — RFC 34 §4 W0.1.
 
 The JobRun row records every background task we hand off to Celery.
 It exists for three reasons:
@@ -30,7 +30,7 @@ from app.database import GUID, Base
 
 
 class JobRun(Base):
-    """A single background-job invocation tracked through its lifecycle.
+    """‌⁠‍A single background-job invocation tracked through its lifecycle.
 
     Status state machine:
 

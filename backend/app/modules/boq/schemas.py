@@ -1,4 +1,4 @@
-"""BOQ Pydantic schemas — request/response models.
+"""‌⁠‍BOQ Pydantic schemas — request/response models.
 
 Defines create, update, and response schemas for BOQs, positions, markups,
 structured (sectioned) BOQ responses, templates, and activity log entries.
@@ -15,7 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 def _sanitise_free_text(value: str | None) -> str | None:
-    """Strip XSS-dangerous HTML from free-text BOQ fields (BUG-326/389).
+    """‌⁠‍Strip XSS-dangerous HTML from free-text BOQ fields (BUG-326/389).
 
     BOQ names and descriptions are rendered in multiple places in the
     frontend (BOQ editor, reports, exports), some of which historically
@@ -33,7 +33,7 @@ def _sanitise_free_text(value: str | None) -> str | None:
 
 
 class BOQCreate(BaseModel):
-    """Create a new Bill of Quantities."""
+    """‌⁠‍Create a new Bill of Quantities."""
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -181,11 +181,11 @@ class PositionCreate(BaseModel):
     )
     source: str = Field(
         default="manual",
-        pattern=r"^(manual|cad_import|ai_takeoff|gaeb_import|excel_import|takeoff|smart_import|smart_import_ai|cad_import_ai|cost_database|assembly|cwicr|enriched)$",
+        pattern=r"^(manual|cad_import|ai_takeoff|gaeb_import|excel_import|takeoff|smart_import|smart_import_ai|cad_import_ai|cost_database|assembly|cwicr|enriched|ai_match)$",
         description=(
             "Data source. One of: manual, cad_import, ai_takeoff, gaeb_import, "
             "excel_import, takeoff, smart_import, smart_import_ai, cad_import_ai, "
-            "cost_database, assembly, cwicr, enriched."
+            "cost_database, assembly, cwicr, enriched, ai_match."
         ),
         examples=["manual"],
     )
@@ -265,7 +265,7 @@ class PositionUpdate(BaseModel):
     classification: dict[str, Any] | None = None
     source: str | None = Field(
         default=None,
-        pattern=r"^(manual|cad_import|ai_takeoff|gaeb_import|excel_import|takeoff|smart_import|smart_import_ai|cad_import_ai|cost_database|assembly|cwicr|enriched)$",
+        pattern=r"^(manual|cad_import|ai_takeoff|gaeb_import|excel_import|takeoff|smart_import|smart_import_ai|cad_import_ai|cost_database|assembly|cwicr|enriched|ai_match)$",
     )
     confidence: float | None = Field(default=None, ge=0.0, le=1.0)
     cad_element_ids: list[str] | None = None
@@ -703,7 +703,24 @@ class ResourceSummaryItem(BaseModel):
     current_variant_label: str | None = None
     variant_default: str | None = None
     currency: str | None = None
+    # CWICR resource_code — first non-empty value seen across contributing
+    # rows. Used by the frontend to dedupe variant pickers when two summary
+    # rows share an abstract-resource catalog (CWICR ships some rates with
+    # multiple human-readable component names that resolve to the same
+    # ``resource_code`` and therefore the same variant catalog).
+    resource_code: str | None = None
     position_refs: list[ResourcePositionRef] = Field(default_factory=list)
+
+    # Issue #106 — Pareto / ABC analysis. ``abc_percentage`` is the share
+    # this resource takes of the total summed cost across the response
+    # (``sum(item.total_cost for item in resources)``), expressed as 0–100.
+    # ``abc_class`` is the conventional A/B/C bucket using the standard
+    # 80/15/5 cumulative thresholds — A = top items that together make up
+    # ~80 % of cost, B = next ~15 %, C = bottom ~5 %. Both fields are
+    # populated server-side after rows are sorted by descending cost so
+    # the frontend just renders without re-summing.
+    abc_percentage: float = 0.0
+    abc_class: str | None = None  # "A" | "B" | "C"
 
 
 class ResourceTypeSummary(BaseModel):
@@ -719,6 +736,11 @@ class ResourceSummaryResponse(BaseModel):
     total_resources: int
     by_type: dict[str, ResourceTypeSummary] = Field(default_factory=dict)
     resources: list[ResourceSummaryItem] = Field(default_factory=list)
+    # Issue #106 — sum of every ``resource.total_cost`` in this response.
+    # The frontend uses it to render the ABC dashboard's "Total" column
+    # without recomputing, and to validate that the per-row percentages
+    # sum to 100 (rounding tolerance ≤ 0.01).
+    grand_total: float = 0.0
 
 
 class CO2MaterialBreakdown(BaseModel):

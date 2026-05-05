@@ -46,11 +46,11 @@ export function RegisterPage() {
     setError('');
 
     if (!passwordsMatch) {
-      setError(t('auth.passwords_no_match', { defaultValue: 'Passwords do not match' }));
+      setError(t('auth.passwords_no_match', { defaultValue: 'Passwords do not match‌⁠‍' }));
       return;
     }
     if (!passwordLongEnough) {
-      setError(t('auth.password_min_length', { defaultValue: 'Password must be at least 8 characters' }));
+      setError(t('auth.password_min_length', { defaultValue: 'Password must be at least 8 characters‌⁠‍' }));
       return;
     }
 
@@ -73,6 +73,24 @@ export function RegisterPage() {
       if (!regRes.ok) {
         const data = await regRes.json().catch(() => null);
         setError(data?.detail || t('auth.registration_failed', 'Registration failed'));
+        return;
+      }
+
+      // The registration endpoint returns the user record. In gated modes
+      // (admin-approve / email-verify) the new account comes back with
+      // is_active=false and the immediate login attempt 401s with the
+      // same generic "Invalid email or password" used for bad creds, so
+      // without this branch users get a confusing dead-end. Surface a
+      // clear pending-activation message instead.
+      const regBody = await regRes.json().catch(() => null);
+      if (regBody && regBody.is_active === false) {
+        setError(
+          t(
+            'auth.registration_pending_activation',
+            'Account created. An administrator needs to activate it before you can log in. ' +
+              'For local installs, set OE_REGISTRATION_MODE=open in your .env to skip this step.',
+          ),
+        );
         return;
       }
 

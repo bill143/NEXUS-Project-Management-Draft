@@ -1,4 +1,4 @@
-"""RFI service — business logic for RFI management.
+"""‌⁠‍RFI service — business logic for RFI management.
 
 - Event publishing on create/update/delete
 """
@@ -22,7 +22,7 @@ _logger_ev = logging.getLogger(__name__ + ".events")
 
 async def _safe_publish(name: str, data: dict, source_module: str = "") -> None:
     try:
-        await event_bus.publish(name, data, source_module=source_module)
+        event_bus.publish_detached(name, data, source_module=source_module)
     except Exception:
         _logger_ev.debug("Event publish skipped: %s", name)
 
@@ -40,7 +40,7 @@ _RFI_STATUS_TRANSITIONS: dict[str, set[str]] = {
 
 
 def _add_business_days(start: datetime, days: int) -> str:
-    """Return ISO date string after adding *days* business days to *start*."""
+    """‌⁠‍Return ISO date string after adding *days* business days to *start*."""
     added = 0
     current = start
     while added < days:
@@ -51,7 +51,7 @@ def _add_business_days(start: datetime, days: int) -> str:
 
 
 class RFIService:
-    """Business logic for RFI operations."""
+    """‌⁠‍Business logic for RFI operations."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

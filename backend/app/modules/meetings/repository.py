@@ -1,4 +1,4 @@
-"""Meetings data access layer.
+"""‌⁠‍Meetings data access layer.
 
 All database queries for meetings live here.
 No business logic — pure data access.
@@ -13,13 +13,13 @@ from app.modules.meetings.models import Meeting
 
 
 class MeetingRepository:
-    """Data access for Meeting models."""
+    """‌⁠‍Data access for Meeting models."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, meeting_id: uuid.UUID) -> Meeting | None:
-        """Get meeting by ID."""
+        """‌⁠‍Get meeting by ID."""
         return await self.session.get(Meeting, meeting_id)
 
     async def list_for_project(
@@ -182,3 +182,29 @@ class MeetingRepository:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def action_items_for_project(
+        self, project_id: uuid.UUID
+    ) -> list[tuple[uuid.UUID, str, str, str | None, list]]:
+        """Stream only the JSON action_items per meeting.
+
+        Returns ``(id, meeting_number, title, meeting_date, action_items)``
+        tuples — skips loading the full Meeting row so a project with 5000
+        meetings only ships the JSON column (most rows have <10 entries).
+        Used by stats + open-actions endpoints. Filters out cancelled
+        meetings and meetings whose action_items are empty.
+        """
+        stmt = (
+            select(
+                Meeting.id,
+                Meeting.meeting_number,
+                Meeting.title,
+                Meeting.meeting_date,
+                Meeting.action_items,
+            )
+            .where(Meeting.project_id == project_id)
+            .where(Meeting.status.notin_(("cancelled",)))
+            .order_by(Meeting.meeting_date.desc())
+        )
+        result = await self.session.execute(stmt)
+        return list(result.all())

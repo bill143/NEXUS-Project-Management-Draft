@@ -98,11 +98,11 @@ const STATUS_COLORS: Record<string, 'neutral' | 'blue' | 'success' | 'warning' |
 
 function getReasonLabels(t: (key: string, opts?: Record<string, unknown>) => string): Record<string, string> {
   return {
-    client_request: t('changeorders.reason_client_request', { defaultValue: 'Client Request' }),
-    design_change: t('changeorders.reason_design_change', { defaultValue: 'Design Change' }),
-    unforeseen: t('changeorders.reason_unforeseen', { defaultValue: 'Unforeseen Conditions' }),
-    regulatory: t('changeorders.reason_regulatory', { defaultValue: 'Regulatory' }),
-    error: t('changeorders.reason_error', { defaultValue: 'Error/Omission' }),
+    client_request: t('changeorders.reason_client_request', { defaultValue: 'Client Request‌⁠‍' }),
+    design_change: t('changeorders.reason_design_change', { defaultValue: 'Design Change‌⁠‍' }),
+    unforeseen: t('changeorders.reason_unforeseen', { defaultValue: 'Unforeseen Conditions‌⁠‍' }),
+    regulatory: t('changeorders.reason_regulatory', { defaultValue: 'Regulatory‌⁠‍' }),
+    error: t('changeorders.reason_error', { defaultValue: 'Error/Omission‌⁠‍' }),
   };
 }
 
@@ -923,6 +923,7 @@ export function ChangeOrdersPage() {
   const queryClient = useQueryClient();
   const addToast = useToastStore((s) => s.addToast);
   const activeProjectId = useProjectContextStore((s) => s.activeProjectId);
+  const { confirm: confirmList, ...confirmListProps } = useConfirm();
 
   const [showCreate, setShowCreate] = useState(false);
   const [selectedOrderId, setSelectedOrderId] = useState<string | null>(null);
@@ -1250,9 +1251,16 @@ export function ChangeOrdersPage() {
                         <div className="flex items-center gap-1">
                           {order.status === 'draft' && (
                             <button
-                              onClick={(e) => {
+                              onClick={async (e) => {
                                 e.stopPropagation();
-                                deleteMut.mutate(order.id);
+                                const ok = await confirmList({
+                                  title: t('changeorders.delete_confirm_title', { defaultValue: 'Delete change order?' }),
+                                  message: t('changeorders.delete_confirm', {
+                                    defaultValue: 'Delete change order {{code}}? This cannot be undone.',
+                                    code: order.code,
+                                  }),
+                                });
+                                if (ok) deleteMut.mutate(order.id);
                               }}
                               className="text-content-tertiary hover:text-semantic-error transition-colors p-1"
                               title={t('common.delete', { defaultValue: 'Delete' })}
@@ -1284,6 +1292,7 @@ export function ChangeOrdersPage() {
           onCreated={handleRefresh}
         />
       )}
+      <ConfirmDialog {...confirmListProps} />
     </div>
   );
 }

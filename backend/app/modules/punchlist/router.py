@@ -1,4 +1,4 @@
-"""Punch List API routes.
+"""‌⁠‍Punch List API routes.
 
 Endpoints:
     POST   /items                        — Create punch item
@@ -48,7 +48,7 @@ def _get_service(session: SessionDep) -> PunchListService:
 
 
 def _item_to_response(item: object) -> PunchItemResponse:
-    """Build a PunchItemResponse from a PunchItem ORM object."""
+    """‌⁠‍Build a PunchItemResponse from a PunchItem ORM object."""
     return PunchItemResponse(
         id=item.id,  # type: ignore[attr-defined]
         project_id=item.project_id,  # type: ignore[attr-defined]
@@ -86,7 +86,7 @@ async def get_summary(
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     service: PunchListService = Depends(_get_service),
 ) -> PunchListSummary:
-    """Aggregated punch list stats for a project."""
+    """‌⁠‍Aggregated punch list stats for a project."""
     await verify_project_access(project_id, user_id, session)
     data = await service.get_summary(project_id)
     return PunchListSummary(**data)
@@ -154,11 +154,13 @@ async def list_items(
 @router.get("/items/{item_id}", response_model=PunchItemResponse)
 async def get_item(
     item_id: uuid.UUID,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     service: PunchListService = Depends(_get_service),
 ) -> PunchItemResponse:
     """Get a single punch item."""
     item = await service.get_item(item_id)
+    await verify_project_access(item.project_id, str(user_id), session)
     return _item_to_response(item)
 
 
@@ -169,11 +171,14 @@ async def get_item(
 async def update_item(
     item_id: uuid.UUID,
     data: PunchItemUpdate,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     _perm: None = Depends(RequirePermission("punchlist.update")),
     service: PunchListService = Depends(_get_service),
 ) -> PunchItemResponse:
     """Update a punch item."""
+    existing = await service.get_item(item_id)
+    await verify_project_access(existing.project_id, str(user_id), session)
     item = await service.update_item(item_id, data)
     return _item_to_response(item)
 
@@ -184,11 +189,14 @@ async def update_item(
 @router.delete("/items/{item_id}", status_code=204)
 async def delete_item(
     item_id: uuid.UUID,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     _perm: None = Depends(RequirePermission("punchlist.delete")),
     service: PunchListService = Depends(_get_service),
 ) -> None:
     """Delete a punch item."""
+    existing = await service.get_item(item_id)
+    await verify_project_access(existing.project_id, str(user_id), session)
     await service.delete_item(item_id)
 
 

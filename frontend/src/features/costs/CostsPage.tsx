@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
   Copy,
@@ -33,7 +33,7 @@ import {
 } from 'lucide-react';
 import { Button, Card, Badge, EmptyState, InfoHint, SkeletonTable, CountryFlag, Breadcrumb, ConfirmDialog } from '@/shared/ui';
 import { useConfirm } from '@/shared/hooks/useConfirm';
-import { apiGet, apiPost, apiDelete, triggerDownload } from '@/shared/lib/api';
+import { apiGet, apiPost, apiDelete, triggerDownload, extractErrorMessageFromBody } from '@/shared/lib/api';
 import { getIntlLocale } from '@/shared/lib/formatters';
 import { useToastStore } from '@/stores/useToastStore';
 import { useProjectContextStore } from '@/stores/useProjectContextStore';
@@ -114,10 +114,10 @@ async function downloadExcelExport(): Promise<void> {
 
   const response = await fetch('/api/v1/costs/actions/export-excel/', { method: 'GET', headers });
   if (!response.ok) {
-    let detail = 'Export failed';
+    let detail = `Export failed (HTTP ${response.status})`;
     try {
       const body = await response.json();
-      detail = body.detail || detail;
+      detail = extractErrorMessageFromBody(body) ?? detail;
     } catch {
       // ignore parse error
     }
@@ -190,12 +190,21 @@ function RegionTabBar({
   activeRegion,
   onChangeRegion,
   totalItemCount,
+  /** ``true`` while ``/v1/costs/regions/`` is still in-flight on first
+   *  paint. The endpoint does a SELECT DISTINCT scan over the active
+   *  catalog and can take 18 s on cold SQLite when 100 k+ rows are
+   *  loaded, so we MUST distinguish "still loading" from "definitely
+   *  empty" — the previous code conflated the two and showed
+   *  "No database loaded" for the entire 18 s wait, which the user
+   *  reported as "the page never loads". */
+  isLoadingRegions,
 }: {
   regions: string[];
   regionStats: RegionStat[];
   activeRegion: string;
   onChangeRegion: (region: string) => void;
   totalItemCount: number;
+  isLoadingRegions: boolean;
 }) {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -233,16 +242,42 @@ function RegionTabBar({
     el.scrollBy({ left: dir === 'left' ? -200 : 200, behavior: 'smooth' });
   }, []);
 
+  // While the regions request is still in-flight, render a tab-bar
+  // skeleton instead of the "No database loaded" empty state. Cold
+  // SQLite responds in ~18 s on 100 k+ catalogs; without this guard
+  // the user sees the empty state for the entire wait and assumes the
+  // app is broken.
+  if (isLoadingRegions && regions.length === 0) {
+    return (
+      <div
+        className="mb-5 flex items-center gap-2"
+        data-testid="costs-region-tabs-skeleton"
+        aria-busy="true"
+      >
+        {[0, 1, 2, 3, 4].map((i) => (
+          <div
+            key={i}
+            className="h-9 w-24 rounded-t-lg bg-surface-secondary/60 animate-pulse"
+          />
+        ))}
+        <span className="ms-3 text-xs text-content-tertiary inline-flex items-center gap-2">
+          <Loader2 size={12} className="animate-spin" />
+          {t('costs.loading_databases', { defaultValue: 'Loading databases…‌⁠‍' })}
+        </span>
+      </div>
+    );
+  }
+
   if (regions.length === 0 && totalItemCount === 0) {
     return (
       <div className="mb-6 rounded-xl border-2 border-dashed border-border-light bg-surface-secondary/50 p-6 text-center">
         <Database size={28} className="mx-auto mb-2 text-content-tertiary" strokeWidth={1.5} />
         <p className="text-sm font-medium text-content-primary mb-1">
-          {t('costs.no_database_loaded', { defaultValue: 'No database loaded' })}
+          {t('costs.no_database_loaded', { defaultValue: 'No database loaded‌⁠‍' })}
         </p>
         <p className="text-xs text-content-tertiary mb-3">
           {t('costs.import_first_hint', {
-            defaultValue: 'Import a regional cost database to start searching 55,000+ items.',
+            defaultValue: 'Import a regional cost database to start searching 55,000+ items.‌⁠‍',
           })}
         </p>
         <Button
@@ -251,7 +286,7 @@ function RegionTabBar({
           icon={<Upload size={14} />}
           onClick={() => navigate('/costs/import')}
         >
-          {t('costs.import_database', { defaultValue: 'Import Database' })}
+          {t('costs.import_database', { defaultValue: 'Import Database‌⁠‍' })}
         </Button>
       </div>
     );
@@ -349,7 +384,7 @@ function RegionTabBar({
         <button
           onClick={() => navigate('/costs/import')}
           className="flex items-center gap-1.5 shrink-0 rounded-t-lg px-3 py-2.5 border-b-2 border-transparent text-content-tertiary hover:text-oe-blue hover:bg-oe-blue-subtle/10 transition-all duration-fast ease-oe"
-          title={t('costs.import_database', { defaultValue: 'Import database' })}
+          title={t('costs.import_database', { defaultValue: 'Import database‌⁠‍' })}
         >
           <Plus size={14} />
           <span className="text-sm font-medium whitespace-nowrap">
@@ -407,12 +442,19 @@ export function CostsPage() {
   const activeRegion = useCostDatabaseStore((s) => s.activeRegion);
   const setActiveRegion = useCostDatabaseStore((s) => s.setActiveRegion);
 
+  // ?region=DE_BERLIN deep-link from /setup/databases — pre-selects the
+  // region filter on mount so the user lands directly on the items they
+  // just imported. We only read the param ONCE on mount to avoid fighting
+  // user-driven changes after that.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const regionFromUrl = searchParams.get('region') ?? '';
+
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [unit, setUnit] = useState('');
   const [source, setSource] = useState('');
   const [category, setCategory] = useState('');
-  const [region, setRegion] = useState<string>(activeRegion);
+  const [region, setRegion] = useState<string>(regionFromUrl || activeRegion);
   const [offset, setOffset] = useState(0);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -434,16 +476,45 @@ export function CostsPage() {
   const [recentItems, setRecentItems] = useState<RecentItem[]>(() => loadRecent());
   const [specialTab, setSpecialTab] = useState<'' | 'favourites' | 'recent'>('');
 
+  // One-shot: if mounted with ``?region=X``, push it to the global store
+  // so the tab strip highlights it, then strip the param so a reload
+  // doesn't keep forcing the filter back over user changes.
+  useEffect(() => {
+    if (!regionFromUrl) return;
+    setActiveRegion(regionFromUrl);
+    setRegion(regionFromUrl);
+    searchParams.delete('region');
+    setSearchParams(searchParams, { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // Fetch loaded regions list. ``staleTime`` keeps the cache hot for 5
   // minutes so a quick navigation away-and-back doesn't re-fire any of
   // these aggregates — they only change when a user installs / removes a
   // database, which already invalidates them explicitly.
-  const { data: loadedRegions } = useQuery({
+  const { data: loadedRegions, isLoading: isLoadingRegions } = useQuery({
     queryKey: ['costs', 'regions'],
     queryFn: () => apiGet<string[]>('/v1/costs/regions/'),
     retry: false,
     staleTime: 5 * 60_000,
   });
+
+  // Auto-pick a region when the page mounts with no region selected and
+  // there are loaded regions available. Without this fallback the user
+  // sees an "No database loaded" empty state even when /setup/databases
+  // already populated rows — the page just hadn't been told which one to
+  // show. We only auto-pick once, and only if the user has not already
+  // chosen something via the global store or the URL.
+  useEffect(() => {
+    if (region) return;
+    if (regionFromUrl) return;
+    if (activeRegion) return;
+    const first = loadedRegions?.[0];
+    if (!first) return;
+    setRegion(first);
+    setActiveRegion(first);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadedRegions]);
 
   // Fetch per-region stats (for item counts in tabs)
   const { data: regionStats } = useQuery({
@@ -749,6 +820,7 @@ export function CostsPage() {
         activeRegion={region}
         onChangeRegion={handleRegionChange}
         totalItemCount={total}
+        isLoadingRegions={isLoadingRegions}
       />
 
       {/* Favourites & Recent Quick Filters */}

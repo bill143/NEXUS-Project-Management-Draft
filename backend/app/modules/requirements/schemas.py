@@ -1,4 +1,4 @@
-"""Requirements & Quality Gates Pydantic schemas — request/response models.
+"""‌⁠‍Requirements & Quality Gates Pydantic schemas — request/response models.
 
 Defines create, update, and response schemas for requirement sets,
 individual requirements (EAC triplets), and quality gate results.
@@ -14,7 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class RequirementCreate(BaseModel):
-    """Create a new EAC requirement."""
+    """‌⁠‍Create a new EAC requirement."""
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -22,9 +22,9 @@ class RequirementCreate(BaseModel):
     attribute: str = Field(..., min_length=1, max_length=255)
     constraint_type: str = Field(
         default="equals",
-        pattern=r"^(equals|min|max|range|contains|regex)$",
+        pattern=r"^(equals|not_equals|min|max|range|contains|not_contains|regex|exists|not_exists)$",
     )
-    constraint_value: str = Field(..., min_length=1, max_length=500)
+    constraint_value: str = Field(default="", max_length=500)
     unit: str = Field(default="", max_length=50)
     category: str = Field(default="general", max_length=100)
     priority: str = Field(
@@ -38,7 +38,7 @@ class RequirementCreate(BaseModel):
 
 
 class RequirementUpdate(BaseModel):
-    """Partial update for a requirement."""
+    """‌⁠‍Partial update for a requirement."""
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
@@ -46,9 +46,9 @@ class RequirementUpdate(BaseModel):
     attribute: str | None = Field(default=None, min_length=1, max_length=255)
     constraint_type: str | None = Field(
         default=None,
-        pattern=r"^(equals|min|max|range|contains|regex)$",
+        pattern=r"^(equals|not_equals|min|max|range|contains|not_contains|regex|exists|not_exists)$",
     )
-    constraint_value: str | None = Field(default=None, min_length=1, max_length=500)
+    constraint_value: str | None = Field(default=None, max_length=500)
     unit: str | None = Field(default=None, max_length=50)
     category: str | None = Field(default=None, max_length=100)
     priority: str | None = Field(

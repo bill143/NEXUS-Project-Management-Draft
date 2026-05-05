@@ -1,4 +1,4 @@
-"""SnapshotService — the orchestration seam for T01.
+"""‌⁠‍SnapshotService — the orchestration seam for T01.
 
 Composes the repository, the cad2data bridge, the snapshot-storage
 helper, the DuckDB pool, and the event bus. Other dashboards tasks
@@ -48,7 +48,7 @@ logger = logging.getLogger(__name__)
 
 
 class SnapshotError(Exception):
-    """Base class for snapshot service errors.
+    """‌⁠‍Base class for snapshot service errors.
 
     Each subclass carries a ``message_key`` that the router uses to
     localise the 4xx/5xx response body (see
@@ -115,7 +115,7 @@ class CreateSnapshotArgs:
 
 
 class SnapshotService:
-    """Orchestrate create/list/get/delete for snapshots.
+    """‌⁠‍Orchestrate create/list/get/delete for snapshots.
 
     A fresh instance is constructed per request — it does not hold
     state between calls. ``session`` and ``pool`` are injected so tests
@@ -209,7 +209,7 @@ class SnapshotService:
         # 6 — publish. Wrap in a try so a buggy handler never blocks the
         # HTTP response.
         try:
-            await event_bus.publish(
+            event_bus.publish_detached(
                 event_taxonomy.SNAPSHOT_CREATED,
                 {
                     "snapshot_id": str(snapshot_id),
@@ -295,7 +295,7 @@ class SnapshotService:
             )
 
         try:
-            await event_bus.publish(
+            event_bus.publish_detached(
                 event_taxonomy.SNAPSHOT_DELETED,
                 {
                     "snapshot_id": str(snapshot_id),

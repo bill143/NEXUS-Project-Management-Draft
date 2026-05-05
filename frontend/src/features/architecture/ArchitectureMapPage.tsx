@@ -10,6 +10,7 @@ import {
   ReactFlow as RFComponent,
   Background,
   Controls,
+  Handle,
   MiniMap,
   useNodesState,
   useEdgesState,
@@ -182,6 +183,8 @@ function ModuleNodeComponent({ data }: { data: ModuleNodeData }) {
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
       }}
     >
+      <Handle type="target" position={Position.Left} style={{ visibility: 'hidden' }} />
+      <Handle type="source" position={Position.Right} style={{ visibility: 'hidden' }} />
       <div className="flex items-center gap-2 mb-2">
         <div
           className="w-3 h-3 rounded-full shrink-0"
@@ -227,6 +230,8 @@ function ModelNodeComponent({ data }: { data: ModelNodeData }) {
         color: NODE_TEXT,
       }}
     >
+      <Handle type="target" position={Position.Left} style={{ visibility: 'hidden' }} />
+      <Handle type="source" position={Position.Right} style={{ visibility: 'hidden' }} />
       <div
         className="px-3 py-1.5 text-xs font-bold"
         style={{ background: `${color}20`, borderBottom: `1px solid ${color}30` }}
@@ -289,6 +294,8 @@ function RouteNodeComponent({ data }: { data: RouteNodeData }) {
         color: NODE_TEXT,
       }}
     >
+      <Handle type="target" position={Position.Left} style={{ visibility: 'hidden' }} />
+      <Handle type="source" position={Position.Right} style={{ visibility: 'hidden' }} />
       <div className="flex items-center gap-2">
         <span
           className="px-1.5 py-0.5 rounded text-[9px] font-bold shrink-0"
@@ -741,7 +748,7 @@ function DetailPanel({ manifest, selectedNodeId, onClose }: DetailPanelProps) {
           {mod.manifest?.depends && mod.manifest.depends.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold mb-1" style={{ color: NODE_TEXT }}>
-                {t('architecture.dependencies', { defaultValue: 'Dependencies' })}
+                {t('architecture.dependencies', { defaultValue: 'Dependencies‌⁠‍' })}
               </h4>
               <div className="flex flex-wrap gap-1">
                 {mod.manifest.depends.map((dep) => (
@@ -760,7 +767,7 @@ function DetailPanel({ manifest, selectedNodeId, onClose }: DetailPanelProps) {
           {mod.models.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold mb-1" style={{ color: NODE_TEXT }}>
-                {t('architecture.models', { defaultValue: 'Models' })} ({mod.models.length})
+                {t('architecture.models', { defaultValue: 'Models‌⁠‍' })} ({mod.models.length})
               </h4>
               <div className="space-y-1">
                 {mod.models.map((model) => (
@@ -782,7 +789,7 @@ function DetailPanel({ manifest, selectedNodeId, onClose }: DetailPanelProps) {
           {mod.routes.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold mb-1" style={{ color: NODE_TEXT }}>
-                {t('architecture.routes', { defaultValue: 'Routes' })} ({mod.routes.length})
+                {t('architecture.routes', { defaultValue: 'Routes‌⁠‍' })} ({mod.routes.length})
               </h4>
               <div className="space-y-1 max-h-[300px] overflow-y-auto">
                 {mod.routes.map((route, idx) => (
@@ -840,7 +847,7 @@ function DetailPanel({ manifest, selectedNodeId, onClose }: DetailPanelProps) {
 
           <div>
             <h4 className="text-xs font-semibold mb-1" style={{ color: NODE_TEXT }}>
-              {t('architecture.columns', { defaultValue: 'Columns' })} ({model.columns.length})
+              {t('architecture.columns', { defaultValue: 'Columns‌⁠‍' })} ({model.columns.length})
             </h4>
             <div className="space-y-0.5 max-h-[400px] overflow-y-auto">
               {model.columns.map((col) => {
@@ -881,7 +888,7 @@ function DetailPanel({ manifest, selectedNodeId, onClose }: DetailPanelProps) {
           {model.relationships.length > 0 && (
             <div>
               <h4 className="text-xs font-semibold mb-1" style={{ color: NODE_TEXT }}>
-                {t('architecture.relationships', { defaultValue: 'Relationships' })}
+                {t('architecture.relationships', { defaultValue: 'Relationships‌⁠‍' })}
               </h4>
               {model.relationships.map((rel) => (
                 <div

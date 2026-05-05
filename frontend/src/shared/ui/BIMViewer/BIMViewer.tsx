@@ -9,6 +9,7 @@
 
 import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { MatchSuggestionsPanel } from '@/features/match';
 import clsx from 'clsx';
 import {
   Home,
@@ -42,6 +43,7 @@ import {
   Tag,
   Settings,
   Camera,
+  Sparkles,
 } from 'lucide-react';
 import { fetchBIMElementProperties } from '@/features/bim/api';
 import { SceneManager } from './SceneManager';
@@ -459,7 +461,7 @@ export function BIMViewer({
   /** Keyboard shortcut overlay toggle (press ? to show). */
   const [showShortcuts, setShowShortcuts] = useState(false);
   /** Properties panel active tab. */
-  const [propsTab, setPropsTab] = useState<'key' | 'all' | 'links' | 'validation'>('key');
+  const [propsTab, setPropsTab] = useState<'key' | 'all' | 'links' | 'validation' | 'match'>('key');
   /** Parquet/DuckDB "all properties" expansion state. */
   const [parquetProps, setParquetProps] = useState<Record<string, unknown> | null>(null);
   const [parquetLoading, setParquetLoading] = useState(false);
@@ -471,6 +473,9 @@ export function BIMViewer({
    *  blob downloads — a 100MB model can take 30+ seconds and the
    *  previous spinner gave the user no signal anything was happening. */
   const [geometryProgress, setGeometryProgress] = useState<number | null>(null);
+  // Track the "hide-overlay" timeout so the cleanup effect can clear it
+  // when the component unmounts mid-load (avoids setState-on-unmounted warns).
+  const geometryProgressTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   /** "Placeholder geometry" banner dismissal. Session-scoped (resets on
    *  next page load). The banner appears when ANY loaded element carries
@@ -692,9 +697,9 @@ export function BIMViewer({
       onMiss: () => {
         useToastStore.getState().addToast({
           type: 'info',
-          title: t('bim.measure_miss_title', { defaultValue: 'Click missed the model' }),
+          title: t('bim.measure_miss_title', { defaultValue: 'Click missed the model‌⁠‍' }),
           message: t('bim.measure_miss_msg', {
-            defaultValue: 'Click directly on an element to place a measurement point.',
+            defaultValue: 'Click directly on an element to place a measurement point.‌⁠‍',
           }),
         });
       },
@@ -827,7 +832,13 @@ export function BIMViewer({
           // (after parsing finishes); hide the overlay one frame
           // later so the bar fully fills before disappearing.
           setGeometryProgress(1);
-          setTimeout(() => setGeometryProgress(null), 200);
+          if (geometryProgressTimeoutRef.current !== null) {
+            clearTimeout(geometryProgressTimeoutRef.current);
+          }
+          geometryProgressTimeoutRef.current = setTimeout(() => {
+            setGeometryProgress(null);
+            geometryProgressTimeoutRef.current = null;
+          }, 200);
           onGeometryLoadedRef.current?.(mgr.getMeshMatchRatio());
           // Re-fit the camera AFTER the DAE scene has been parented and
           // the next render cycle had a chance to commit world matrices.
@@ -853,6 +864,14 @@ export function BIMViewer({
           setGeometryProgress(null);
         });
     }
+    return () => {
+      // Clear the "hide overlay" timer if we unmount or re-trigger before
+      // the 200ms delay elapses — prevents setState-on-unmounted warnings.
+      if (geometryProgressTimeoutRef.current !== null) {
+        clearTimeout(geometryProgressTimeoutRef.current);
+        geometryProgressTimeoutRef.current = null;
+      }
+    };
   // Re-run when geometryUrl changes OR when elements first arrive (guard above).
   // Using elements.length as dep avoids re-triggering on data-only updates.
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1351,10 +1370,10 @@ export function BIMViewer({
       addToast?.({
         type: 'error',
         title: t('bim.screenshot_failed_title', {
-          defaultValue: 'Screenshot failed',
+          defaultValue: 'Screenshot failed‌⁠‍',
         }),
         message: t('bim.screenshot_failed', {
-          defaultValue: 'WebGL context unavailable — try reloading the viewer.',
+          defaultValue: 'WebGL context unavailable — try reloading the viewer.‌⁠‍',
         }),
       });
       return;
@@ -1404,7 +1423,7 @@ export function BIMViewer({
     addToast?.({
       type: 'success',
       title: t('bim.screenshot_saved_title', {
-        defaultValue: 'Screenshot saved',
+        defaultValue: 'Screenshot saved‌⁠‍',
       }),
       message: filename,
     });
@@ -2226,12 +2245,19 @@ export function BIMViewer({
       {/* Health stats banner — top-right, multi-pill clickable counts.
           The pills are smart filters: clicking "Errors" narrows the
           3D viewport to elements with validation_status='error', etc.
-          The parent applies the predicate via onSmartFilter. */}
+          The parent applies the predicate via onSmartFilter.
+
+          The container is ``pointer-events-none`` so clicks land on
+          whatever sits beneath the banner (right-panel tabs, model
+          selector, etc.). Each individual pill flips back to
+          ``pointer-events-auto`` so its own click / hover tooltip
+          still works. Verified against the v2.7.5 Match-tab regression
+          where banner pills were intercepting clicks on the 5th tab. */}
       {elementCount > 0 && (
-        <div className="absolute top-3 end-3 z-20 flex items-center gap-1.5 flex-wrap justify-end max-w-[calc(100%-280px)]">
+        <div className="absolute top-3 end-3 z-20 flex items-center gap-1.5 flex-wrap justify-end max-w-[calc(100%-400px)] pointer-events-none">
           {/* Total elements pill — not clickable, just informational */}
           <span
-            className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-surface-primary text-content-secondary border border-border-light shadow-sm"
+            className="pointer-events-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-surface-primary text-content-secondary border border-border-light shadow-sm"
             title={t('bim.element_count_title', {
               defaultValue: '{{count}} elements loaded in this model',
               count: elementCount,
@@ -2246,7 +2272,7 @@ export function BIMViewer({
             <button
               type="button"
               onClick={() => onSmartFilter?.('unlinked_boq')}
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm hover:bg-emerald-100"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-sm hover:bg-emerald-100"
               title={t('bim.linked_count_title', {
                 defaultValue:
                   '{{linked}} of {{total}} linked to BOQ — click to show ONLY the unlinked',
@@ -2264,7 +2290,7 @@ export function BIMViewer({
             <button
               type="button"
               onClick={() => onSmartFilter?.('errors')}
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200 shadow-sm hover:bg-rose-100"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-rose-50 text-rose-700 border border-rose-200 shadow-sm hover:bg-rose-100"
               title={t('bim.errors_count_title', {
                 defaultValue: '{{count}} elements with validation errors — click to filter',
                 count: healthStats.errors,
@@ -2280,7 +2306,7 @@ export function BIMViewer({
             <button
               type="button"
               onClick={() => onSmartFilter?.('warnings')}
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 shadow-sm hover:bg-amber-100"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-700 border border-amber-200 shadow-sm hover:bg-amber-100"
               title={t('bim.warnings_count_title', {
                 defaultValue: '{{count}} elements with validation warnings — click to filter',
                 count: healthStats.warnings,
@@ -2296,7 +2322,7 @@ export function BIMViewer({
             <button
               type="button"
               onClick={() => onSmartFilter?.('has_tasks')}
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200 shadow-sm hover:bg-amber-100"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200 shadow-sm hover:bg-amber-100"
               title={t('bim.tasks_count_title', {
                 defaultValue: '{{count}} elements have linked tasks — click to filter',
                 count: healthStats.hasTasks,
@@ -2312,7 +2338,7 @@ export function BIMViewer({
             <button
               type="button"
               onClick={() => onSmartFilter?.('has_docs')}
-              className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-50 text-violet-700 border border-violet-200 shadow-sm hover:bg-violet-100"
+              className="pointer-events-auto inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-50 text-violet-700 border border-violet-200 shadow-sm hover:bg-violet-100"
               title={t('bim.docs_count_title', {
                 defaultValue: '{{count}} elements have linked documents — click to filter',
                 count: healthStats.hasDocs,
@@ -2893,6 +2919,7 @@ export function BIMViewer({
               ['key', t('bim.tab_properties', { defaultValue: 'Properties' })] as const,
               ['links', t('bim.tab_links', { defaultValue: 'Links' })] as const,
               ['validation', t('bim.tab_check', { defaultValue: 'Check' })] as const,
+              ['match', t('bim.tab_match', { defaultValue: 'Match' })] as const,
             ]).map(([id, label]) => (
               <button
                 key={id}
@@ -2903,12 +2930,13 @@ export function BIMViewer({
                     handleFetchAllProperties();
                   }
                 }}
-                className={`flex-1 py-2 text-xs font-semibold transition-colors border-b-2 ${
+                className={`flex-1 py-2 text-xs font-semibold transition-colors border-b-2 inline-flex items-center justify-center gap-1 ${
                   propsTab === id
                     ? 'border-oe-blue text-oe-blue'
                     : 'border-transparent text-content-tertiary hover:text-content-secondary'
                 }`}
               >
+                {id === 'match' && <Sparkles size={11} />}
                 {label}
                 {id === 'links' && (selectedElement.boq_links?.length ?? 0) > 0 && (
                   <span className="ml-1 text-[10px] text-oe-blue">
@@ -3097,6 +3125,34 @@ export function BIMViewer({
                   </div>
                 )}
               </>
+            )}
+
+            {/* ── Tab: Match (CWICR vector matcher) ──────────────────
+                Suggests CWICR cost-positions for the selected element.
+                ``key={selectedElement.id}`` forces the panel to remount
+                on element switch so the autoFetch effect refires and
+                the per-element rejection accumulator doesn't leak. */}
+            {propsTab === 'match' && (
+              <div className="-mx-3 -mb-3 h-[420px]">
+                <MatchSuggestionsPanel
+                  key={selectedElement.id}
+                  source="bim"
+                  projectId={projectId}
+                  rawElementData={{
+                    id: selectedElement.id,
+                    element_type: selectedElement.element_type,
+                    name: selectedElement.name,
+                    properties:
+                      (selectedElement as { properties?: Record<string, unknown> })
+                        .properties ?? {},
+                    quantities:
+                      (selectedElement as { quantities?: Record<string, number> })
+                        .quantities ?? {},
+                  }}
+                  autoFetch
+                  compact
+                />
+              </div>
             )}
 
             {/* ── Tab: Links ──────────────────────────────────────── */}
