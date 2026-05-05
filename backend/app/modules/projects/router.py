@@ -1,4 +1,4 @@
-"""Projects API routes.
+"""‌⁠‍Projects API routes.
 
 Endpoints:
     POST /                   — Create project (auth required)
@@ -15,6 +15,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 
 from app.dependencies import CurrentUserId, CurrentUserPayload, SessionDep, SettingsDep
 from app.modules.projects.schemas import (
+    MatchProjectSettingsRead,
+    MatchProjectSettingsUpdate,
     MilestoneCreate,
     MilestoneResponse,
     MilestoneUpdate,
@@ -25,7 +27,12 @@ from app.modules.projects.schemas import (
     WBSResponse,
     WBSUpdate,
 )
-from app.modules.projects.service import ProjectService
+from app.modules.projects.service import (
+    ProjectService,
+    get_or_create_match_settings,
+    reset_match_settings,
+    update_match_settings,
+)
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -41,7 +48,7 @@ async def _verify_project_owner(
     user_id: str,
     payload: dict | None = None,
 ) -> object:
-    """Load a project and verify the current user is the owner.
+    """‌⁠‍Load a project and verify the current user is the owner.
 
     Admins (role=admin in JWT payload) bypass the ownership check.
     Returns the project object on success, raises 403 if not owner.
@@ -74,7 +81,7 @@ async def create_project(
     user_id: CurrentUserId,
     service: ProjectService = Depends(_get_service),
 ) -> ProjectResponse:
-    """Create a new project."""
+    """‌⁠‍Create a new project."""
     try:
         project = await service.create_project(data, uuid.UUID(user_id))
         return ProjectResponse.model_validate(project)
@@ -200,7 +207,10 @@ async def delete_project(
         raise
     except Exception as exc:
         _log.getLogger(__name__).exception("Failed to archive project %s", project_id)
-        raise HTTPException(status_code=500, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to archive project. Check server logs for details.",
+        ) from exc
 
 
 # ── Restore (un-archive) ────────────────────────────────────────────────
@@ -1628,3 +1638,74 @@ async def delete_milestone(
         ProjectMilestone.project_id == project_id,
     )
     await session.execute(stmt)
+
+
+# ── Match-settings (v2.8.0) ─────────────────────────────────────────────
+
+
+@router.get(
+    "/{project_id}/match-settings",
+    response_model=MatchProjectSettingsRead,
+    summary="Get per-project match settings",
+    description=(
+        "Return the element-to-CWICR match settings for the project. "
+        "On first read for a project (e.g. one created before v2.8.0), a "
+        "default row is created and returned."
+    ),
+)
+async def get_match_settings(
+    project_id: uuid.UUID,
+    user_id: CurrentUserId,
+    payload: CurrentUserPayload,
+    session: SessionDep,
+    service: ProjectService = Depends(_get_service),
+) -> MatchProjectSettingsRead:
+    """Read (or lazily initialise) the project's match settings."""
+    await _verify_project_owner(service, project_id, user_id, payload)
+    row = await get_or_create_match_settings(session, project_id)
+    return MatchProjectSettingsRead.model_validate(row)
+
+
+@router.patch(
+    "/{project_id}/match-settings",
+    response_model=MatchProjectSettingsRead,
+    summary="Update per-project match settings",
+    description=(
+        "Partially update match settings. Validates classifier, mode, and "
+        "sources against allow-lists; clamps auto_link_threshold to [0,1]. "
+        "Audit-logs the change with before/after snapshots."
+    ),
+)
+async def patch_match_settings(
+    project_id: uuid.UUID,
+    data: MatchProjectSettingsUpdate,
+    user_id: CurrentUserId,
+    payload: CurrentUserPayload,
+    session: SessionDep,
+    service: ProjectService = Depends(_get_service),
+) -> MatchProjectSettingsRead:
+    """PATCH the project's match settings (audit-logged)."""
+    await _verify_project_owner(service, project_id, user_id, payload)
+    row = await update_match_settings(
+        session, project_id, data, user_id=user_id,
+    )
+    return MatchProjectSettingsRead.model_validate(row)
+
+
+@router.post(
+    "/{project_id}/match-settings/reset",
+    response_model=MatchProjectSettingsRead,
+    summary="Reset per-project match settings",
+    description="Reset all match settings to factory defaults. Audit-logged.",
+)
+async def post_reset_match_settings(
+    project_id: uuid.UUID,
+    user_id: CurrentUserId,
+    payload: CurrentUserPayload,
+    session: SessionDep,
+    service: ProjectService = Depends(_get_service),
+) -> MatchProjectSettingsRead:
+    """Reset match settings to defaults (audit-logged)."""
+    await _verify_project_owner(service, project_id, user_id, payload)
+    row = await reset_match_settings(session, project_id, user_id=user_id)
+    return MatchProjectSettingsRead.model_validate(row)

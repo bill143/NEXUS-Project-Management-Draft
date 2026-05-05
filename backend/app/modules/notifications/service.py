@@ -1,4 +1,4 @@
-"""Notification service — business logic for in-app notifications.
+"""‌⁠‍Notification service — business logic for in-app notifications.
 
 Stateless service layer.  Wraps the repository and provides convenience
 helpers like ``notify_users`` for bulk delivery.
@@ -25,15 +25,15 @@ _logger_ev = logging.getLogger(__name__ + ".events")
 
 
 async def _safe_publish(name: str, data: dict, source_module: str = "oe_notifications") -> None:
-    """Best-effort event publish — never blocks the caller on failure."""
+    """‌⁠‍Best-effort event publish — never blocks the caller on failure."""
     try:
-        await event_bus.publish(name, data, source_module=source_module)
+        event_bus.publish_detached(name, data, source_module=source_module)
     except Exception:
         _logger_ev.debug("Event publish skipped: %s", name)
 
 
 class NotificationService:
-    """Business logic for notification operations."""
+    """‌⁠‍Business logic for notification operations."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

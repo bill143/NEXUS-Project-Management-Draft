@@ -123,7 +123,7 @@ export function BOQVariablesDialog({ open, onClose, boqId }: BOQVariablesDialogP
       setServerError(null);
       addToast({
         type: 'success',
-        title: t('boq.variables_saved', { defaultValue: 'Variables saved' }),
+        title: t('boq.variables_saved', { defaultValue: 'Variables saved‌⁠‍' }),
       });
     },
     onError: (err) => {
@@ -171,6 +171,9 @@ export function BOQVariablesDialog({ open, onClose, boqId }: BOQVariablesDialogP
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="boq-variables-dialog-title"
         className="w-full max-w-3xl max-h-[88vh] overflow-hidden rounded-2xl bg-surface-elevated shadow-xl flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
@@ -178,8 +181,8 @@ export function BOQVariablesDialog({ open, onClose, boqId }: BOQVariablesDialogP
         <div className="flex items-center justify-between gap-3 border-b border-border-light px-5 py-3">
           <div className="flex items-center gap-2">
             <VariableIcon size={18} className="text-oe-blue" />
-            <h2 className="text-base font-semibold text-content-primary">
-              {t('boq.variables_title', { defaultValue: 'BOQ variables' })}
+            <h2 id="boq-variables-dialog-title" className="text-base font-semibold text-content-primary">
+              {t('boq.variables_title', { defaultValue: 'BOQ variables‌⁠‍' })}
             </h2>
             <span className="rounded-full bg-surface-secondary px-2 py-0.5 text-2xs font-medium text-content-tertiary">
               {drafts.length}/{MAX_VARIABLES}
@@ -200,19 +203,19 @@ export function BOQVariablesDialog({ open, onClose, boqId }: BOQVariablesDialogP
             <p className="text-xs text-content-tertiary">
               {t('boq.variables_help', {
                 defaultValue:
-                  'Define named values you can reference in formulas. e.g. set $GFA = 1500, then write =$GFA * 0.15 in any quantity or rate cell.',
+                  'Define named values you can reference in formulas. e.g. set $GFA = 1500, then write =$GFA * 0.15 in any quantity or rate cell.‌⁠‍',
               })}
             </p>
 
             {variablesQuery.isLoading && (
-              <p className="text-sm text-content-tertiary">{t('common.loading', { defaultValue: 'Loading…' })}</p>
+              <p className="text-sm text-content-tertiary">{t('common.loading', { defaultValue: 'Loading…‌⁠‍' })}</p>
             )}
 
             {drafts.length === 0 && !variablesQuery.isLoading && (
               <div className="rounded-xl border border-dashed border-border-light bg-surface-secondary/40 px-4 py-8 text-center">
                 <p className="text-sm text-content-secondary">
                   {t('boq.variables_empty', {
-                    defaultValue: 'No variables yet. Add the first one below.',
+                    defaultValue: 'No variables yet. Add the first one below.‌⁠‍',
                   })}
                 </p>
               </div>

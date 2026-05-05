@@ -39,7 +39,7 @@ import {
 import { useConfirm } from '@/shared/hooks/useConfirm';
 import { MoneyDisplay } from '@/shared/ui/MoneyDisplay';
 import { DateDisplay } from '@/shared/ui/DateDisplay';
-import { apiGet, apiPost, triggerDownload } from '@/shared/lib/api';
+import { apiGet, apiPost, triggerDownload, extractErrorMessageFromBody } from '@/shared/lib/api';
 import { ContactSearchInput } from '@/shared/ui/ContactSearchInput';
 import { useToastStore } from '@/stores/useToastStore';
 import { useProjectContextStore } from '@/stores/useProjectContextStore';
@@ -160,10 +160,10 @@ async function fetchBlobWithAuth(url: string, fallbackFilename: string): Promise
 
   const response = await fetch(url, { method: 'GET', headers });
   if (!response.ok) {
-    let detail = 'Export failed';
+    let detail = `Export failed (HTTP ${response.status})`;
     try {
       const body = await response.json();
-      detail = body.detail || detail;
+      detail = extractErrorMessageFromBody(body) ?? detail;
     } catch {
       // ignore parse error
     }
@@ -195,7 +195,7 @@ async function importBudgetsFile(
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const response = await fetch(
-    `/api/v1/finance/budgets/import/file?project_id=${encodeURIComponent(projectId)}`,
+    `/api/v1/finance/budgets/import/file/?project_id=${encodeURIComponent(projectId)}`,
     { method: 'POST', headers, body: formData },
   );
 
@@ -269,28 +269,28 @@ function FinanceSummaryCards({ projectId }: { projectId: string }) {
 
   const cards = [
     {
-      label: t('finance.summary_total_budget', { defaultValue: 'Total Budget' }),
+      label: t('finance.summary_total_budget', { defaultValue: 'Total Budget‌⁠‍' }),
       value: totalBudget,
       icon: <Wallet size={18} />,
       color: 'bg-oe-blue/10 text-oe-blue',
       accent: 'bg-oe-blue',
     },
     {
-      label: t('finance.summary_total_invoiced', { defaultValue: 'Total Invoiced (Payable)' }),
+      label: t('finance.summary_total_invoiced', { defaultValue: 'Total Invoiced (Payable)‌⁠‍' }),
       value: totalInvoiced,
       icon: <Receipt size={18} />,
       color: 'bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400',
       accent: 'bg-amber-500',
     },
     {
-      label: t('finance.summary_receivable', { defaultValue: 'Receivable' }),
+      label: t('finance.summary_receivable', { defaultValue: 'Receivable‌⁠‍' }),
       value: totalReceivable,
       icon: <PiggyBank size={18} />,
       color: 'bg-green-50 text-green-600 dark:bg-green-950/40 dark:text-green-400',
       accent: 'bg-green-500',
     },
     {
-      label: t('finance.summary_remaining', { defaultValue: 'Remaining Budget' }),
+      label: t('finance.summary_remaining', { defaultValue: 'Remaining Budget‌⁠‍' }),
       value: remaining,
       icon: <DollarSign size={18} />,
       color: remaining >= 0
@@ -337,7 +337,7 @@ function FinanceModuleLinks({ projectId: _projectId }: { projectId: string }) {
         className="inline-flex items-center gap-1.5 rounded-lg border border-border-light bg-surface-primary px-3 py-1.5 text-xs font-medium text-content-secondary hover:bg-surface-secondary hover:text-oe-blue transition-colors"
       >
         <ExternalLink size={12} />
-        {t('finance.link_to_boq', { defaultValue: 'BOQ Estimate' })}
+        {t('finance.link_to_boq', { defaultValue: 'BOQ Estimate‌⁠‍' })}
       </Link>
       <Link
         to="/5d"
@@ -647,7 +647,7 @@ function BudgetsTab({ projectId }: { projectId: string }) {
   const exportBudgetsMut = useMutation({
     mutationFn: () =>
       fetchBlobWithAuth(
-        `/api/v1/finance/budgets/export?project_id=${encodeURIComponent(projectId)}`,
+        `/api/v1/finance/budgets/export/?project_id=${encodeURIComponent(projectId)}`,
         'budgets_export.xlsx',
       ),
     onSuccess: () =>
@@ -1293,7 +1293,7 @@ function InvoicesTab({ projectId }: { projectId: string }) {
   const exportInvoicesMut = useMutation({
     mutationFn: () =>
       fetchBlobWithAuth(
-        `/api/v1/finance/invoices/export?project_id=${encodeURIComponent(projectId)}&direction=${subTab}`,
+        `/api/v1/finance/invoices/export/?project_id=${encodeURIComponent(projectId)}&direction=${subTab}`,
         'invoices_export.xlsx',
       ),
     onSuccess: () =>
@@ -2115,10 +2115,38 @@ function EVMTab({ projectId }: { projectId: string }) {
   const queryClient = useQueryClient();
   const addToast = useToastStore((s) => s.addToast);
 
+  // Backend returns EVMListResponse `{items: EVMSnapshot[], total: int}`
+  // sorted by snapshot_date DESC — the most-recent snapshot is items[0].
+  // EVM money/index fields ship as Decimal-as-string; coerce to numbers
+  // for the KPI cards. Empty list → show the "No EVM data" empty state.
   const { data: evm, isLoading } = useQuery({
     queryKey: ['finance-evm', projectId],
     queryFn: () =>
-      apiGet<EVMData>(`/v1/finance/evm/?project_id=${projectId}`),
+      apiGet<{
+        items: Array<{
+          bac: string; pv: string; ev: string; ac: string; sv: string;
+          cv: string; spi: string; cpi: string; eac: string; etc: string;
+          vac: string; tcpi: string; snapshot_date: string;
+        }>;
+        total: number;
+      }>(`/v1/finance/evm/?project_id=${projectId}`),
+    select: (resp): EVMData | null => {
+      const latest = resp?.items?.[0];
+      if (!latest) return null;
+      const num = (s: string | undefined): number => {
+        const n = Number.parseFloat(s ?? '0');
+        return Number.isFinite(n) ? n : 0;
+      };
+      return {
+        project_id: projectId,
+        bac: num(latest.bac), pv: num(latest.pv), ev: num(latest.ev),
+        ac: num(latest.ac), sv: num(latest.sv), cv: num(latest.cv),
+        spi: num(latest.spi), cpi: num(latest.cpi), eac: num(latest.eac),
+        etc: num(latest.etc), vac: num(latest.vac), tcpi: num(latest.tcpi),
+        currency: 'EUR',
+        data_date: latest.snapshot_date,
+      };
+    },
   });
 
   const snapshotMut = useMutation({

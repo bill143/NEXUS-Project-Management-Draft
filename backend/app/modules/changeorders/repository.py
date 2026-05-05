@@ -1,4 +1,4 @@
-"""Change Order data access layer.
+"""‌⁠‍Change Order data access layer.
 
 All database queries for change orders live here.
 No business logic — pure data access.
@@ -8,12 +8,13 @@ import uuid
 
 from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.modules.changeorders.models import ChangeOrder, ChangeOrderItem
 
 
 class ChangeOrderRepository:
-    """Data access for ChangeOrder and ChangeOrderItem models."""
+    """‌⁠‍Data access for ChangeOrder and ChangeOrderItem models."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -21,7 +22,7 @@ class ChangeOrderRepository:
     # ── ChangeOrder ──────────────────────────────────────────────────────
 
     async def get_by_id(self, order_id: uuid.UUID) -> ChangeOrder | None:
-        """Get change order by ID (includes items via selectin)."""
+        """‌⁠‍Get change order by ID (includes items via selectin)."""
         return await self.session.get(ChangeOrder, order_id)
 
     async def list_for_project(
@@ -40,7 +41,15 @@ class ChangeOrderRepository:
         count_stmt = select(func.count()).select_from(base.subquery())
         total = (await self.session.execute(count_stmt)).scalar_one()
 
-        stmt = base.order_by(ChangeOrder.created_at.desc()).offset(offset).limit(limit)
+        # Eager-load items so the response builder's ``len(order.items)`` and
+        # per-item rendering don't trigger one extra round-trip per row. Was
+        # ~50 extra queries on a default page (limit=50).
+        stmt = (
+            base.order_by(ChangeOrder.created_at.desc())
+            .options(selectinload(ChangeOrder.items))
+            .offset(offset)
+            .limit(limit)
+        )
         result = await self.session.execute(stmt)
         orders = list(result.scalars().all())
 

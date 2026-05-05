@@ -1,4 +1,4 @@
-"""Requirements & Quality Gates service​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠ — business logic.
+"""‌⁠‍Requirements & Quality Gates service​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠ — business logic.
 
 Stateless service layer. Handles:
 - RequirementSet and Requirement CRUD
@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 
 
 async def _safe_publish(name: str, data: dict[str, Any]) -> None:
-    """Best-effort event publish — never raises into the calling path.
+    """‌⁠‍Best-effort event publish — never raises into the calling path.
 
     The vector indexer in :mod:`app.modules.requirements.events` and any
     future cross-module subscriber consume the events emitted here.
@@ -44,7 +44,7 @@ async def _safe_publish(name: str, data: dict[str, Any]) -> None:
     must never break a successful CRUD or link operation.
     """
     try:
-        await event_bus.publish(name, data, source_module="oe_requirements")
+        event_bus.publish_detached(name, data, source_module="oe_requirements")
     except Exception:
         logger.debug("Failed to publish requirements event '%s'", name, exc_info=True)
 
@@ -58,7 +58,7 @@ GATE_NAMES: dict[int, str] = {
 
 
 class RequirementsService:
-    """Business logic for requirements and quality gates."""
+    """‌⁠‍Business logic for requirements and quality gates."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session

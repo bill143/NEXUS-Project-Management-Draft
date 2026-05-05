@@ -216,7 +216,7 @@ export function BOQEditorPage() {
       addRecent({
         type: 'boq',
         id: boqId,
-        title: boq.name || t('boq.untitled', { defaultValue: 'Untitled BOQ' }),
+        title: boq.name || t('boq.untitled', { defaultValue: 'Untitled BOQ‌⁠‍' }),
         url: `/boq/${boqId}`,
       });
     }
@@ -318,7 +318,7 @@ export function BOQEditorPage() {
           } catch { /* ignore */ }
         }
       }, 500);
-      addToast({ type: 'success', title: t('boq.position_added', { defaultValue: 'Position added' }), message: t('boq.click_to_edit', { defaultValue: 'Click any cell to edit' }) });
+      addToast({ type: 'success', title: t('boq.position_added', { defaultValue: 'Position added‌⁠‍' }), message: t('boq.click_to_edit', { defaultValue: 'Click any cell to edit‌⁠‍' }) });
       // Record undo entry for the newly added position (skip if triggered by undo/redo)
       if (!isUndoRedoInProgressRef.current) {
         undoStackRef.current.push({
@@ -337,7 +337,7 @@ export function BOQEditorPage() {
       isUndoRedoInProgressRef.current = false;
     },
     onError: (err: Error) => {
-      addToast({ type: 'error', title: t('boq.add_failed', { defaultValue: 'Failed to add position' }), message: err.message });
+      addToast({ type: 'error', title: t('boq.add_failed', { defaultValue: 'Failed to add position‌⁠‍' }), message: err.message });
     },
   });
 
@@ -420,7 +420,7 @@ export function BOQEditorPage() {
       if (ctx?.previous !== undefined) {
         queryClient.setQueryData(['boq', boqId], ctx.previous);
       }
-      addToast({ type: 'error', title: t('boq.update_failed', { defaultValue: 'Failed to update position' }), message: err.message });
+      addToast({ type: 'error', title: t('boq.update_failed', { defaultValue: 'Failed to update position‌⁠‍' }), message: err.message });
     },
   });
 
@@ -731,6 +731,79 @@ export function BOQEditorPage() {
     document.addEventListener('openCostDbModal', handler);
     return () => document.removeEventListener('openCostDbModal', handler);
   }, []);
+
+  // Idle-time prefetch for the cost-DB modal aggregates. The modal calls
+  // /v1/costs/regions/ and /v1/costs/category-tree/ on open; both are
+  // GROUP BY scans that can take 18 s (regions) and 80+ s (tree) on cold
+  // SQLite when the active catalog holds 100 k+ items. Pre-warming them
+  // while the BOQ editor is idle keeps the user's first "Add from
+  // Database" click instant. requestIdleCallback bails out gracefully on
+  // browsers that don't expose it (Safari < 16) by falling back to a
+  // 1.5 s setTimeout, late enough to not fight first paint.
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      if (cancelled) return;
+      try {
+        await queryClient.prefetchQuery({
+          queryKey: ['cost-regions-modal'],
+          queryFn: () => apiGet<string[]>('/v1/costs/regions/'),
+          staleTime: 5 * 60 * 1000,
+        });
+        if (cancelled) return;
+        const regions = queryClient.getQueryData<string[]>(['cost-regions-modal']) ?? [];
+        const firstRegion = regions[0];
+        if (firstRegion) {
+          const { fetchCategoryTree, fetchCostSearch } = await import('./api');
+          // Run the tree + first-page-search prefetches in parallel so we
+          // amortize round-trip latency. The modal opens both queries
+          // simultaneously when it mounts, and warming both here means
+          // the user's first click on "From Database" lands on a hot
+          // cache for the THREE heaviest calls (regions / tree / search).
+          await Promise.all([
+            queryClient.prefetchQuery({
+              queryKey: ['cost-tree', firstRegion, 2],
+              queryFn: () => fetchCategoryTree(firstRegion, 2),
+              staleTime: 5 * 60 * 1000,
+            }),
+            queryClient.prefetchInfiniteQuery({
+              queryKey: ['cost-search', firstRegion, '', ''],
+              initialPageParam: null as string | null,
+              queryFn: () =>
+                fetchCostSearch({
+                  region: firstRegion,
+                  q: undefined,
+                  classification_path: undefined,
+                  cursor: null,
+                  limit: 15,
+                }),
+              staleTime: 5 * 60 * 1000,
+            }),
+          ]);
+        }
+      } catch {
+        /* prefetch is best-effort — never block the editor on a 5xx */
+      }
+    };
+    const w = window as Window & {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number;
+      cancelIdleCallback?: (handle: number) => void;
+    };
+    let idleId: number | undefined;
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+    if (typeof w.requestIdleCallback === 'function') {
+      idleId = w.requestIdleCallback(() => void run(), { timeout: 4000 });
+    } else {
+      timeoutId = setTimeout(() => void run(), 1500);
+    }
+    return () => {
+      cancelled = true;
+      if (idleId !== undefined && typeof w.cancelIdleCallback === 'function') {
+        w.cancelIdleCallback(idleId);
+      }
+      if (timeoutId !== undefined) clearTimeout(timeoutId);
+    };
+  }, [queryClient]);
 
   // Scroll to and highlight a position when ?highlight=pos_id is in URL
   // Works with both AG Grid rows (div[row-id]) and legacy table rows (tr[data-position-id])
@@ -1207,6 +1280,31 @@ export function BOQEditorPage() {
 
   const vatAmount = netTotal * vatRate;
   const grossTotal = netTotal + vatAmount;
+
+  /* ── Display currency (Issue #88, follow-up) ──────────────────────────
+   *  The user can flip the grand-total visualisation between the project's
+   *  base currency and any FX-rate'd currency without persisting anything
+   *  server-side. Empty string ⇒ show in base. Non-empty ⇒ show converted.
+   *  Per-section / per-position conversion is intentionally NOT covered
+   *  here — it requires plumbing through the cell renderers and footer
+   *  rows, which is a separate follow-up. The mini-summary grand total
+   *  alone covers the "1 click to see total in USD" use case skolodi
+   *  raised, and the converted value is clearly labelled so it can't be
+   *  confused with the persisted base currency. */
+  const [displayCurrency, setDisplayCurrency] = useState<string>('');
+  const displayCurrencyMeta = useMemo(() => {
+    if (!displayCurrency) return null;
+    const fx = fxRates.find((f) => f.currency === displayCurrency);
+    if (!fx || !Number.isFinite(fx.rate) || fx.rate <= 0) return null;
+    return fx;
+  }, [displayCurrency, fxRates]);
+  // FX rates store rate-to-base, so converting from base → display is
+  // ``base_amount / rate``. Example: base ARS, rate.USD = 1200 ⇒ 12 000 ARS
+  // shown as 10 USD.
+  const grossTotalDisplay = displayCurrencyMeta
+    ? grossTotal / displayCurrencyMeta.rate
+    : grossTotal;
+  const displaySymbol = displayCurrencyMeta ? displayCurrencyMeta.currency : currencySymbol;
 
   /* ── Quality score ───────────────────────────────────────────────── */
 
@@ -3042,8 +3140,50 @@ export function BOQEditorPage() {
               <span className="text-border-light">|</span>
             </>
           )}
-          <span className="ml-auto font-medium text-content-primary tabular-nums">
-            {t('boq.grand_total', { defaultValue: 'Grand Total' })}: {currencySymbol} {grossTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          <span className="ml-auto flex items-center gap-2 font-medium text-content-primary tabular-nums">
+            {/* Issue #88 — display currency selector. Renders only when the
+                project has at least one FX rate configured; otherwise stays
+                hidden and the grand total reads as before. The 'Base'
+                option is always present so the user can flip back. */}
+            {fxRates.length > 0 && (
+              <span className="inline-flex items-center gap-1.5 text-2xs text-content-tertiary normal-case">
+                <span>{t('boq.display_in', { defaultValue: 'Display in' })}:</span>
+                <select
+                  value={displayCurrency}
+                  onChange={(e) => setDisplayCurrency(e.target.value)}
+                  aria-label={t('boq.display_currency_aria', {
+                    defaultValue: 'Choose currency for grand total display',
+                  })}
+                  className="bg-surface-elevated border border-border-light rounded px-1 py-0.5 text-content-primary
+                             text-2xs focus:outline-none focus:ring-1 focus:ring-oe-blue/40 cursor-pointer"
+                >
+                  <option value="">
+                    {currencyCode || t('boq.display_base', { defaultValue: 'Base' })}
+                  </option>
+                  {fxRates.map((fx) => (
+                    <option key={fx.currency} value={fx.currency}>
+                      {fx.currency}
+                    </option>
+                  ))}
+                </select>
+              </span>
+            )}
+            <span title={
+              displayCurrencyMeta
+                ? t('boq.grand_total_conversion_tooltip', {
+                    defaultValue:
+                      'Converted from {{base}} via project FX rate {{rate}}. Per-section and per-position conversion follows in a later release.',
+                    base: currencyCode || currencySymbol,
+                    rate: displayCurrencyMeta.rate.toLocaleString(undefined, {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 6,
+                    }),
+                  })
+                : ''
+            }>
+              {t('boq.grand_total', { defaultValue: 'Grand Total' })}: {displaySymbol}{' '}
+              {grossTotalDisplay.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </span>
           </span>
         </div>
         <BOQGrid
@@ -3065,6 +3205,11 @@ export function BOQEditorPage() {
           currencySymbol={currencySymbol}
           currencyCode={currencyCode}
           fxRates={fxRates}
+          onOpenFxRateSettings={
+            boq?.project_id
+              ? () => navigate(`/projects/${boq.project_id}/settings#fx-rates`)
+              : undefined
+          }
           locale={locale}
           footerRows={boqFooterRows}
           onSelectionChanged={handleSelectionChanged}
@@ -3306,14 +3451,14 @@ export function BOQEditorPage() {
       {/* ── Update Rates Confirmation Dialog ────────────────────────── */}
       {showRecalcConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm animate-fade-in" onClick={() => setShowRecalcConfirm(false)}>
-          <div className="w-full max-w-md mx-4 rounded-2xl bg-surface-primary shadow-2xl border border-border-light overflow-hidden animate-scale-in" onClick={(e) => e.stopPropagation()}>
+          <div role="dialog" aria-modal="true" aria-labelledby="boq-recalc-confirm-title" className="w-full max-w-md mx-4 rounded-2xl bg-surface-primary shadow-2xl border border-border-light overflow-hidden animate-scale-in" onClick={(e) => e.stopPropagation()}>
             <div className="px-6 py-5">
               <div className="flex items-center gap-3 mb-3">
                 <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-950/30 flex items-center justify-center">
                   <Database size={20} className="text-oe-blue" />
                 </div>
                 <div>
-                  <h3 className="text-base font-semibold">{t('boq.recalc_confirm_title', { defaultValue: 'Update Unit Rates' })}</h3>
+                  <h3 id="boq-recalc-confirm-title" className="text-base font-semibold">{t('boq.recalc_confirm_title', { defaultValue: 'Update Unit Rates' })}</h3>
                   <p className="text-xs text-content-secondary">{t('boq.recalc_confirm_subtitle', { defaultValue: 'Match positions to cost database' })}</p>
                 </div>
               </div>
@@ -3347,11 +3492,14 @@ export function BOQEditorPage() {
           onClick={() => setGaebPreviewOpen(false)}
         >
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="boq-gaeb-export-title"
             className="bg-surface-elevated rounded-xl border border-border-light shadow-lg w-[420px] p-6 animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-sm font-semibold text-content-primary">
+              <h3 id="boq-gaeb-export-title" className="text-sm font-semibold text-content-primary">
                 {t('boq.gaeb_export_title', { defaultValue: 'Export GAEB XML (X83)' })}
               </h3>
               <button
@@ -3456,10 +3604,13 @@ export function BOQEditorPage() {
       {showSectionModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowSectionModal(false)}>
           <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="boq-add-section-title"
             className="bg-surface-elevated rounded-xl border border-border-light shadow-lg w-96 p-5 animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-sm font-semibold text-content-primary mb-3">
+            <h3 id="boq-add-section-title" className="text-sm font-semibold text-content-primary mb-3">
               {t('boq.add_section', { defaultValue: 'Add Section' })}
             </h3>
             <input

@@ -1,4 +1,4 @@
-"""Submittals API routes.
+"""‌⁠‍Submittals API routes.
 
 Endpoints:
     GET    /                          - List submittals for a project
@@ -105,10 +105,12 @@ async def create_submittal(
 )
 async def get_submittal(
     submittal_id: uuid.UUID,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     service: SubmittalService = Depends(_get_service),
 ) -> SubmittalResponse:
     submittal = await service.get_submittal(submittal_id)
+    await verify_project_access(submittal.project_id, str(user_id), session)
     return _to_response(submittal)
 
 
@@ -116,10 +118,13 @@ async def get_submittal(
 async def update_submittal(
     submittal_id: uuid.UUID,
     data: SubmittalUpdate,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     _perm: None = Depends(RequirePermission("submittals.update")),
     service: SubmittalService = Depends(_get_service),
 ) -> SubmittalResponse:
+    existing = await service.get_submittal(submittal_id)
+    await verify_project_access(existing.project_id, str(user_id), session)
     submittal = await service.update_submittal(submittal_id, data)
     return _to_response(submittal)
 
@@ -127,10 +132,13 @@ async def update_submittal(
 @router.delete("/{submittal_id}", status_code=204)
 async def delete_submittal(
     submittal_id: uuid.UUID,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     _perm: None = Depends(RequirePermission("submittals.delete")),
     service: SubmittalService = Depends(_get_service),
 ) -> None:
+    existing = await service.get_submittal(submittal_id)
+    await verify_project_access(existing.project_id, str(user_id), session)
     await service.delete_submittal(submittal_id)
 
 
@@ -141,7 +149,7 @@ async def submit_submittal(
     _perm: None = Depends(RequirePermission("submittals.update")),
     service: SubmittalService = Depends(_get_service),
 ) -> SubmittalResponse:
-    """Move a submittal from draft to submitted."""
+    """‌⁠‍Move a submittal from draft to submitted."""
     submittal = await service.submit_submittal(submittal_id)
     return _to_response(submittal)
 
@@ -154,7 +162,7 @@ async def review_submittal(
     _perm: None = Depends(RequirePermission("submittals.update")),
     service: SubmittalService = Depends(_get_service),
 ) -> SubmittalResponse:
-    """Review a submittal (approve, reject, revise and resubmit, etc.)."""
+    """‌⁠‍Review a submittal (approve, reject, revise and resubmit, etc.)."""
     submittal = await service.review_submittal(submittal_id, body.status, reviewer_id=user_id)
     return _to_response(submittal)
 

@@ -1,4 +1,4 @@
-"""Document Management service — business logic for document management.
+"""‌⁠‍Document Management service — business logic for document management.
 
 Stateless service layer. Handles:
 - Document CRUD
@@ -72,7 +72,7 @@ BLOCKED_EXTENSIONS = {
 
 
 def _sanitize_filename(name: str) -> str:
-    """Remove path components and dangerous characters from filename."""
+    """‌⁠‍Remove path components and dangerous characters from filename."""
     name = os.path.basename(name)
     name = re.sub(r"[^\w.\-]", "_", name)
     if not name or name.startswith("."):
@@ -84,7 +84,7 @@ def _generate_photo_thumbnail(
     source_bytes: bytes,
     dest_path: Path,
 ) -> bool:
-    """Write a JPEG thumbnail of ``source_bytes`` to ``dest_path``.
+    """‌⁠‍Write a JPEG thumbnail of ``source_bytes`` to ``dest_path``.
 
     Returns ``True`` on success, ``False`` if anything went wrong (missing
     Pillow, corrupt image, unsupported mode). Thumbnail generation is a
@@ -236,7 +236,7 @@ class DocumentService:
         try:
             from app.core.events import event_bus
 
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "document.uploaded",
                 {
                     "project_id": str(project_id),
@@ -258,7 +258,7 @@ class DocumentService:
         try:
             from app.core.events import event_bus
 
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "documents.document.created",
                 {
                     "project_id": str(project_id),
@@ -368,7 +368,7 @@ class DocumentService:
         try:
             from app.core.events import event_bus
 
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "documents.document.updated",
                 {
                     "project_id": str(document.project_id),
@@ -406,7 +406,7 @@ class DocumentService:
         try:
             from app.core.events import event_bus
 
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "documents.document.deleted",
                 {
                     "project_id": str(project_id) if project_id else "",

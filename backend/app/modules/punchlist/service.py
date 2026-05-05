@@ -1,4 +1,4 @@
-"""Punch List service — business logic for punch list management.
+"""‌⁠‍Punch List service — business logic for punch list management.
 
 Stateless service layer. Handles:
 - Punch item CRUD
@@ -27,9 +27,9 @@ _logger_ev = logging.getLogger(__name__ + ".events")
 
 
 async def _safe_publish(name: str, data: dict, source_module: str = "oe_punchlist") -> None:
-    """Best-effort event publish — never blocks the caller on failure."""
+    """‌⁠‍Best-effort event publish — never blocks the caller on failure."""
     try:
-        await event_bus.publish(name, data, source_module=source_module)
+        event_bus.publish_detached(name, data, source_module=source_module)
     except Exception:
         _logger_ev.debug("Event publish skipped: %s", name)
 
@@ -48,7 +48,7 @@ VALID_TRANSITIONS: dict[str, list[str]] = {
 
 
 class PunchListService:
-    """Business logic for punch list operations."""
+    """‌⁠‍Business logic for punch list operations."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -370,37 +370,34 @@ class PunchListService:
 
     async def get_summary(self, project_id: uuid.UUID) -> dict[str, Any]:
         """Get aggregated stats for a project's punch list."""
-        items = await self.repo.all_for_project(project_id)
+        agg = await self.repo.summary_aggregates(project_id)
         overdue = await self.repo.count_overdue(project_id)
 
-        by_status: dict[str, int] = {}
-        by_priority: dict[str, int] = {}
+        # closed_timestamps is a list of (created_at, verified_at, resolved_at,
+        # updated_at) tuples for closed/verified items only — SQL diff isn't
+        # portable across SQLite/PostgreSQL so we still walk in Python.
         closed_durations: list[float] = []
-
-        for item in items:
-            by_status[item.status] = by_status.get(item.status, 0) + 1
-            by_priority[item.priority] = by_priority.get(item.priority, 0) + 1
-
-            # Compute days-to-close for closed/verified items
-            if item.status in ("closed", "verified") and item.created_at:
-                end_time = item.verified_at or item.resolved_at or item.updated_at
-                if end_time:
-                    try:
-                        delta = end_time - item.created_at
-                        days = delta.total_seconds() / 86400.0
-                        if days >= 0:
-                            closed_durations.append(days)
-                    except (TypeError, AttributeError):
-                        pass
+        for created_at, verified_at, resolved_at, updated_at in agg["closed_timestamps"]:
+            if not created_at:
+                continue
+            end_time = verified_at or resolved_at or updated_at
+            if end_time is None:
+                continue
+            try:
+                days = (end_time - created_at).total_seconds() / 86400.0
+            except (TypeError, AttributeError):
+                continue
+            if days >= 0:
+                closed_durations.append(days)
 
         avg_days_to_close: float | None = None
         if closed_durations:
             avg_days_to_close = round(sum(closed_durations) / len(closed_durations), 1)
 
         return {
-            "total": len(items),
-            "by_status": by_status,
-            "by_priority": by_priority,
+            "total": agg["total"],
+            "by_status": agg["by_status"],
+            "by_priority": agg["by_priority"],
             "overdue": overdue,
             "avg_days_to_close": avg_days_to_close,
         }

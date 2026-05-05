@@ -1,4 +1,4 @@
-"""Backup & Restore API.
+"""‌⁠‍Backup & Restore API.
 
 Endpoints:
     POST /export    -- Download a ZIP backup of all user data
@@ -38,7 +38,7 @@ MAX_BACKUP_SIZE = 100 * 1024 * 1024
 
 
 class RestoreResponse(BaseModel):
-    """Result of a restore operation."""
+    """‌⁠‍Result of a restore operation."""
 
     status: str
     mode: str
@@ -48,7 +48,7 @@ class RestoreResponse(BaseModel):
 
 
 class ValidateResponse(BaseModel):
-    """Result of a backup validation check."""
+    """‌⁠‍Result of a backup validation check."""
 
     valid: bool
     format_version: str
@@ -416,7 +416,7 @@ async def restore_backup(
             raise HTTPException(
                 status_code=500,
                 detail="Restore failed due to an internal error. Please check the backup file and try again.",
-            )
+            ) from exc
 
     total_imported = sum(imported.values())
     total_skipped = sum(skipped.values())

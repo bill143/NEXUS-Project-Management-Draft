@@ -16,6 +16,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useProjectContextStore } from '@/stores/useProjectContextStore';
 import { apiGet, apiPost } from '@/shared/lib/api';
+import { isModuleLoaded } from '@/shared/lib/moduleProbe';
 import { ScoreRing } from './ScoreRing';
 import { GapCard } from './GapCard';
 import { AIAdvisorPanel } from './AIAdvisorPanel';
@@ -129,6 +130,18 @@ export function ProjectIntelligencePage() {
   const fetchData = useCallback(
     async (refresh = false) => {
       if (!activeProjectId) return;
+      // The module is optional. When disabled the dashboard shows the
+      // "module disabled" empty state instead of 404-logging once per
+      // load.
+      if (!(await isModuleLoaded('oe_project_intelligence'))) {
+        setLoading(false);
+        setError(
+          t('project_intelligence.module_disabled', {
+            defaultValue: 'Project Intelligence module is disabled. Enable it from the Modules page to use this dashboard.‌⁠‍',
+          }),
+        );
+        return;
+      }
       try {
         if (refresh) setRefreshing(true);
         else setLoading(true);
@@ -211,13 +224,13 @@ export function ProjectIntelligencePage() {
         </div>
         <h2 className="text-lg font-bold text-content-primary">
           {t('project_intelligence.page_title_v191', {
-            defaultValue: 'Estimation Dashboard',
+            defaultValue: 'Estimation Dashboard‌⁠‍',
           })}
         </h2>
         <p className="text-sm text-content-secondary max-w-xl mx-auto leading-relaxed">
           {t('project_intelligence.v191_select_prompt', {
             defaultValue:
-              'Select a project from the header to see its cost variance, anomalies, and bid analytics.',
+              'Select a project from the header to see its cost variance, anomalies, and bid analytics.‌⁠‍',
           })}
         </p>
       </div>
@@ -231,7 +244,7 @@ export function ProjectIntelligencePage() {
           <BrainCircuit size={48} className="mx-auto text-oe-blue" />
           <p className="text-sm text-content-secondary">
             {t('project_intelligence.analyzing', {
-              defaultValue: 'Analyzing project...',
+              defaultValue: 'Analyzing project...‌⁠‍',
             })}
           </p>
         </div>
@@ -253,7 +266,7 @@ export function ProjectIntelligencePage() {
           <h2 className="text-lg font-bold text-content-primary">
             {isAuth
               ? t('project_intelligence.auth_error', {
-                  defaultValue: 'Session expired',
+                  defaultValue: 'Session expired‌⁠‍',
                 })
               : t('project_intelligence.load_error', {
                   defaultValue: 'Could not load analysis',

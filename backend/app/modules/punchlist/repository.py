@@ -1,4 +1,4 @@
-"""Punch List data access layer.
+"""‌⁠‍Punch List data access layer.
 
 All database queries for punch list items live here.
 No business logic — pure data access.
@@ -14,13 +14,13 @@ from app.modules.punchlist.models import PunchItem
 
 
 class PunchListRepository:
-    """Data access for PunchItem models."""
+    """‌⁠‍Data access for PunchItem models."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def get_by_id(self, item_id: uuid.UUID) -> PunchItem | None:
-        """Get punch item by ID."""
+        """‌⁠‍Get punch item by ID."""
         return await self.session.get(PunchItem, item_id)
 
     async def list_for_project(
@@ -79,6 +79,61 @@ class PunchListRepository:
         stmt = select(PunchItem).where(PunchItem.project_id == project_id)
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def summary_aggregates(
+        self, project_id: uuid.UUID
+    ) -> dict[str, object]:
+        """Return SQL aggregates for the punch-list summary.
+
+        Counts and group-by-status/priority are pure SQL. The closed
+        durations still need a Python loop because SQLite lacks a
+        portable date diff, but we project only 5 timestamp columns
+        instead of hydrating full ORM rows.
+        """
+        total = (
+            await self.session.execute(
+                select(func.count(PunchItem.id)).where(
+                    PunchItem.project_id == project_id
+                )
+            )
+        ).scalar_one()
+
+        status_rows = (
+            await self.session.execute(
+                select(PunchItem.status, func.count())
+                .where(PunchItem.project_id == project_id)
+                .group_by(PunchItem.status)
+            )
+        ).all()
+
+        priority_rows = (
+            await self.session.execute(
+                select(PunchItem.priority, func.count())
+                .where(PunchItem.project_id == project_id)
+                .group_by(PunchItem.priority)
+            )
+        ).all()
+
+        closed_rows = (
+            await self.session.execute(
+                select(
+                    PunchItem.created_at,
+                    PunchItem.verified_at,
+                    PunchItem.resolved_at,
+                    PunchItem.updated_at,
+                ).where(
+                    PunchItem.project_id == project_id,
+                    PunchItem.status.in_(("closed", "verified")),
+                )
+            )
+        ).all()
+
+        return {
+            "total": int(total),
+            "by_status": {row[0]: row[1] for row in status_rows},
+            "by_priority": {row[0]: row[1] for row in priority_rows},
+            "closed_timestamps": list(closed_rows),
+        }
 
     async def count_overdue(self, project_id: uuid.UUID) -> int:
         """Count punch items that are past due and not closed/verified."""

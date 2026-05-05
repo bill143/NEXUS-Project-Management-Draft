@@ -2,7 +2,7 @@
 # CWICR Cost Database Engine · CAD2DATA Pipeline
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 # AGPL-3.0 License · DDC-CWICR-OE-2026
-"""OpenEstimate​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠ — FastAPI application factory.
+"""‌⁠‍OpenEstimate​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠ — FastAPI application factory.
 
 Usage:
     uvicorn app.main:create_app --factory --reload --port 8000
@@ -66,7 +66,7 @@ logger = logging.getLogger(__name__)
 
 
 def configure_logging(settings: Settings) -> None:
-    """Configure structured logging."""
+    """‌⁠‍Configure structured logging."""
     structlog.configure(
         processors=[
             structlog.contextvars.merge_contextvars,
@@ -87,7 +87,7 @@ def configure_logging(settings: Settings) -> None:
 
 
 def _init_vector_db() -> None:
-    """Initialize vector database on startup (non-blocking, never fatal).
+    """‌⁠‍Initialize vector database on startup (non-blocking, never fatal).
 
     Vector search is an important feature of OpenConstructionERP —
     it powers semantic cost-item matching, BOQ auto-classification,
@@ -172,6 +172,7 @@ async def _auto_backfill_vector_collections() -> None:
             COLLECTION_BIM_ELEMENTS,
             COLLECTION_BOQ,
             COLLECTION_CHAT,
+            COLLECTION_COSTS,
             COLLECTION_DOCUMENTS,
             COLLECTION_REQUIREMENTS,
             COLLECTION_RISKS,
@@ -352,6 +353,69 @@ async def _auto_backfill_vector_collections() -> None:
                 adapter,
                 options=options,
             )
+
+        # ── Cost catalog (oe_cost_items) ─────────────────────────────────
+        # The cost adapter needs the E5 ``passage:`` prefix at encode time
+        # so it can't go through ``reindex_collection`` (which uses the
+        # adapter's plain ``to_text``).  Run a dedicated delta pass that
+        # uses the cost-specific helper instead.
+        try:
+            import os as _os
+
+            from app.modules.costs import vector_adapter as _cost_vec
+            from app.modules.costs.events import (
+                _delta_reindex_all_active as _cost_reindex_active,
+            )
+            from app.modules.costs.models import CostItem as _CostItem
+
+            force_backfill = _os.environ.get(
+                "OE_COST_VECTOR_FORCE_BACKFILL", ""
+            ).strip() in ("1", "true", "True", "yes")
+
+            indexed_count = await _cost_vec.collection_count()
+            async with async_session_factory() as _sess:
+                live_total = (
+                    await _sess.execute(
+                        select(func.count())
+                        .select_from(_CostItem)
+                        .where(_CostItem.is_active.is_(True))
+                    )
+                ).scalar_one() or 0
+
+            if not live_total:
+                logger.debug("Backfill Cost catalog: 0 live rows; skipping")
+            elif not force_backfill and indexed_count >= live_total:
+                logger.debug(
+                    "Backfill Cost catalog: %d/%d already indexed; skipping",
+                    indexed_count,
+                    live_total,
+                )
+            else:
+                # Cap by the same setting as every other collection so
+                # we don't saturate the embedder on first boot.
+                if cap > 0 and live_total > cap:
+                    logger.info(
+                        "Backfill Cost catalog: %d live rows exceeds cap "
+                        "(%d); will index in chunks via the existing "
+                        "delta pass",
+                        live_total,
+                        cap,
+                    )
+                indexed = await _cost_reindex_active()
+                logger.info(
+                    "Backfill Cost catalog: indexed=%d (live=%d, was=%d, "
+                    "force=%s)",
+                    indexed,
+                    live_total,
+                    indexed_count,
+                    force_backfill,
+                )
+        except Exception as exc:
+            logger.debug("Backfill Cost catalog skipped: %s", exc)
+
+        # Sentinel — keeps imports above flagged as used by ruff F401 even
+        # if a future refactor drops one of the targeted collections.
+        _ = COLLECTION_COSTS
 
         logger.info("Vector auto-backfill pass complete")
     except Exception as exc:  # noqa: BLE001
@@ -843,6 +907,11 @@ def create_app() -> FastAPI:
     from app.core.sidebar_badges_router import router as sidebar_badges_router
 
     app.include_router(sidebar_badges_router)
+
+    # Translation service (element → catalog cross-lingual normalisation)
+    from app.core.translation.router import router as translation_router
+
+    app.include_router(translation_router, prefix="/api/v1")
 
     # Store startup time for uptime calculation
     _startup_time: float = time.time()
@@ -1586,6 +1655,24 @@ def create_app() -> FastAPI:
         _section("Vector DB")
         _init_vector_db()
 
+        # Pre-warm the embedder + boot the inference process pool. Both
+        # are env-var-gated so dev startup stays fast unless the
+        # operator opted in. See ``app.core.embedding_pool`` for the
+        # full rationale and trade-offs.
+        try:
+            from app.core.embedding_pool import init_pool, maybe_preload_in_process
+
+            preloaded = maybe_preload_in_process()
+            workers = init_pool()
+            if preloaded or workers:
+                logger.info(
+                    "Embedding warm-up: preload=%s pool_workers=%d",
+                    preloaded,
+                    workers,
+                )
+        except Exception as exc:  # noqa: BLE001 — never fatal for startup
+            logger.warning("Embedding pool init skipped: %s", exc)
+
         # Auto-backfill the multi-collection vector store from existing
         # rows.  Detached as a background task so a slow embedding model
         # download or a large dataset doesn't delay startup — semantic
@@ -1621,6 +1708,113 @@ def create_app() -> FastAPI:
                     logger.exception("KPI recalculation scheduler failed")
 
         asyncio.create_task(_kpi_scheduler())
+
+        # ── Cost-DB cache pre-warm (runs once, in background) ──────────
+        # The "Add from Database" modal in the BOQ editor calls three
+        # endpoints on open: /costs/regions/, /costs/category-tree/, and
+        # /costs/search/. The first two issue full-table aggregations
+        # (SELECT DISTINCT region, GROUP BY 4 json_extract paths) that
+        # can take 18 s and 86 s respectively on cold SQLite when the
+        # active catalog holds 100 k+ rows. The user reported the modal
+        # "loading forever" — this prewarm pays the aggregation cost
+        # once at boot so every subsequent click is a cache hit.
+        async def _prewarm_cost_caches() -> None:
+            await asyncio.sleep(2)  # let other startup tasks settle
+            try:
+                import time as _ptime
+
+                from sqlalchemy import distinct, select
+                from sqlalchemy import func as _func
+
+                from app.database import async_session_factory as _cost_sf
+                from app.modules.costs.models import CostItem
+                from app.modules.costs.router import (
+                    _category_tree_cache,
+                    _region_cache,
+                )
+                from app.modules.costs.schemas import CategoryTreeNode
+                from app.modules.costs.service import CostItemService
+
+                async with _cost_sf() as cost_session:
+                    # 1) Distinct region list — drives the tab bar on /costs
+                    #    and the modal's region picker.
+                    r = await cost_session.execute(
+                        select(distinct(CostItem.region))
+                        .where(CostItem.is_active.is_(True))
+                        .where(CostItem.region.isnot(None))
+                        .where(CostItem.region != "")
+                    )
+                    regions = sorted(row[0] for row in r.all())
+                    _region_cache["regions"] = regions
+
+                    # 2) Per-region item-count stats — drives the count badge
+                    #    on each region tab.
+                    s = await cost_session.execute(
+                        select(
+                            CostItem.region,
+                            _func.count(CostItem.id).label("cnt"),
+                        )
+                        .where(CostItem.is_active.is_(True))
+                        .where(CostItem.region.isnot(None))
+                        .where(CostItem.region != "")
+                        .group_by(CostItem.region)
+                        .order_by(_func.count(CostItem.id).desc())
+                    )
+                    _region_cache["stats"] = [
+                        {"region": row[0], "count": row[1]} for row in s.all()
+                    ]
+
+                    # 3) Distinct top-level categories — drives the category
+                    #    filter dropdown. Warm the all-regions list (the
+                    #    page's default before any region tab is clicked).
+                    from sqlalchemy import func as __func
+
+                    from app.database import engine as __engine
+
+                    if "sqlite" in str(__engine.url):
+                        coll_expr = __func.json_extract(
+                            CostItem.classification, "$.collection"
+                        )
+                    else:
+                        coll_expr = CostItem.classification["collection"].as_string()
+                    c = await cost_session.execute(
+                        select(distinct(coll_expr))
+                        .where(CostItem.is_active.is_(True))
+                        .where(coll_expr.isnot(None))
+                        .where(coll_expr != "")
+                        .order_by(coll_expr)
+                    )
+                    _region_cache["categories_all"] = [
+                        row[0] for row in c.all() if row[0]
+                    ]
+                    _region_cache["ts"] = _ptime.monotonic()
+
+                    svc = CostItemService(cost_session)
+                    for reg in regions:
+                        try:
+                            raw = await svc.category_tree(region=reg, depth=4)
+                            nodes = [
+                                CategoryTreeNode.model_validate(n) for n in raw
+                            ]
+                            key = f"tree::{reg}::d=4::p="
+                            _category_tree_cache[key] = {
+                                "nodes": nodes,
+                                "ts": _ptime.monotonic(),
+                            }
+                        except Exception:
+                            logger.debug(
+                                "Pre-warm tree failed for region=%s",
+                                reg,
+                                exc_info=True,
+                            )
+                logger.info(
+                    "Cost-DB caches pre-warmed for %d regions",
+                    len(regions),
+                )
+            except Exception:
+                logger.debug("Cost-DB pre-warm failed (non-fatal)", exc_info=True)
+
+        asyncio.create_task(_prewarm_cost_caches())
 
         # ── Scheduled reports worker (1-minute tick) ────────────────────
         # Polls oe_reporting_template for rows whose ``next_run_at`` is
@@ -1733,6 +1927,15 @@ def create_app() -> FastAPI:
             stop_sweeper()
         except Exception:
             logger.debug("collab lock sweeper stop failed", exc_info=True)
+
+        # Tear down the embedding inference pool so Ctrl-C doesn't
+        # leave orphan Python worker processes alive.
+        try:
+            from app.core.embedding_pool import shutdown_pool
+
+            shutdown_pool()
+        except Exception:
+            logger.debug("embedding pool shutdown failed", exc_info=True)
 
         await engine.dispose()
 

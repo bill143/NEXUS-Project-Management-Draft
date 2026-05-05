@@ -1,4 +1,4 @@
-"""Safety service — business logic for incident and observation management."""
+"""‌⁠‍Safety service — business logic for incident and observation management."""
 
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 def _compute_risk_tier(risk_score: int) -> str:
-    """Derive risk tier from risk_score.
+    """‌⁠‍Derive risk tier from risk_score.
 
     Tiers: low (1-5), medium (6-10), high (11-15), critical (16-25).
     """
@@ -39,7 +39,7 @@ def _compute_risk_tier(risk_score: int) -> str:
 
 
 class SafetyService:
-    """Business logic for safety incidents and observations."""
+    """‌⁠‍Business logic for safety incidents and observations."""
 
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
@@ -117,7 +117,7 @@ class SafetyService:
             logger.exception("Failed to create notification for safety incident %s", incident_number)
 
         # Emit event for additional cross-module handlers (analytics, etc.)
-        await event_bus.publish(
+        event_bus.publish_detached(
             "safety.incident.created",
             {
                 "project_id": str(data.project_id),
@@ -262,7 +262,7 @@ class SafetyService:
                 )
 
             # Emit event for additional cross-module handlers
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "safety.observation.high_risk",
                 data={
                     "project_id": str(data.project_id),
@@ -329,7 +329,7 @@ class SafetyService:
         # Emit high-risk event if risk_score crossed the critical threshold
         new_risk_score = fields.get("risk_score", observation.risk_score)
         if new_risk_score > 15:
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "safety.observation.high_risk",
                 data={
                     "project_id": str(observation.project_id),

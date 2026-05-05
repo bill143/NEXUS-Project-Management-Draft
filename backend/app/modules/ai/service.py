@@ -1,4 +1,4 @@
-"""AI Estimation service — business logic for AI-powered BOQ generation.
+"""‌⁠‍AI Estimation service — business logic for AI-powered BOQ generation.
 
 Stateless service layer. Handles:
 - Per-user AI settings (get, create, update)
@@ -24,7 +24,7 @@ _logger_ev = __import__("logging").getLogger(__name__ + ".events")
 
 async def _safe_publish(name: str, data: dict, source_module: str = "") -> None:
     try:
-        await event_bus.publish(name, data, source_module=source_module)
+        event_bus.publish_detached(name, data, source_module=source_module)
     except Exception:
         _logger_ev.debug("Event publish skipped: %s", name)
 
@@ -53,7 +53,7 @@ logger = logging.getLogger(__name__)
 
 
 def _validate_items(raw_items: Any) -> list[dict[str, Any]]:
-    """Validate and clean AI-generated work items.
+    """‌⁠‍Validate and clean AI-generated work items.
 
     Filters out invalid entries, normalises fields, and computes totals.
 
@@ -126,7 +126,7 @@ def _validate_items(raw_items: Any) -> list[dict[str, Any]]:
 
 
 def _build_settings_response(settings: AISettings) -> AISettingsResponse:
-    """Build an AISettingsResponse from an AISettings ORM instance.
+    """‌⁠‍Build an AISettingsResponse from an AISettings ORM instance.
 
     A key is only reported as "set" when it is both present *and* decryptable
     with the current backend encryption key. If the ciphertext was written

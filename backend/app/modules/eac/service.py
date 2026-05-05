@@ -1,6 +1,6 @@
 # DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
-"""High-level service layer for EAC v2 (RFC 35 §1.7, task #221).
+"""‌⁠‍High-level service layer for EAC v2 (RFC 35 §1.7, task #221).
 
 This is the seam between the HTTP router and the engine internals.
 Routers get the auth/tenant guard, the service composes the engine
@@ -40,7 +40,7 @@ async def compile_plan(
     session: AsyncSession,
     tenant_id: uuid.UUID | None,
 ) -> CompiledPlan:
-    """Validate + plan a rule definition. Read-only — no events."""
+    """‌⁠‍Validate + plan a rule definition. Read-only — no events."""
     return await engine_api.compile_plan(
         rule_definition,
         session=session,
@@ -49,7 +49,7 @@ async def compile_plan(
 
 
 def describe_plan(compiled: CompiledPlan) -> dict[str, Any]:
-    """Render a :class:`CompiledPlan` as a JSON-serialisable dict."""
+    """‌⁠‍Render a :class:`CompiledPlan` as a JSON-serialisable dict."""
     payload = engine_api.describe_plan(compiled.plan)
     payload["valid"] = compiled.valid
     payload["issues"] = list(compiled.issues)
@@ -115,7 +115,7 @@ async def cancel_run(
     accepted = await engine_api.cancel(session, run_id, tenant_id=tenant_id)
     if accepted and pre_status not in {"cancelled", "success", "failed"}:
         try:
-            await event_bus.publish(
+            event_bus.publish_detached(
                 "eac.run.cancelled",
                 {
                     "run_id": str(run_id),
@@ -153,7 +153,7 @@ async def rerun(
         triggered_by=triggered_by,
     )
     try:
-        await event_bus.publish(
+        event_bus.publish_detached(
             "eac.run.rerun_started",
             {
                 "run_id": str(new_run.id),

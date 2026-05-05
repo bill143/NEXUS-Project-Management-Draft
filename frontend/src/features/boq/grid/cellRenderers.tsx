@@ -107,13 +107,13 @@ function getValidationTooltip(
 ): string {
   switch (status) {
     case 'passed':
-      return t('boq.validation_passed', { defaultValue: 'Validation passed — position is complete' });
+      return t('boq.validation_passed', { defaultValue: 'Validation passed — position is complete‌⁠‍' });
     case 'warnings':
-      return t('boq.validation_warnings', { defaultValue: 'Validation warnings — review recommended' });
+      return t('boq.validation_warnings', { defaultValue: 'Validation warnings — review recommended‌⁠‍' });
     case 'errors':
-      return t('boq.validation_errors', { defaultValue: 'Validation errors — action required' });
+      return t('boq.validation_errors', { defaultValue: 'Validation errors — action required‌⁠‍' });
     case 'pending':
-      return t('boq.validation_pending', { defaultValue: 'Validation pending — not yet checked' });
+      return t('boq.validation_pending', { defaultValue: 'Validation pending — not yet checked‌⁠‍' });
     default:
       return status;
   }
@@ -192,7 +192,7 @@ export function SectionFullWidthRenderer(params: ICellRendererParams) {
                    text-content-secondary hover:text-content-primary
                    hover:bg-surface-tertiary/80 transition-colors"
         title={isCollapsed
-          ? t('boq.expand_section', { defaultValue: 'Expand section' })
+          ? t('boq.expand_section', { defaultValue: 'Expand section‌⁠‍' })
           : t('boq.collapse_section', { defaultValue: 'Collapse section' })
         }
       >
@@ -349,6 +349,10 @@ export interface ResourceGridContext {
    *  ``metadata.variant`` flip directly. ``anchorEl`` is the V button
    *  itself so the popover positions correctly. */
   onOpenPositionVariantPicker?: (positionId: string, anchorEl: HTMLElement | null) => void;
+  /** Issue #105 — when a resource is in a foreign currency that has no FX
+   *  rate configured for the project, the warning badge becomes clickable
+   *  and routes the user straight to Project Settings → FX Rates. */
+  onOpenFxRateSettings?: () => void;
   currencySymbol: string;
   currencyCode: string;
   locale: string;
@@ -2465,17 +2469,31 @@ function ResourceTypePicker({
   value,
   onChange,
   t,
+  isVariant = false,
 }: {
   value: string;
   onChange: (next: string) => void;
   t: (key: string, opts?: Record<string, string>) => string;
+  /** Override the displayed chip label/colour with a clear "Variant" tag
+   *  when the underlying resource has a variant catalog. The dropdown still
+   *  exposes the full Material / Labor / Equipment / … list so the user can
+   *  reclassify if needed; only the BUTTON face changes. */
+  isVariant?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number } | null>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
 
-  const badge = RESOURCE_TYPE_BADGE[value] ?? RESOURCE_TYPE_BADGE.other ?? { bg: 'bg-gray-100 text-gray-600', label: '?' };
-  const label = getResourceTypeLabel(value, t);
+  const baseBadge = RESOURCE_TYPE_BADGE[value] ?? RESOURCE_TYPE_BADGE.other ?? { bg: 'bg-gray-100 text-gray-600', label: '?' };
+  const baseLabel = getResourceTypeLabel(value, t);
+  const variantLabel = t('boq.resource_type_variant_chip', { defaultValue: 'Variant' });
+  const label = isVariant ? variantLabel : baseLabel;
+  const badge = isVariant
+    ? {
+        ...baseBadge,
+        bg: 'bg-gradient-to-br from-violet-500 to-purple-600 text-white ring-1 ring-violet-300/40 shadow-[0_1px_3px_rgba(139,92,246,0.45)]',
+      }
+    : baseBadge;
 
   useEffect(() => {
     if (!open) return;
@@ -2517,8 +2535,24 @@ function ResourceTypePicker({
         className={`shrink-0 inline-flex items-center justify-center h-4 px-1.5 rounded
                     text-[9px] font-bold uppercase tracking-wider whitespace-nowrap
                     cursor-pointer outline-none border-0 focus:ring-1 focus:ring-oe-blue ${badge.bg}`}
-        title={t('boq.resource_type', { defaultValue: 'Resource type' })}
-        aria-label={t('boq.resource_type', { defaultValue: 'Resource type' })}
+        title={
+          isVariant
+            ? t('boq.resource_type_variant_tooltip', {
+                defaultValue:
+                  'Variant resource — pick from {{base}} catalog. Click to reclassify resource type.',
+                base: baseLabel,
+              })
+            : t('boq.resource_type', { defaultValue: 'Resource type' })
+        }
+        aria-label={
+          isVariant
+            ? t('boq.resource_type_variant_tooltip', {
+                defaultValue:
+                  'Variant resource — pick from {{base}} catalog. Click to reclassify resource type.',
+                base: baseLabel,
+              })
+            : t('boq.resource_type', { defaultValue: 'Resource type' })
+        }
         aria-haspopup="listbox"
         aria-expanded={open}
       >
@@ -3395,6 +3429,7 @@ export function EditableResourceRow({ data, ctx, colWidths }: { data: Record<str
           value={resourceType}
           onChange={handleTypeChange}
           t={ctx.t}
+          isVariant={hasVariants}
         />
       </span>
 
@@ -3547,17 +3582,44 @@ export function EditableResourceRow({ data, ctx, colWidths }: { data: Record<str
         title={totalTitle}
       >
         {isForeign && !hasFxRate && (
-          <span
-            className="inline-flex items-center justify-center h-3 px-1 rounded
-                       text-[8px] font-bold uppercase
-                       bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
-            title={ctx.t('boq.resource_no_fx_rate', {
-              defaultValue: 'No FX rate configured for {{code}} — total shown in {{code}}',
-              code: resourceCurrency,
-            })}
-          >
-            ⚠ no FX
-          </span>
+          ctx.onOpenFxRateSettings ? (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                ctx.onOpenFxRateSettings?.();
+              }}
+              className="inline-flex items-center justify-center h-3 px-1 rounded
+                         text-[8px] font-bold uppercase cursor-pointer
+                         bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300
+                         hover:bg-amber-200 hover:text-amber-900
+                         dark:hover:bg-amber-800/60 dark:hover:text-amber-100
+                         focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-amber-500
+                         transition-colors"
+              title={ctx.t('boq.resource_no_fx_rate_click', {
+                defaultValue: 'No FX rate configured for {{code}} — click to set one in Project Settings',
+                code: resourceCurrency,
+              })}
+              aria-label={ctx.t('boq.resource_no_fx_rate_click', {
+                defaultValue: 'No FX rate configured for {{code}} — click to set one in Project Settings',
+                code: resourceCurrency,
+              })}
+            >
+              ⚠ {ctx.t('boq.resource_no_fx_short', { defaultValue: 'set FX' })}
+            </button>
+          ) : (
+            <span
+              className="inline-flex items-center justify-center h-3 px-1 rounded
+                         text-[8px] font-bold uppercase
+                         bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300"
+              title={ctx.t('boq.resource_no_fx_rate', {
+                defaultValue: 'No FX rate configured for {{code}} — total shown in {{code}}',
+                code: resourceCurrency,
+              })}
+            >
+              ⚠ no FX
+            </span>
+          )
         )}
         <span>{formattedTotal}</span>
       </span>

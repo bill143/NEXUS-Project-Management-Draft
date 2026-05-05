@@ -1,4 +1,4 @@
-"""BOQ API routes.
+"""‌⁠‍BOQ API routes.
 
 Endpoints:
     POST   /boqs/                              — Create a new BOQ
@@ -156,7 +156,7 @@ async def _verify_boq_owner(
     user_id: str,
     payload: dict | None = None,
 ) -> None:
-    """Load a BOQ, then its project, and verify ownership.
+    """‌⁠‍Load a BOQ, then its project, and verify ownership.
 
     Admins bypass the check. Raises 403 if the user is not the project owner.
     """
@@ -186,7 +186,7 @@ async def _verify_project_owner_for_boq(
     user_id: str,
     payload: dict | None = None,
 ) -> None:
-    """Verify the current user owns the given project. Admins bypass.
+    """‌⁠‍Verify the current user owns the given project. Admins bypass.
 
     Treats archived (soft-deleted) projects as 404 — no operations on
     archived projects are permitted via this gateway.
@@ -4712,6 +4712,7 @@ async def get_resource_summary(
                 "available_variants": None,
                 "variant_stats": None,
                 "currency": None,
+                "resource_code": None,
                 # Distinct (label, default) tuples observed across positions:
                 # if all entries agree we surface that pick; mixed → "__mixed__".
                 "variant_labels": set(),
@@ -4725,7 +4726,7 @@ async def get_resource_summary(
         entry["rates"].append(rate)
         entry["positions"].add(pos_id)
 
-        # Capture variant catalog / stats / currency on first sighting.
+        # Capture variant catalog / stats / currency / code on first sighting.
         avail = raw.get("available_variants")
         if entry["available_variants"] is None and isinstance(avail, list) and len(avail) >= 2:
             entry["available_variants"] = avail
@@ -4735,6 +4736,9 @@ async def get_resource_summary(
         cur = raw.get("currency")
         if entry["currency"] is None and isinstance(cur, str) and cur:
             entry["currency"] = cur
+        rc = raw.get("code")
+        if entry["resource_code"] is None and isinstance(rc, str) and rc.strip():
+            entry["resource_code"] = rc.strip()
 
         # Track current pick / default per position so the UI can show a
         # consistent pill (or flag "mixed" when positions disagree).
@@ -4824,11 +4828,50 @@ async def get_resource_summary(
                 current_variant_label=current_label,
                 variant_default=variant_default,
                 currency=entry["currency"],
+                resource_code=entry["resource_code"],
                 position_refs=entry["position_refs"],
             )
         )
 
     resource_items.sort(key=lambda r: r.total_cost, reverse=True)
+
+    # Dedupe variant pickers across summary rows. Two collapse scenarios:
+    #   1. Two rows share the same ``resource_code`` (CWICR
+    #      KADX_KATO_KAKASA_KATO: two component rows under KALI-RI-KATO-KANE
+    #      with identical 3-variant catalogs).
+    #   2. Two rows carry the same variant-label set even with different
+    #      codes — happens when a position persisted the synthetic top-level
+    #      resource alongside a component that mirrors it (BG_SOFIA shape:
+    #      "Стоманени конструкции" appears as both the cost item's top
+    #      variants and as component[0]).
+    # In both cases strip ``available_variants`` / ``variant_stats`` from
+    # secondary rows so the UI only renders one ▾N picker per unique
+    # catalog. Picker fan-out via ``position_refs`` covers all linked
+    # positions already.
+    seen_codes: set[str] = set()
+    seen_hashes: set[str] = set()
+    for it in resource_items:
+        if not it.available_variants:
+            continue
+        label_hash = "|".join(
+            (v.get("label") or "").strip()
+            for v in it.available_variants
+            if isinstance(v, dict)
+        )
+        already = (
+            (it.resource_code and it.resource_code in seen_codes)
+            or (label_hash and label_hash in seen_hashes)
+        )
+        if already:
+            it.available_variants = None
+            it.variant_stats = None
+            it.current_variant_label = None
+            it.variant_default = None
+        else:
+            if it.resource_code:
+                seen_codes.add(it.resource_code)
+            if label_hash:
+                seen_hashes.add(label_hash)
 
     # Build by_type summary
     by_type: dict[str, ResourceTypeSummary] = {}
@@ -4838,10 +4881,35 @@ async def get_resource_summary(
         by_type[item.type].count += 1
         by_type[item.type].total_cost = round(by_type[item.type].total_cost + item.total_cost, 2)
 
+    # Issue #106 — Pareto / ABC analysis. Items are already sorted by total_cost
+    # descending above, so we walk the cumulative percentage and assign the
+    # standard 80/15/5 buckets. The thresholds are conventional, not
+    # ISO-prescribed; they match the user's "what hurts the budget most" intent
+    # (A = ~top 20 % of items that drive ~80 % of cost). When grand_total is 0
+    # (e.g. fresh BOQ with no rates yet) we skip ABC entirely so we don't
+    # divide by zero.
+    grand_total = round(sum(it.total_cost for it in resource_items), 2)
+    if grand_total > 0:
+        cumulative = 0.0
+        for item in resource_items:
+            pct = (item.total_cost / grand_total) * 100.0
+            item.abc_percentage = round(pct, 2)
+            cumulative += pct
+            # Use the cumulative threshold *before* this item rather than
+            # after — otherwise the single biggest item would always be
+            # classified A even on a flat distribution. Standard practice.
+            if cumulative <= 80.0:
+                item.abc_class = "A"
+            elif cumulative <= 95.0:
+                item.abc_class = "B"
+            else:
+                item.abc_class = "C"
+
     return ResourceSummaryResponse(
         total_resources=len(resource_items),
         by_type=by_type,
         resources=resource_items,
+        grand_total=grand_total,
     )
 
 

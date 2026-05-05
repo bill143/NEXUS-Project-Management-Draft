@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import {
   Search,
   ChevronDown,
@@ -197,8 +197,8 @@ function RegionImportGrid({
     onSuccess: (result) => {
       addToast({
         type: 'success',
-        title: t('catalog.import_success', { defaultValue: 'Import complete' }),
-        message: `${result.imported} ${t('catalog.resources_imported', { defaultValue: 'resources imported' })}`,
+        title: t('catalog.import_success', { defaultValue: 'Import complete‌⁠‍' }),
+        message: `${result.imported} ${t('catalog.resources_imported', { defaultValue: 'resources imported‌⁠‍' })}`,
       });
       setImportingId(null);
       onImported();
@@ -206,7 +206,7 @@ function RegionImportGrid({
     onError: (err: Error) => {
       addToast({
         type: 'error',
-        title: t('catalog.import_failed', { defaultValue: 'Import failed' }),
+        title: t('catalog.import_failed', { defaultValue: 'Import failed‌⁠‍' }),
         message: err.message,
       });
       setImportingId(null);
@@ -230,12 +230,12 @@ function RegionImportGrid({
           </div>
           <div>
             <h2 className="text-base font-semibold text-content-primary">
-              {t('catalog.import_regions_title', { defaultValue: 'Import Resource Catalog' })}
+              {t('catalog.import_regions_title', { defaultValue: 'Import Resource Catalog‌⁠‍' })}
             </h2>
             <p className="text-xs text-content-tertiary">
               {t('catalog.import_regions_desc', {
                 defaultValue:
-                  'Download pre-built resource catalogs from CWICR regional databases',
+                  'Download pre-built resource catalogs from CWICR regional databases‌⁠‍',
               })}
             </p>
           </div>
@@ -953,6 +953,9 @@ function BuildAssemblyModal({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="catalog-build-assembly-title"
         className="bg-surface-elevated rounded-2xl border border-border shadow-2xl w-full max-w-2xl mx-4 overflow-hidden max-h-[85vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
@@ -963,7 +966,7 @@ function BuildAssemblyModal({
               <Layers size={18} />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-content-primary">
+              <h2 id="catalog-build-assembly-title" className="text-base font-semibold text-content-primary">
                 {t('catalog.build_assembly', { defaultValue: 'Build Assembly' })}
               </h2>
               <p className="text-xs text-content-tertiary">
@@ -1165,13 +1168,28 @@ export function CatalogPage() {
 
   const navigate = useNavigate();
 
+  // ?region=DE_BERLIN deep-link from /setup/databases — pre-selects the
+  // region filter on mount so the user lands directly on the resources
+  // they just imported.
+  const [searchParams, setSearchParams] = useSearchParams();
+  const regionFromUrl = searchParams.get('region') ?? '';
+
   const [query, setQuery] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
   const [resourceType, setResourceType] = useState('');
   const [category, setCategory] = useState('');
   const [unit, setUnit] = useState('');
-  const [region, setRegion] = useState('');
+  const [region, setRegion] = useState(regionFromUrl);
   const [offset, setOffset] = useState(0);
+
+  // Strip the region param after one-shot apply so the filter doesn't
+  // get re-forced on every render or refresh.
+  useEffect(() => {
+    if (!regionFromUrl) return;
+    searchParams.delete('region');
+    setSearchParams(searchParams, { replace: true });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -1202,6 +1220,21 @@ export function CatalogPage() {
     queryFn: () => apiGet<CatalogRegionStat[]>('/v1/catalog/regions/'),
     retry: false,
   });
+
+  // Auto-pick a region when no filter is active and rows exist somewhere.
+  // Mirrors the CostsPage fallback so a user landing on /catalog after
+  // /setup/databases doesn't see "0 resources" when the just-loaded region
+  // is sitting one click away.
+  useEffect(() => {
+    if (region) return;
+    if (regionFromUrl) return;
+    const first = (regionStats ?? [])
+      .map((r) => r.region)
+      .find((r): r is string => Boolean(r));
+    if (!first) return;
+    setRegion(first);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [regionStats]);
 
   // Fetch resources
   const searchUrl = buildSearchUrl(debouncedQuery, resourceType, category, unit, region, offset);
@@ -1281,6 +1314,15 @@ export function CatalogPage() {
 
   const handleDeleteRegion = useCallback(
     async (regionId: string) => {
+      // Destructive: wipes every resource in the region. Confirm before firing
+      // so a stray click can't nuke a populated region.
+      const confirmed = window.confirm(
+        t('catalog.delete_region_confirm', {
+          defaultValue: 'Delete region "{{region}}" and all its resources? This cannot be undone.',
+          region: regionId,
+        }),
+      );
+      if (!confirmed) return;
       try {
         const result = await apiDelete<{ deleted: number; region: string }>(
           `/v1/catalog/region/${regionId}`,
@@ -1990,6 +2032,9 @@ function PriceAdjustModal({
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="catalog-adjust-prices-title"
         className="bg-surface-elevated rounded-2xl border border-border shadow-2xl w-full max-w-lg mx-4 overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
@@ -2000,7 +2045,7 @@ function PriceAdjustModal({
               <TrendingUp size={18} />
             </div>
             <div>
-              <h2 className="text-base font-semibold text-content-primary">
+              <h2 id="catalog-adjust-prices-title" className="text-base font-semibold text-content-primary">
                 {t('catalog.adjust_prices', { defaultValue: 'Adjust Prices' })}
               </h2>
               <p className="text-xs text-content-tertiary">
@@ -2370,10 +2415,16 @@ function CreateResourceModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={onClose}>
-      <div className="bg-surface-elevated rounded-2xl border border-border shadow-2xl w-full max-w-md mx-4 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="catalog-create-resource-title"
+        className="bg-surface-elevated rounded-2xl border border-border shadow-2xl w-full max-w-md mx-4 animate-fade-in"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between px-6 py-4 border-b border-border-light">
           <div>
-            <h2 className="text-base font-semibold text-content-primary">
+            <h2 id="catalog-create-resource-title" className="text-base font-semibold text-content-primary">
               {t('catalog.create_resource', { defaultValue: 'Add Custom Resource' })}
             </h2>
             <p className="text-xs text-content-tertiary">

@@ -1,4 +1,4 @@
-"""Event bus​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠ for inter-module communication.
+"""‌⁠‍Event bus​‌‍⁠​‌‍⁠​‌‍⁠​‌‍⁠ for inter-module communication.
 
 Modules publish events; other modules subscribe to them.
 Supports both sync and async handlers.
@@ -36,7 +36,7 @@ EventHandler = Callable[..., Any]
 
 @dataclass
 class Event:
-    """Represents a published event."""
+    """‌⁠‍Represents a published event."""
 
     name: str
     data: dict[str, Any]
@@ -47,7 +47,7 @@ class Event:
 
 @dataclass
 class EventResult:
-    """Result of processing an event through all handlers."""
+    """‌⁠‍Result of processing an event through all handlers."""
 
     event: Event
     handler_results: list[dict[str, Any]] = field(default_factory=list)
@@ -99,6 +99,30 @@ class EventBus:
             self._wildcard_handlers.remove(handler)
         else:
             self._handlers[event_name].remove(handler)
+
+    def publish_detached(
+        self,
+        event_name: str,
+        data: dict[str, Any] | None = None,
+        source_module: str | None = None,
+    ) -> asyncio.Task[EventResult]:
+        """Schedule an event publish without blocking the caller.
+
+        Use this from request-handler code paths where the caller is still
+        holding an open SQLAlchemy/aiosqlite session: SQLite allows only
+        one writer at a time, so subscribers that open a second session
+        via ``async_session_factory()`` (notifications, webhooks, etc.)
+        will deadlock the outer transaction for ~30s if we ``await`` them
+        here. Detaching via :func:`asyncio.create_task` lets the request
+        commit and release the writer lock before the subscribers fire.
+
+        Returns the task so callers can ``await`` it in tests; production
+        code should fire-and-forget. Errors inside the detached task are
+        logged by :meth:`publish` itself.
+        """
+        return asyncio.create_task(
+            self.publish(event_name, data, source_module=source_module)
+        )
 
     async def publish(
         self,

@@ -1,4 +1,4 @@
-"""Project service — business logic for project management.
+"""‌⁠‍Project service — business logic for project management.
 
 Stateless service layer. Handles:
 - Project CRUD with ownership enforcement
@@ -30,7 +30,7 @@ async def _safe_audit(
     user_id: str | None = None,
     details: dict | None = None,
 ) -> None:
-    """Best-effort audit log — never blocks the caller on failure."""
+    """‌⁠‍Best-effort audit log — never blocks the caller on failure."""
     try:
         from app.core.audit import audit_log
 
@@ -48,7 +48,7 @@ async def _safe_audit(
 
 async def _safe_publish(name: str, data: dict, source_module: str = "") -> None:
     try:
-        await event_bus.publish(name, data, source_module=source_module)
+        event_bus.publish_detached(name, data, source_module=source_module)
     except Exception:
         _logger_ev.debug("Event publish skipped: %s", name)
 
@@ -61,7 +61,7 @@ logger = logging.getLogger(__name__)
 
 
 class ProjectService:
-    """Business logic for project operations."""
+    """‌⁠‍Business logic for project operations."""
 
     def __init__(self, session: AsyncSession, settings: Settings) -> None:
         self.session = session
@@ -237,6 +237,20 @@ class ProjectService:
         # Refresh the project object
         await self.session.refresh(project)
 
+        # If the region changed, drop it from the match-service region
+        # cache so the boost layer sees the new value on the very next
+        # match request — without this we'd carry stale region data for
+        # up to 60 s after the PATCH.
+        if "region" in fields:
+            try:
+                from app.core.match_service.region_cache import (
+                    clear_project_region_cache,
+                )
+
+                clear_project_region_cache(project_id)
+            except Exception:
+                pass
+
         await _safe_publish(
             "projects.project.updated",
             {
@@ -391,3 +405,150 @@ class ProjectService:
 
         # Re-fetch to return fresh data
         return await self.get_project(project_id)
+
+
+# ── Match-settings service helpers (v2.8.0) ──────────────────────────────
+
+
+def _settings_snapshot(row: object) -> dict:
+    """Pure dict snapshot of a MatchProjectSettings row for audit trails."""
+    return {
+        "target_language": getattr(row, "target_language", None),
+        "classifier": getattr(row, "classifier", None),
+        "auto_link_threshold": getattr(row, "auto_link_threshold", None),
+        "auto_link_enabled": getattr(row, "auto_link_enabled", None),
+        "mode": getattr(row, "mode", None),
+        "sources_enabled": list(getattr(row, "sources_enabled", []) or []),
+        "cost_database_id": getattr(row, "cost_database_id", None),
+    }
+
+
+async def get_or_create_match_settings(
+    db: AsyncSession,
+    project_id: uuid.UUID,
+):
+    """Fetch the project's match settings, creating a default row on first read.
+
+    Lazy initialisation keeps existing projects (created before v2.8.0)
+    backwards-compatible — they get a default row the first time the UI or
+    matcher service asks for it. Callers receive the ORM row so the router
+    can ``model_validate`` it into a Pydantic response.
+    """
+    from sqlalchemy import select
+
+    from app.modules.projects.models import (
+        MATCH_DEFAULT_AUTO_LINK_ENABLED,
+        MATCH_DEFAULT_AUTO_LINK_THRESHOLD,
+        MATCH_DEFAULT_CLASSIFIER,
+        MATCH_DEFAULT_MODE,
+        MATCH_DEFAULT_SOURCES,
+        MATCH_DEFAULT_TARGET_LANGUAGE,
+        MatchProjectSettings,
+    )
+
+    stmt = select(MatchProjectSettings).where(
+        MatchProjectSettings.project_id == project_id,
+    )
+    row = (await db.execute(stmt)).scalar_one_or_none()
+    if row is not None:
+        return row
+
+    row = MatchProjectSettings(
+        project_id=project_id,
+        target_language=MATCH_DEFAULT_TARGET_LANGUAGE,
+        classifier=MATCH_DEFAULT_CLASSIFIER,
+        auto_link_threshold=MATCH_DEFAULT_AUTO_LINK_THRESHOLD,
+        auto_link_enabled=MATCH_DEFAULT_AUTO_LINK_ENABLED,
+        mode=MATCH_DEFAULT_MODE,
+        sources_enabled=list(MATCH_DEFAULT_SOURCES),
+    )
+    db.add(row)
+    await db.flush()
+    await db.refresh(row)
+    return row
+
+
+async def update_match_settings(
+    db: AsyncSession,
+    project_id: uuid.UUID,
+    patch,  # MatchProjectSettingsUpdate — typed lazily to avoid circular import
+    *,
+    user_id: str | None = None,
+):
+    """Apply a partial PATCH to the project's match settings.
+
+    Audit-logs the change with both ``before`` and ``after`` snapshots so
+    the audit trail is self-contained. Returns the refreshed ORM row.
+    """
+    row = await get_or_create_match_settings(db, project_id)
+    before = _settings_snapshot(row)
+
+    fields = patch.model_dump(exclude_unset=True)
+    if not fields:
+        return row
+
+    for key, value in fields.items():
+        setattr(row, key, value)
+    await db.flush()
+    await db.refresh(row)
+
+    await _safe_audit(
+        db,
+        action="update",
+        entity_type="project_match_settings",
+        entity_id=str(project_id),
+        user_id=user_id,
+        details={
+            "before": before,
+            "after": _settings_snapshot(row),
+            "updated_fields": list(fields.keys()),
+        },
+    )
+    return row
+
+
+async def reset_match_settings(
+    db: AsyncSession,
+    project_id: uuid.UUID,
+    *,
+    user_id: str | None = None,
+):
+    """Reset the project's match settings to factory defaults.
+
+    Audit-logs the reset with a ``before`` snapshot of the prior state and
+    the canonical default ``after`` snapshot.
+    """
+    from app.modules.projects.models import (
+        MATCH_DEFAULT_AUTO_LINK_ENABLED,
+        MATCH_DEFAULT_AUTO_LINK_THRESHOLD,
+        MATCH_DEFAULT_CLASSIFIER,
+        MATCH_DEFAULT_MODE,
+        MATCH_DEFAULT_SOURCES,
+        MATCH_DEFAULT_TARGET_LANGUAGE,
+    )
+
+    row = await get_or_create_match_settings(db, project_id)
+    before = _settings_snapshot(row)
+
+    row.target_language = MATCH_DEFAULT_TARGET_LANGUAGE
+    row.classifier = MATCH_DEFAULT_CLASSIFIER
+    row.auto_link_threshold = MATCH_DEFAULT_AUTO_LINK_THRESHOLD
+    row.auto_link_enabled = MATCH_DEFAULT_AUTO_LINK_ENABLED
+    row.mode = MATCH_DEFAULT_MODE
+    row.sources_enabled = list(MATCH_DEFAULT_SOURCES)
+    row.cost_database_id = None
+    await db.flush()
+    await db.refresh(row)
+
+    await _safe_audit(
+        db,
+        action="reset",
+        entity_type="project_match_settings",
+        entity_id=str(project_id),
+        user_id=user_id,
+        details={
+            "before": before,
+            "after": _settings_snapshot(row),
+        },
+    )
+    return row

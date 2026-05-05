@@ -1,4 +1,4 @@
-"""RFI API routes.
+"""‌⁠‍RFI API routes.
 
 Endpoints:
     GET    /                    - List RFIs for a project
@@ -39,7 +39,7 @@ def _get_service(session: SessionDep) -> RFIService:
 
 
 def _compute_rfi_fields(item: object) -> tuple[bool, int]:
-    """Compute is_overdue and days_open for an RFI item."""
+    """‌⁠‍Compute is_overdue and days_open for an RFI item."""
     now = datetime.now(UTC)
 
     # days_open: from created_at to now (or responded_at if answered/closed)
@@ -133,7 +133,7 @@ async def list_rfis(
     ),
     service: RFIService = Depends(_get_service),
 ) -> list[RFIResponse]:
-    """List RFIs for a project."""
+    """‌⁠‍List RFIs for a project."""
     await verify_project_access(project_id, user_id, session)
     rfis, _ = await service.list_rfis(
         project_id,
@@ -364,11 +364,13 @@ async def batch_update_rfi_status(
 )
 async def get_rfi(
     rfi_id: uuid.UUID,
+    session: SessionDep,
     user_id: CurrentUserId,
     service: RFIService = Depends(_get_service),
 ) -> RFIResponse:
     """Get a single RFI."""
     rfi = await service.get_rfi(rfi_id)
+    await verify_project_access(rfi.project_id, str(user_id), session)
     return _to_response(rfi)
 
 
@@ -376,11 +378,14 @@ async def get_rfi(
 async def update_rfi(
     rfi_id: uuid.UUID,
     data: RFIUpdate,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     _perm: None = Depends(RequirePermission("rfi.update")),
     service: RFIService = Depends(_get_service),
 ) -> RFIResponse:
     """Update an RFI."""
+    existing = await service.get_rfi(rfi_id)
+    await verify_project_access(existing.project_id, str(user_id), session)
     rfi = await service.update_rfi(rfi_id, data)
     return _to_response(rfi)
 
@@ -388,11 +393,14 @@ async def update_rfi(
 @router.delete("/{rfi_id}", status_code=204)
 async def delete_rfi(
     rfi_id: uuid.UUID,
+    session: SessionDep,
     user_id: CurrentUserId = None,  # type: ignore[assignment]
     _perm: None = Depends(RequirePermission("rfi.delete")),
     service: RFIService = Depends(_get_service),
 ) -> None:
     """Delete an RFI."""
+    existing = await service.get_rfi(rfi_id)
+    await verify_project_access(existing.project_id, str(user_id), session)
     await service.delete_rfi(rfi_id)
 
 
