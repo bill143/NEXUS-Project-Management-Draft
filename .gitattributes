@@ -1,0 +1,8 @@
+# Enforce LF line endings on shell scripts regardless of OS.
+#
+# Without this, Windows clients with core.autocrlf=true will check out
+# *.sh files with CRLF endings. When such a file is COPYed into a Linux
+# Docker image, the shebang reads `#!/usr/bin/env sh\r` and the kernel
+# fails with: /usr/bin/env: 'sh\r': No such file or directory
+*.sh   text eol=lf
+*.bash text eol=lf
