@@ -15,7 +15,16 @@ class CostItem(Base):
 
     __tablename__ = "oe_costs_item"
     __table_args__ = (
-        UniqueConstraint("code", "region", name="uq_costs_code_region"),
+        # postgresql_nulls_not_distinct: Postgres treats NULL != NULL in
+        # unique indexes by default, so without this flag the constraint
+        # silently allows duplicate (code, NULL) rows. SQLite ignores the
+        # postgresql_-prefixed kwarg.
+        UniqueConstraint(
+            "code",
+            "region",
+            name="uq_costs_code_region",
+            postgresql_nulls_not_distinct=True,
+        ),
         # Indexes for common filter combinations in search()
         Index("ix_costs_source_region", "source", "region"),
         Index("ix_costs_is_active", "is_active"),
