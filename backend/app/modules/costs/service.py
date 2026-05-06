@@ -331,18 +331,31 @@ class CostItemService:
     # ── Bulk import ───────────────────────────────────────────────────────
 
     async def bulk_import(self, items_data: list[CostItemCreate]) -> list[CostItem]:
-        """Bulk import cost items. Skips items with duplicate codes.
+        """Bulk import cost items. Skips items with duplicate (code, region) pairs.
 
         Returns the list of successfully created items.
         """
+        if not items_data:
+            return []
+
         created: list[CostItem] = []
         skipped_codes: list[str] = []
 
+        # Single batched SELECT for existing (code, region) pairs instead of
+        # N+1 get_by_code calls. For 55k-row CWICR imports this turns ~3 minutes
+        # of round-trips into a few seconds.
+        all_codes = list({data.code for data in items_data})
+        seen = await self.repo.get_code_region_pairs(all_codes)
+
         for data in items_data:
-            existing = await self.repo.get_by_code(data.code, region=data.region)
-            if existing is not None:
+            key = (data.code, data.region)
+            if key in seen:
                 skipped_codes.append(data.code)
                 continue
+            # Add to seen so within-batch duplicates also get skipped — the
+            # uq_costs_code_region constraint (NULLS NOT DISTINCT) would
+            # otherwise reject the second row at INSERT time.
+            seen.add(key)
 
             item = CostItem(
                 code=data.code,
