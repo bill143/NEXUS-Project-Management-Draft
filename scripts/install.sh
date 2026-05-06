@@ -1,5 +1,5 @@
 #!/bin/bash
-# OpenConstructionERP — One-Line Installer for Linux / macOS
+# NEXUS — One-Line Installer for Linux / macOS
 #
 # Usage:
 #   curl -fsSL https://raw.githubusercontent.com/datadrivenconstruction/OpenConstructionERP/main/scripts/install.sh | bash
@@ -11,7 +11,7 @@
 #
 # Environment variables:
 #   OE_VERSION     - Version to install (default: latest)
-#   OE_INSTALL_DIR - Installation directory (default: ~/.openconstructionerp)
+#   OE_INSTALL_DIR - Installation directory (default: ~/.nexus)
 #   OE_METHOD      - Force method: docker, pip, uv (default: auto-detect)
 #   OE_PORT        - Port to run on (default: 8080)
 
@@ -19,7 +19,7 @@ set -euo pipefail
 
 # ── Configuration ────────────────────────────────────────────────────
 OE_VERSION="${OE_VERSION:-latest}"
-OE_INSTALL_DIR="${OE_INSTALL_DIR:-$HOME/.openconstructionerp}"
+OE_INSTALL_DIR="${OE_INSTALL_DIR:-$HOME/.nexus}"
 OE_METHOD="${OE_METHOD:-auto}"
 OE_PORT="${OE_PORT:-8080}"
 OE_REPO="https://github.com/datadrivenconstruction/OpenConstructionERP"
@@ -96,14 +96,14 @@ install_uv() {
         export PATH="$HOME/.local/bin:$PATH"
     fi
 
-    # Install OpenConstructionERP (PyPI package name — see pyproject.toml).
+    # Install NEXUS (PyPI package name — see pyproject.toml).
     # Honour OE_VERSION env var (advertised in file header).
     if [ "$OE_VERSION" = "latest" ]; then
-        uv tool install openconstructionerp
+        uv tool install nexus
     else
-        uv tool install "openconstructionerp==$OE_VERSION"
+        uv tool install "nexus==$OE_VERSION"
     fi
-    ok "OpenConstructionERP installed!"
+    ok "NEXUS installed!"
 
     # Create systemd service if on Linux
     if [ "$(uname -s)" = "Linux" ] && command -v systemctl &>/dev/null; then
@@ -146,24 +146,24 @@ install_pip() {
     # pin honours the env var advertised in the file header.
     pip install --upgrade pip
     if [ "$OE_VERSION" = "latest" ]; then
-        pip install --upgrade openconstructionerp
+        pip install --upgrade nexus
     else
-        pip install --upgrade "openconstructionerp==$OE_VERSION"
+        pip install --upgrade "nexus==$OE_VERSION"
     fi
 
-    ok "OpenConstructionERP installed in $OE_INSTALL_DIR/venv"
+    ok "NEXUS installed in $OE_INSTALL_DIR/venv"
 
     # Create convenience script
     cat > "$OE_INSTALL_DIR/start.sh" << 'SCRIPT'
 #!/bin/bash
 source "$(dirname "$0")/venv/bin/activate"
-openconstructionerp serve "$@"
+nexus serve "$@"
 SCRIPT
     chmod +x "$OE_INSTALL_DIR/start.sh"
 
     echo ""
     echo "Run: $OE_INSTALL_DIR/start.sh --port $OE_PORT"
-    echo " Or: source $OE_INSTALL_DIR/venv/bin/activate && openconstructionerp serve"
+    echo " Or: source $OE_INSTALL_DIR/venv/bin/activate && nexus serve"
 }
 
 create_systemd_service() {
@@ -171,11 +171,11 @@ create_systemd_service() {
     mkdir -p "$(dirname "$service_file")"
 
     local oe_bin
-    oe_bin="$(which openconstructionerp 2>/dev/null || echo "$HOME/.local/bin/openconstructionerp")"
+    oe_bin="$(which nexus 2>/dev/null || echo "$HOME/.local/bin/nexus")"
 
     cat > "$service_file" << EOF
 [Unit]
-Description=OpenConstructionERP Server
+Description=NEXUS Server
 After=network.target
 
 [Service]
@@ -189,14 +189,14 @@ WantedBy=default.target
 EOF
 
     systemctl --user daemon-reload
-    info "Systemd service created. Enable with: systemctl --user enable --now openconstructionerp"
+    info "Systemd service created. Enable with: systemctl --user enable --now nexus"
 }
 
 # ── Main ─────────────────────────────────────────────────────────────
 main() {
     echo ""
     echo "  ╔═══════════════════════════════════════════════╗"
-    echo "  ║      OpenConstructionERP Installer            ║"
+    echo "  ║      NEXUS Installer            ║"
     echo "  ║      Construction Cost Estimation Platform    ║"
     echo "  ╚═══════════════════════════════════════════════╝"
     echo ""

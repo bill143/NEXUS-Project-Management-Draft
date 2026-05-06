@@ -104,9 +104,7 @@ export function Logo({ size = 'md', animate = false, className }: LogoProps) {
 
 /* ── LogoWithText ──────────────────────────────────────────────────────── */
 
-interface LogoWithTextProps extends LogoProps {
-  showVersion?: boolean;
-}
+type LogoWithTextProps = LogoProps;
 
 /* Text sizes — larger than icon to make the name prominent */
 const textSizeMap = {
@@ -128,23 +126,22 @@ const gapSizeMap = {
 /**
  * Logo + brand name. Per BRAND.md:
  * - Font: Plus Jakarta Sans 800
- * - Name: "OpenConstructionERP" (PascalCase, one word)
+ * - Name: "NEXUS" (PascalCase, one word)
  * - Letter-spacing: -0.02em
  * - Icon is compact, name is prominent
  */
-export function LogoWithText({ size = 'md', animate, showVersion = true, className }: LogoWithTextProps) {
+export function LogoWithText({ size = 'md', animate, className }: LogoWithTextProps) {
   return (
     <div className={clsx('flex items-center', gapSizeMap[size], className)}>
       <Logo size={size} animate={animate} />
       <span
         className={clsx(
           textSizeMap[size],
-          'font-extrabold text-content-primary whitespace-nowrap tracking-tight',
+          'font-extrabold text-oe-blue whitespace-nowrap tracking-tight',
         )}
         style={{ fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", letterSpacing: '-0.02em' }}
       >
-        Open<span className="text-oe-blue">Construction</span>
-        {showVersion && <span className="text-content-quaternary font-semibold">ERP</span>}
+        NEXUS
       </span>
     </div>
   );

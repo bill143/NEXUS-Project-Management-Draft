@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 """Phase-0 performance smoke tests for v2.8.0 vector match feature.
 
 Sanity-bounds, not formal benchmarks. The numbers below are intentionally

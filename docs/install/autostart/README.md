@@ -1,4 +1,4 @@
-# Autostart OpenConstructionERP on system boot
+# Autostart NEXUS on system boot
 
 Three ready-to-use templates for the three major OSes. Pick yours.
 
@@ -18,7 +18,7 @@ All three start `openestimate serve` and rebind on crash.
 # 1. Install backend (creates ~/.venv with openestimate inside it)
 sudo useradd -m -r -s /bin/bash openestimate
 sudo -u openestimate python3 -m venv /home/openestimate/.venv
-sudo -u openestimate /home/openestimate/.venv/bin/pip install --upgrade openconstructionerp
+sudo -u openestimate /home/openestimate/.venv/bin/pip install --upgrade nexus
 
 # 2. Drop the unit file in
 sudo cp systemd-openestimate.service /etc/systemd/system/openestimate.service
@@ -46,7 +46,7 @@ sudo ufw allow 8000/tcp
 ```bash
 # 1. Install (in your venv of choice)
 python3 -m venv ~/.venv
-~/.venv/bin/pip install --upgrade openconstructionerp
+~/.venv/bin/pip install --upgrade nexus
 
 # 2. Edit the plist — replace USERNAME with your home dir name
 sed -i '' "s|USERNAME|$USER|g" macos-com.openestimate.plist
@@ -82,13 +82,13 @@ those before running if you used a non-default install location.
 
 Verify:
 ```powershell
-schtasks /Query /TN OpenConstructionERP
+schtasks /Query /TN NEXUS
 curl http://localhost:8000/api/health
 ```
 
 To remove:
 ```powershell
-schtasks /Delete /TN OpenConstructionERP /F
+schtasks /Delete /TN NEXUS /F
 ```
 
 For LAN access on Windows, also open the firewall:

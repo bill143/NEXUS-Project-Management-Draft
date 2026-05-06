@@ -4,11 +4,11 @@
 
 Artem Boiko / DataDrivenConstruction.io ("Licensor") makes the
 following unilateral patent non-assertion commitment in respect
-of the OpenConstructionERP project.
+of the NEXUS project.
 
 ## 1. Definitions
 
-- **"Software"** means the OpenConstructionERP source code,
+- **"Software"** means the NEXUS source code,
   modules, workflows, Docker images, and official distribution
   artefacts under any of its licences
   (AGPL-3.0-or-later for the open-source edition; the
@@ -51,7 +51,7 @@ and the defensive-termination mechanism of AGPL-3.0 §10.
 
 ## 4. Relationship to CLA
 
-Contributors to OpenConstructionERP execute the Contributor
+Contributors to NEXUS execute the Contributor
 Licence Agreement (see [CLA.md](./CLA.md)), Section 3 of which
 grants Licensor a royalty-free, worldwide, irrevocable patent
 licence to their contributions. That grant flows to all
@@ -79,7 +79,7 @@ those third-party patents.
 
 This policy covers patents only. It does not licence any
 trademark. See [TRADEMARK.md](./TRADEMARK.md) for the trademark
-policy covering OpenConstructionERP, OpenEstimate,
+policy covering NEXUS, OpenEstimate,
 DataDrivenConstruction, CWICR, and related marks.
 
 ## 7. Future Assignment

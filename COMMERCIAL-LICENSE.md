@@ -2,7 +2,7 @@
 
 This document is a **template** for organisations that cannot accept the
 AGPL-3.0 network-copyleft obligation (see §13 of the AGPL) and therefore
-need a commercial licence to deploy OpenConstructionERP in a
+need a commercial licence to deploy NEXUS in a
 closed-source context.
 
 It is **not** itself a binding licence. Before any deployment under a
@@ -19,7 +19,7 @@ based on this template with terms adapted to the specific engagement
   Artem Boiko, and any successor or assign.
 - **"Licensee"** means the legal entity identified in the signed order
   form.
-- **"Software"** means the OpenConstructionERP source code and binaries
+- **"Software"** means the NEXUS source code and binaries
   as of the version identified in the order form, plus any updates
   provided during the Subscription Term.
 - **"Production Use"** means any deployment of the Software that is
@@ -52,7 +52,7 @@ Licensee shall not:
 
 1. Remove or alter copyright, trademark, or other proprietary notices in
    the Software;
-2. Use the trademarks "OpenConstructionERP", "OpenEstimate",
+2. Use the trademarks "NEXUS", "OpenEstimate",
    "DataDrivenConstruction", "CWICR", or related logos beyond the
    limited use described in §5;
 3. Reverse-engineer or decompile compiled binaries except as permitted
@@ -70,9 +70,9 @@ components' licences.
 
 ## 5. Trademarks
 
-"OpenConstructionERP", "OpenEstimate", "DataDrivenConstruction", and
+"NEXUS", "OpenEstimate", "DataDrivenConstruction", and
 "CWICR" are trademarks of Licensor. Licensee may reference them
-factually ("built on OpenConstructionERP") but may not imply endorsement
+factually ("built on NEXUS") but may not imply endorsement
 or co-branding without a separate written agreement.
 
 ## 6. Fees

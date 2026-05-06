@@ -4,13 +4,13 @@
 **Last reviewed:** 2026-04-21
 
 This statement describes the accessibility status of
-OpenConstructionERP ("the Software") and of the hosted instance
+NEXUS ("the Software") and of the hosted instance
 operated by DataDrivenConstruction ("DDC") at
-<https://openconstructionerp.com> ("the Service").
+<https://nexus.eliteal.info> ("the Service").
 
 ## 1. Standards we target
 
-OpenConstructionERP targets conformance with:
+NEXUS targets conformance with:
 
 - **WCAG 2.1 Level AA** (W3C, 2018) across all user-facing
   web surfaces;
@@ -68,7 +68,7 @@ To support accessibility we:
 
 ## 5. Accessibility features for self-hosters
 
-If you deploy OpenConstructionERP on your own infrastructure,
+If you deploy NEXUS on your own infrastructure,
 you inherit the accessibility characteristics above. When you
 extend the product:
 

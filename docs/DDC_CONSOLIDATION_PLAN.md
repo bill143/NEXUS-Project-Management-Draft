@@ -1,8 +1,8 @@
 DDC Consolidation Plan — NEXUS-Project-Management-Draft
-Author: Generated via automated audit (Phase 3 of consolidation workstream) Date: 2026-05-02 Scope: Audit and port-strategy matrix for 23 DataDrivenConstruction (DDC) reference repositories targeting consolidation into a single application built on the OpenConstructionERP shell. Status: Draft — awaiting user approval before any code is written (Phase 4 gate).
+Author: Generated via automated audit (Phase 3 of consolidation workstream) Date: 2026-05-02 Scope: Audit and port-strategy matrix for 23 DataDrivenConstruction (DDC) reference repositories targeting consolidation into a single application built on the NEXUS shell. Status: Draft — awaiting user approval before any code is written (Phase 4 gate).
 ________________________________________
 1. Goal
-Produce a single unified application — NEXUS-Project-Management-Draft — built on top of the OpenConstructionERP shell, organized into 7 modules plus 1 P0 submodule:
+Produce a single unified application — NEXUS-Project-Management-Draft — built on top of the NEXUS shell, organized into 7 modules plus 1 P0 submodule:
 #	NEXUS Module	Purpose
 1	Conversion & Ingestion	RVT/IFC/DWG/DGN/PDF → tabular data; ETL pipelines
 2	Estimation & Takeoff	QTO, grouping rules, 4D/5D pipelines

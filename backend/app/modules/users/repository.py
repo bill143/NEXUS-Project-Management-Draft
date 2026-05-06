@@ -91,7 +91,7 @@ class UserRepository:
         the configured viewer role.
 
         The seeded demo account ``demo@openestimator.io`` is intentionally
-        excluded: a fresh ``pip install openconstructionerp`` ships with
+        excluded: a fresh ``pip install nexus`` ships with
         that admin already in the DB, and counting it would dead-lock the
         bootstrap path — every self-registered user would be created
         dormant in admin-approve mode with no real admin around to flip

@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 """‌⁠‍Parquet spool for EAC runs that overflow the OLTP cap (Wave 1, RFC 36 W1.1).
 

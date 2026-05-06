@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 """Concurrency perf tests for the match service (Phase 4 hardening).
 
 These tests use a mocked vector adapter so they don't depend on a real

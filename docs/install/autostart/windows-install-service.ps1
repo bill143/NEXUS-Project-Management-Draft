@@ -1,11 +1,11 @@
-# Install OpenConstructionERP as a Windows service (autostart on boot).
+# Install NEXUS as a Windows service (autostart on boot).
 # Uses Windows Task Scheduler — no extra tools required (NSSM optional).
 #
 # Run this script ONCE as Administrator:
 #   powershell -ExecutionPolicy Bypass -File windows-install-service.ps1
 #
 # To remove later:
-#   schtasks /Delete /TN "OpenConstructionERP" /F
+#   schtasks /Delete /TN "NEXUS" /F
 
 $ErrorActionPreference = 'Stop'
 
@@ -25,7 +25,7 @@ if (-not (Test-Path $openestimatePath)) {
     exit 1
 }
 
-$taskName = "OpenConstructionERP"
+$taskName = "NEXUS"
 $action = New-ScheduledTaskAction `
     -Execute $openestimatePath `
     -Argument "serve --host $bindHost --port $port" `
@@ -55,7 +55,7 @@ Register-ScheduledTask `
     -Trigger $trigger `
     -Settings $settings `
     -Principal $principal `
-    -Description "OpenConstructionERP backend on http://${bindHost}:${port}"
+    -Description "NEXUS backend on http://${bindHost}:${port}"
 
 Start-ScheduledTask -TaskName $taskName
 

@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report a bug in OpenConstructionERP
+description: Report a bug in NEXUS
 title: "[BUG] "
 labels: ["bug", "triage"]
 body:
@@ -12,7 +12,7 @@ body:
     id: version
     attributes:
       label: App Version
-      description: What version of OpenConstructionERP are you using? (visible in Settings > About)
+      description: What version of NEXUS are you using? (visible in Settings > About)
       placeholder: "0.1.0"
     validations:
       required: true

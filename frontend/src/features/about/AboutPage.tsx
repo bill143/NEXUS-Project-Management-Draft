@@ -7,7 +7,7 @@ import {
   Mail, Shield, BookOpen, Users, Award,
   Code2, Building2, Briefcase, Globe, ExternalLink,
   Linkedin, Youtube, Star, Coffee, Rocket, ArrowRight, Handshake,
-  Github, MessageCircle,
+  MessageCircle,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/shared/ui';
 import { APP_VERSION } from '@/shared/lib/version';
@@ -28,13 +28,13 @@ export function AboutPage() {
       {/* Header */}
       <div className="text-center py-6">
         <a
-          href="https://openconstructionerp.com?utm_source=app&utm_medium=about"
+          href="https://nexus.eliteal.info?utm_source=app&utm_medium=about"
           target="_blank"
           rel="noopener noreferrer"
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-oe-blue hover:text-oe-blue-dark transition-colors mb-4"
         >
           <Globe size={13} />
-          openconstructionerp.com
+          nexus.eliteal.info
           <ExternalLink size={11} />
         </a>
         <div className="flex items-center justify-center gap-2 mb-4">
@@ -44,7 +44,7 @@ export function AboutPage() {
           </span>
           <span className="text-xs font-semibold uppercase tracking-widest text-emerald-600">Open Source</span>
         </div>
-        <h1 className="text-3xl font-bold text-content-primary tracking-tight">OpenConstructionERP</h1>
+        <h1 className="text-3xl font-bold text-content-primary tracking-tight">NEXUS</h1>
         <p className="mt-2 text-base text-content-secondary">
           {t('about.tagline', { defaultValue: 'The #1 open-source platform for construction cost estimation‌⁠‍' })}
         </p>
@@ -80,7 +80,7 @@ export function AboutPage() {
             ))}
           </div>
           <p className="mt-4 text-sm text-content-secondary leading-relaxed">
-            {t('about.platform_desc', { defaultValue: 'OpenConstructionERP covers the full construction estimation workflow — BOQ editing, 4D scheduling, 5D cost modeling, AI-powered estimation, CAD/BIM quantity takeoff (RVT, IFC, DWG, DGN), tendering, and reporting. Supports regional classification standards and custom schemas.' })}
+            {t('about.platform_desc', { defaultValue: 'NEXUS covers the full construction estimation workflow — BOQ editing, 4D scheduling, 5D cost modeling, AI-powered estimation, CAD/BIM quantity takeoff (RVT, IFC, DWG, DGN), tendering, and reporting. Supports regional classification standards and custom schemas.' })}
           </p>
 
           {/* Community — invite for feedback & ideas */}
@@ -178,95 +178,24 @@ export function AboutPage() {
         </div>
       </Card>
 
-      {/* Data Driven Construction */}
+      {/* Company */}
       <Card className="animate-card-in" style={{ animationDelay: '100ms' }}>
         <div className="p-6">
-          {/* DDC Logo + Header */}
-          <div className="flex items-center gap-5 mb-4">
-            <a href="https://datadrivenconstruction.io" target="_blank" rel="noopener noreferrer" className="shrink-0">
-              <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 ring-1 ring-border-light shadow-lg hover:shadow-xl transition-shadow p-2">
-                <img
-                  src="/brand/ddc-logo.png"
-                  alt="Data Driven Construction"
-                  className="h-full w-full object-contain"
-                  loading="lazy"
-                />
-              </div>
-            </a>
-            <div>
-              <a href="https://datadrivenconstruction.io" target="_blank" rel="noopener noreferrer" className="hover:text-oe-blue transition-colors">
-                <h2 className="text-lg font-semibold text-content-primary flex items-center gap-1.5">
-                  Data Driven Construction
-                  <ExternalLink size={13} className="text-content-quaternary" />
-                </h2>
-              </a>
-              <p className="text-xs text-content-tertiary">datadrivenconstruction.io</p>
-            </div>
-          </div>
-
+          <h2 className="text-lg font-semibold text-content-primary mb-3">
+            {"O'Neill Contractors, Inc."}
+          </h2>
           <p className="text-sm text-content-secondary leading-relaxed mb-4">
-            {t('about.ddc_desc', { defaultValue: 'The company behind OpenConstructionERP. Data Driven Construction develops open-source tools and commercial solutions for the global construction industry. Our mission: make professional cost estimation accessible, transparent, and AI-augmented — from a solo quantity surveyor to enterprise-scale contractors.' })}
+            Federal construction management serving SDVOSB, VOSB, and EDWOSB certified projects across the United States.
           </p>
-
-          {/* Product cards with links */}
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <a
-              href="https://github.com/datadrivenconstruction/OpenConstructionEstimate-DDC-CWICR"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative flex flex-col items-center rounded-xl border border-border-light bg-surface-secondary/30 p-4 text-center hover:border-oe-blue/40 hover:bg-oe-blue/[0.03] transition-all"
-            >
-              <span className="absolute top-2 right-2 inline-flex items-center justify-center h-6 w-6 rounded-md bg-surface-primary border border-border-light text-content-tertiary group-hover:text-content-primary group-hover:border-oe-blue/40 transition-colors">
-                <Github size={12} />
-              </span>
-              <div className="text-2xl font-bold text-content-primary group-hover:text-oe-blue transition-colors">CWICR</div>
-              <div className="text-xs text-content-tertiary mt-1">
-                {t('about.ddc_cwicr', { defaultValue: '55,000+ cost items · 9 languages · 11 regional databases' })}
-              </div>
-              <div className="mt-2 text-2xs text-oe-blue opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                <Github size={10} /> Repository
-              </div>
-            </a>
-            <a
-              href="https://github.com/datadrivenconstruction/cad2data-Revit-IFC-DWG-DGN-pipeline-with-conversion-validation-qto"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative flex flex-col items-center rounded-xl border border-border-light bg-surface-secondary/30 p-4 text-center hover:border-oe-blue/40 hover:bg-oe-blue/[0.03] transition-all"
-            >
-              <span className="absolute top-2 right-2 inline-flex items-center justify-center h-6 w-6 rounded-md bg-surface-primary border border-border-light text-content-tertiary group-hover:text-content-primary group-hover:border-oe-blue/40 transition-colors">
-                <Github size={12} />
-              </span>
-              <div className="text-2xl font-bold text-content-primary group-hover:text-oe-blue transition-colors">cad2data</div>
-              <div className="text-xs text-content-tertiary mt-1">
-                {t('about.ddc_cad2data', { defaultValue: 'CAD/BIM pipeline — RVT, IFC, DWG, DGN to structured quantities' })}
-              </div>
-              <div className="mt-2 text-2xs text-oe-blue opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                <Github size={10} /> Repository
-              </div>
-            </a>
-            <a
-              href="https://datadrivenconstruction.io/contact-support/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="group relative flex flex-col items-center justify-center rounded-xl border border-border-light bg-surface-secondary/30 p-4 text-center hover:border-oe-blue/40 hover:bg-oe-blue/[0.03] transition-all"
-            >
-              <span className="absolute top-2 right-2 inline-flex items-center justify-center h-6 w-6 rounded-md bg-surface-primary border border-border-light text-content-tertiary group-hover:text-content-primary group-hover:border-oe-blue/40 transition-colors">
-                <ExternalLink size={11} />
-              </span>
-              <img
-                src="/brand/ddc-logo.webp"
-                alt="Data Driven Construction"
-                className="h-8 w-auto mt-1 mb-0.5 object-contain"
-                loading="lazy"
-              />
-              <div className="text-xs text-content-tertiary mt-1">
-                {t('about.ddc_platform', { defaultValue: 'Consulting, training & enterprise solutions for digital construction' })}
-              </div>
-              <div className="mt-2 text-2xs text-oe-blue opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1">
-                <ExternalLink size={10} /> Contact
-              </div>
-            </a>
-          </div>
+          <a
+            href="https://nexus.eliteal.info"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 text-sm text-oe-blue hover:underline"
+          >
+            nexus.eliteal.info
+            <ExternalLink size={13} className="text-content-quaternary" />
+          </a>
         </div>
       </Card>
 
@@ -468,7 +397,7 @@ export function AboutPage() {
               </p>
             </div>
             <a
-              href="https://openconstructionerp.com/docs.html"
+              href="https://nexus.eliteal.info/docs.html"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center gap-1.5 rounded-lg bg-oe-blue px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-oe-blue/90 transition-colors"
@@ -500,7 +429,7 @@ export function AboutPage() {
                   <Handshake size={18} className="text-oe-blue" />
                 </div>
                 <h2 className="text-2xl font-bold tracking-tight text-content-primary">
-                  {t('about.support_title', { defaultValue: 'Support OpenConstructionERP' })}
+                  {t('about.support_title', { defaultValue: 'Support NEXUS' })}
                 </h2>
               </div>
               <p className="text-sm text-content-secondary leading-relaxed max-w-xl mx-auto">
@@ -649,7 +578,7 @@ export function AboutPage() {
             </h2>
           </div>
           <p className="text-sm text-content-secondary leading-relaxed mb-3">
-            {t('about.license_desc', { defaultValue: 'OpenConstructionERP is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means you can freely use, modify, and distribute the software, as long as any modifications are also made available under the same license.' })}
+            {t('about.license_desc', { defaultValue: 'NEXUS is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means you can freely use, modify, and distribute the software, as long as any modifications are also made available under the same license.' })}
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="success" size="sm">Free to use</Badge>

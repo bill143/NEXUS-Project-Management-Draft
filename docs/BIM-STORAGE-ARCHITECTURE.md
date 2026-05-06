@@ -269,7 +269,7 @@ All four S3-compatible backends use the same `S3StorageBackend` — only the
 
 ```bash
 # 1. Install the s3 extras
-pip install "openconstructionerp[s3]"
+pip install "nexus[s3]"
 
 # 2. Set storage backend in .env
 STORAGE_BACKEND=s3
@@ -283,7 +283,7 @@ S3_REGION=eu-central-1
 python -m backend.scripts.migrate_bim_to_s3
 
 # 4. Restart the backend
-systemctl restart openconstructionerp
+systemctl restart nexus
 ```
 
 After step 4, every existing model continues to load — the file paths in the

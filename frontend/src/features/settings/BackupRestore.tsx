@@ -121,7 +121,7 @@ export function BackupRestore() {
       const blob = await exportBackup();
       const now = new Date();
       const dateStr = now.toISOString().slice(0, 10);
-      const filename = `openconstructionerp-backup-${dateStr}.zip`;
+      const filename = `nexus-backup-${dateStr}.zip`;
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');

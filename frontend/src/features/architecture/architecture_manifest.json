@@ -1,7 +1,7 @@
 {
   "_meta": {
     "generator": "generate_architecture_manifest.py",
-    "description": "Auto-generated architecture manifest for OpenConstructionERP",
+    "description": "Auto-generated architecture manifest for NEXUS",
     "version": "1.0.0"
   },
   "modules": [

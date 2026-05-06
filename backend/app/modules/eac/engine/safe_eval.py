@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 """‌⁠‍Safe formula evaluator (RFC 34 L14, EAC-1.3 §4).
 

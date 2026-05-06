@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 """‌⁠‍Classifier boost — rewards candidates whose classification matches the hint."""
 

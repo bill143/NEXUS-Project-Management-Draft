@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 """Unit tests for the embedding warm-pool (Phase-4 perf fix).
 
 These exercise the pool wiring without spinning up real torch — the

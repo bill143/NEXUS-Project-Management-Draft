@@ -623,7 +623,7 @@ async def main() -> None:
         # 1. Find or create a demo user
         # ------------------------------------------------------------------
         print("=" * 78)
-        print("  OpenConstructionERP  —  Demo Estimate Seeder")
+        print("  NEXUS  —  Demo Estimate Seeder")
         print("=" * 78)
 
         user = (await session.execute(select(User).where(User.role == "admin").limit(1))).scalar_one_or_none()

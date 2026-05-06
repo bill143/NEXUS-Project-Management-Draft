@@ -106,7 +106,7 @@ class TestSmtpBackend:
             "smtp_port": 587,
             "smtp_user": "",
             "smtp_password": "",
-            "smtp_from": "notifications@openconstructionerp.com",
+            "smtp_from": "notifications@nexus.eliteal.info",
             "smtp_tls": True,
         }
         base.update(overrides)
@@ -302,7 +302,7 @@ class TestTemplates:
     def test_wrap_contains_boilerplate(self):
         html = wrap("Title", "<p>Body</p>")
         assert "<!DOCTYPE html>" in html
-        assert "OpenConstructionERP" in html
+        assert "NEXUS" in html
         assert "Title" in html
         assert "<p>Body</p>" in html
 
@@ -317,7 +317,7 @@ class TestTemplates:
             reset_url="https://x.y/r?token=T",
             token_lifetime_minutes=45,
         )
-        assert "Reset your OpenConstructionERP password" in subject
+        assert "Reset your NEXUS password" in subject
         assert "Alice" in html
         assert "https://x.y/r?token=T" in html
         assert "45 minutes" in html

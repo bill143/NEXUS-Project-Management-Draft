@@ -1,5 +1,5 @@
 name: Feature Request
-description: Suggest a new feature or improvement for OpenConstructionERP
+description: Suggest a new feature or improvement for NEXUS
 title: "[FEATURE] "
 labels: ["enhancement"]
 body:
@@ -63,7 +63,7 @@ body:
       options:
         - Nice to have
         - Important for my workflow
-        - Blocking my adoption of OpenConstructionERP
+        - Blocking my adoption of NEXUS
 
   - type: textarea
     id: context

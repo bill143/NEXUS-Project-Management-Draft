@@ -1,7 +1,7 @@
 # CLAUDE-DASHBOARDS.md — Dashboards, Compliance & Cost-Match Layer
 
 > **Scope.** Implementation plan for 13 new features that add an analytical
-> dashboard layer on top of OpenConstructionERP: data snapshots, cascade
+> dashboard layer on top of NEXUS: data snapshots, cascade
 > filters, compliance rules, 3D↔dashboard sync, multi-source federation,
 > historical navigation, CWICR matching, and a natural-language rule
 > builder. Adapted from the original draft (`CLAUDE (3).md`) to match the
@@ -382,7 +382,7 @@ of lines instead of thousands.
 ## 3.5. Graceful degradation
 
 - `[semantic]` missing → T12 falls back to exact match only, UI shows a
-  "Semantic match requires `pip install openconstructionerp[semantic]`" banner.
+  "Semantic match requires `pip install nexus[semantic]`" banner.
 - `[analytics]` (now core, but still) missing → T04 returns pure-pyarrow
   filtered results, no DuckDB aggregation. Already the pattern in
   `app/modules/bim_hub/analytics.py` — reuse it.

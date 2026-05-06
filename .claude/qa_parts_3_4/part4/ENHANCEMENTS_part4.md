@@ -1,4 +1,4 @@
-# OpenConstructionERP — ENHANCEMENTS (Part 4)
+# NEXUS — ENHANCEMENTS (Part 4)
 
 **Дата:** 2026-04-18
 **Предыдущие части:** Part 1 (10), Part 2 (16), Part 3 (12) — всего 38 улучшений

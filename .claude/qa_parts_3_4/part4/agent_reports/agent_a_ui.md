@@ -1,6 +1,6 @@
 # Part 4 - Agent A - Deep UI Audit
 
-Target: OpenConstructionERP V4 (http://127.0.0.1:8080), bundled React SPA + FastAPI.
+Target: NEXUS V4 (http://127.0.0.1:8080), bundled React SPA + FastAPI.
 Test file: `qa_output/generated_tests/test_p4_agent_a_ui_deep.py`
 Run log: `qa_output/logs/p4_agent_a_run.log`
 Browser: Chromium headless, 1440x900, single authenticated context.
@@ -235,7 +235,7 @@ p4_i18n_de.png     p4_i18n_ar.png     p4_i18n_zh.png
 p4_boq_after_add.png  p4_projects_click.png
 ```
 
-All under `C:/Users/Artem/OpenConstructionERP/qa_output/screenshots/`.
+All under `C:/Users/Artem/NEXUS/qa_output/screenshots/`.
 
 ## Next steps suggested
 

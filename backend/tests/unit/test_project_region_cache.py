@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 """Unit tests for the per-project region TTL cache.
 
 The cache lives in ``app.core.match_service.region_cache`` and exists

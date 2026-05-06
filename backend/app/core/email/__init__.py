@@ -1,4 +1,4 @@
-"""‌⁠‍Pluggable email service for OpenConstructionERP.
+"""‌⁠‍Pluggable email service for NEXUS.
 
 Public API (import from ``app.core.email``):
 

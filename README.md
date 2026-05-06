@@ -2,7 +2,7 @@
 
 # NEXUS-Project-Management-Draft
 
-**Federal-pivot fork of [OpenConstructionERP](https://github.com/datadrivenconstruction/OpenConstructionERP) with the DataDrivenConstruction (DDC) reference toolchain consolidated in.**
+**Federal-pivot fork of [NEXUS](https://github.com/datadrivenconstruction/OpenConstructionERP) with the DataDrivenConstruction (DDC) reference toolchain consolidated in.**
 
 NEXUS extends the OCE shell with three federal-grade differentiators on top of OCE's existing 70+ modules:
 
@@ -14,31 +14,31 @@ NEXUS extends the OCE shell with three federal-grade differentiators on top of O
 
 External CAD/BIM converters (DDC's `RvtExporter` / `IfcExporter` / `DwgExporter` / `DgnExporter`) are **not redistributed** here — see [`docs/CONVERTERS.md`](docs/CONVERTERS.md) for install guidance. The full audit/port matrix lives in [`docs/DDC_CONSOLIDATION_PLAN.md`](docs/DDC_CONSOLIDATION_PLAN.md).
 
-> **Upstream attribution.** This fork preserves OpenConstructionERP's AGPL-3.0 license, full attribution chain, and 100% of the upstream content below. Maintained by [Bill Asmar / O'Neill Contractors](https://github.com/bill143). Upstream maintainer: [Artem Boiko / DataDrivenConstruction](https://datadrivenconstruction.io).
+> **Upstream attribution.** This fork preserves NEXUS's AGPL-3.0 license, full attribution chain, and 100% of the upstream content below. Maintained by [Bill Asmar / O'Neill Contractors](https://github.com/bill143). Upstream maintainer: [Artem Boiko / DataDrivenConstruction](https://datadrivenconstruction.io).
 
 ---
 
 <div align="center">
 
-# OpenConstructionERP _(upstream baseline)_
+# NEXUS _(upstream baseline)_
 
 **Open-source ERP for construction estimation and project management**
 
 Professional BOQ, 4D/5D planning, AI-powered estimation, CAD/BIM takeoff — all in one platform.
 
-[▶ Watch the 12-min walkthrough](https://www.youtube.com/watch?v=X06cIaroAeI) · [Demo](https://openconstructionerp.com) · [Documentation](https://openconstructionerp.com/docs) · [Discussions](https://t.me/datadrivenconstruction) · [Report Bug](https://github.com/datadrivenconstruction/OpenConstructionERP/issues)
+[▶ Watch the 12-min walkthrough](https://www.youtube.com/watch?v=X06cIaroAeI) · [Demo](https://nexus.eliteal.info) · [Documentation](https://nexus.eliteal.info/docs) · [Discussions](https://t.me/datadrivenconstruction) · [Report Bug](https://github.com/datadrivenconstruction/OpenConstructionERP/issues)
 
 [![License](https://img.shields.io/badge/license-AGPL--3.0-blue)](LICENSE)
 [![Version](https://img.shields.io/github/v/release/datadrivenconstruction/OpenConstructionERP?label=version&color=green)](https://github.com/datadrivenconstruction/OpenConstructionERP/releases/latest)
-[![PyPI](https://img.shields.io/pypi/v/openconstructionerp?color=informational&label=pypi)](https://pypi.org/project/openconstructionerp/)
-[![Downloads (pepy · per month)](https://static.pepy.tech/personalized-badge/openconstructionerp?period=month&units=international_system&left_color=grey&right_color=blue&left_text=downloads%20(pepy%20%C2%B7%20per%20month))](https://pepy.tech/project/openconstructionerp)
+[![PyPI](https://img.shields.io/pypi/v/nexus?color=informational&label=pypi)](https://pypi.org/project/nexus/)
+[![Downloads (pepy · per month)](https://static.pepy.tech/personalized-badge/nexus?period=month&units=international_system&left_color=grey&right_color=blue&left_text=downloads%20(pepy%20%C2%B7%20per%20month))](https://pepy.tech/project/nexus)
 [![Stars](https://img.shields.io/github/stars/datadrivenconstruction/OpenConstructionERP?style=flat&logo=github)](https://github.com/datadrivenconstruction/OpenConstructionERP/stargazers)
 <br/>
 [![Last commit](https://img.shields.io/github/last-commit/datadrivenconstruction/OpenConstructionERP?color=informational)](https://github.com/datadrivenconstruction/OpenConstructionERP/commits/main)
 ![Languages](https://img.shields.io/badge/languages-24-orange)
 ![Cost Items](https://img.shields.io/badge/cost_items-55%2C000%2B-red)
 
-<img src="docs/screenshots/hero-overview.jpg" alt="OpenConstructionERP — Dashboard Overview" width="800" />
+<img src="docs/screenshots/hero-overview.jpg" alt="NEXUS — Dashboard Overview" width="800" />
 
 <video src="https://github.com/user-attachments/assets/20b9b585-93ac-4829-a3dc-0ede9ca9e2fc" controls width="800" playsinline>
   <a href="https://github.com/datadrivenconstruction/OpenConstructionERP/releases/download/v2.0.0/oce_full_demo.mp4">▶ 1-minute teaser (your browser can't inline this — click for full 12-min walkthrough)</a>
@@ -65,7 +65,7 @@ Professional BOQ, 4D/5D planning, AI-powered estimation, CAD/BIM takeoff — all
 <td valign="top">
 
 **Getting Started**
-- [Why OpenConstructionERP?](#why-openconstructionerp)
+- [Why NEXUS?](#why-nexus)
 - [See It In Action](#see-it-in-action)
 - [Quick Start](#quick-start)
 - [Demo Accounts](#demo-accounts)
@@ -145,7 +145,7 @@ Professional BOQ, 4D/5D planning, AI-powered estimation, CAD/BIM takeoff — all
 ---
 
 ⭐ <b>If you want to see new updates and database versions and if you find our tools useful please give our repositories a star to see more similar applications for the construction industry.</b>
-Star OpenConstructionERP on GitHub and be instantly notified of new releases.
+Star NEXUS on GitHub and be instantly notified of new releases.
 <p align="center">
   <br>
   <img src="https://github.com/datadrivenconstruction/cad2data-Revit-IFC-DWG-DGN-pipeline-with-conversion-validation-qto/blob/main/DDC_in_additon/DDC_readme_content/OCE%20star%20GitHub.gif" width="100%"/>
@@ -198,9 +198,9 @@ See the [full v2.7.0 changelog](CHANGELOG.md#270--2026-05-03) or the [v2.7.0 Git
 
 ---
 
-## Why OpenConstructionERP?
+## Why NEXUS?
 
-Construction cost estimation software is expensive, closed-source, and locked to specific regions. OpenConstructionERP changes that.
+Construction cost estimation software is expensive, closed-source, and locked to specific regions. NEXUS changes that.
 
 | What you get | How it works |
 |-------------|-------------|
@@ -216,7 +216,7 @@ Construction cost estimation software is expensive, closed-source, and locked to
 <table>
 <tr>
 <th align="left">Capability</th>
-<th align="center">OpenConstructionERP</th>
+<th align="center">NEXUS</th>
 <th align="center">Enterprise BIM Suites</th>
 <th align="center">CAD Takeoff Software</th>
 <th align="center">Legacy Estimating Tools</th>
@@ -240,7 +240,7 @@ Construction cost estimation software is expensive, closed-source, and locked to
 <tr><td><b>BIM requirements (IDS/COBie)</b></td><td align="center">&#10004; import + export</td><td align="center">&#10006;</td><td align="center">&#10006;</td><td align="center">&#10006;</td><td align="center">&#10006;</td></tr>
 </table>
 
-<sub>Comparison reflects typical category capabilities based on publicly available information as of Q1 2026. Pricing is approximate (per-seat, list price) and varies by vendor and region. OpenConstructionERP is an independent open-source project and is not affiliated with any commercial vendor in the categories above.</sub>
+<sub>Comparison reflects typical category capabilities based on publicly available information as of Q1 2026. Pricing is approximate (per-seat, list price) and varies by vendor and region. NEXUS is an independent open-source project and is not affiliated with any commercial vendor in the categories above.</sub>
 
 ---
 
@@ -327,7 +327,7 @@ Each block below is a short GIF cut from the full walkthrough above — same ord
 
 ### Complete Estimation Workflow
 
-OpenConstructionERP covers the full lifecycle — from first sketch to final tender submission:
+NEXUS covers the full lifecycle — from first sketch to final tender submission:
 
 ```
   Upload              Convert            Validate           Estimate           Tender
@@ -500,17 +500,17 @@ Get productive in under 10 minutes:
 ### Recommended: pip install (1 command, full app)
 
 ```bash
-pip install --upgrade openconstructionerp
+pip install --upgrade nexus
 openestimate
 ```
 
-That's it. Installs backend + pre-built React frontend in one wheel (~7.4 MB), opens your browser at **http://localhost:8080**, creates a SQLite database, and seeds the three demo accounts on first boot. No Docker, no Node.js, no extra services. [PyPI package](https://pypi.org/project/openconstructionerp/).
+That's it. Installs backend + pre-built React frontend in one wheel (~7.4 MB), opens your browser at **http://localhost:8080**, creates a SQLite database, and seeds the three demo accounts on first boot. No Docker, no Node.js, no extra services. [PyPI package](https://pypi.org/project/nexus/).
 
 > **Ubuntu / Debian users:** on Ubuntu 23.04+ (including Ubuntu 26) and Debian 12+, `pip install` directly to the system Python fails with `error: externally-managed-environment` (PEP 668). Use a venv:
 > ```bash
 > sudo apt install -y python3.12 python3.12-venv
 > python3.12 -m venv venv && source venv/bin/activate
-> pip install --upgrade openconstructionerp
+> pip install --upgrade nexus
 > ```
 > Full Linux guide with system deps and troubleshooting: [docs/INSTALL_LINUX.md](docs/INSTALL_LINUX.md).
 
@@ -532,7 +532,7 @@ Picks Docker if installed, otherwise uv, otherwise pip. Runs at **http://localho
 
 ```bash
 git clone https://github.com/datadrivenconstruction/OpenConstructionERP.git
-cd OpenConstructionERP
+cd NEXUS
 make quickstart
 ```
 
@@ -542,7 +542,7 @@ Open **http://localhost:8080** — builds everything in ~2 minutes.
 
 ```bash
 git clone https://github.com/datadrivenconstruction/OpenConstructionERP.git
-cd OpenConstructionERP
+cd NEXUS
 
 # Install dependencies
 pip install -e ./backend[server]
@@ -662,7 +662,7 @@ flowchart TB
 
 ## Support the Project
 
-OpenConstructionERP is built and maintained by the community. If you find it useful:
+NEXUS is built and maintained by the community. If you find it useful:
 
 - ⭐ **[Star this repo](https://github.com/datadrivenconstruction/OpenConstructionERP)** — helps others discover the project
 - 💬 **[Join Discussions](https://t.me/datadrivenconstruction)** — ask questions, share ideas, help others
@@ -671,7 +671,7 @@ OpenConstructionERP is built and maintained by the community. If you find it use
 
 ## Security
 
-OpenConstructionERP includes security hardening for production deployments:
+NEXUS includes security hardening for production deployments:
 - Path traversal protection on all file download endpoints
 - CORS wildcard blocking in production mode
 - Bounded input validation on bulk price operations
@@ -700,7 +700,7 @@ tender-submission use. See [NOTICE](NOTICE) and [TERMS.md](TERMS.md) §4.
 All product names, logos, and trademarks referenced in this repository
 are property of their respective owners. Any comparative references to
 commercial categories or products are made for fair comparative purposes
-based on publicly available information. OpenConstructionERP is an
+based on publicly available information. NEXUS is an
 independent project and is not affiliated with, endorsed by, or sponsored
 by any third-party trademark owners. Full attributions in [NOTICE](NOTICE).
 

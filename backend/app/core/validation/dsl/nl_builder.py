@@ -1,4 +1,4 @@
-# DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+# DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 """‌⁠‍Natural-language → Compliance DSL builder (T13).
 
@@ -515,7 +515,7 @@ def _try_patterns(
 
 
 _AI_SYSTEM_PROMPT = """\
-You are a Compliance DSL author for OpenConstructionERP. Convert the
+You are a Compliance DSL author for NEXUS. Convert the
 user's plain-English construction validation rule into a YAML document
 that matches this schema:
 

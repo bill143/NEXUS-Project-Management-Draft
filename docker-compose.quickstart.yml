@@ -1,4 +1,4 @@
-# OpenConstructionERP — Quickstart Docker Compose
+# NEXUS — Quickstart Docker Compose
 #
 # ⚠️  EVALUATION / LOCAL-DEMO ONLY — NOT FOR PRODUCTION
 #
@@ -22,8 +22,8 @@
 #   - Accessible at http://localhost:8080
 #
 # For evaluation with SQLite (no PostgreSQL):
-#   docker run -d -p 8080:8080 -v oe_data:/data openconstructionerp
-#   (Build first: docker build -t openconstructionerp -f deploy/docker/Dockerfile.unified .)
+#   docker run -d -p 8080:8080 -v oe_data:/data nexus
+#   (Build first: docker build -t nexus -f deploy/docker/Dockerfile.unified .)
 
 services:
   postgres:

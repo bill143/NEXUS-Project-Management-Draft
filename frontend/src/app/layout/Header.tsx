@@ -155,7 +155,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
             const blobUrl = URL.createObjectURL(blob);
             const dl = document.createElement('a');
             dl.href = blobUrl;
-            dl.download = `openconstructionerp-report-${new Date().toISOString().slice(0, 10)}.json`;
+            dl.download = `nexus-report-${new Date().toISOString().slice(0, 10)}.json`;
             dl.click();
             URL.revokeObjectURL(blobUrl);
             const params = new URLSearchParams({
@@ -163,7 +163,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
               app_version: APP_VERSION,
               platform: navigator.userAgent.includes('Win') ? 'Windows' : navigator.userAgent.includes('Mac') ? 'macOS' : 'Linux',
             });
-            window.open(`https://openconstructionerp.com/contact.html?${params}`, '_blank');
+            window.open(`https://nexus.eliteal.info/contact.html?${params}`, '_blank');
           }}
           className={clsx(
             'hidden sm:flex h-8 items-center gap-1.5 rounded-lg px-2.5',
@@ -205,7 +205,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
                 const blobUrl = URL.createObjectURL(blob);
                 const dl = document.createElement('a');
                 dl.href = blobUrl;
-                dl.download = `openconstructionerp-report-${new Date().toISOString().slice(0, 10)}.json`;
+                dl.download = `nexus-report-${new Date().toISOString().slice(0, 10)}.json`;
                 dl.click();
                 URL.revokeObjectURL(blobUrl);
 
@@ -217,7 +217,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
                   app_version: APP_VERSION,
                   platform: navigator.userAgent.includes('Win') ? 'Windows' : navigator.userAgent.includes('Mac') ? 'macOS' : 'Linux',
                 });
-                window.open(`https://openconstructionerp.com/contact.html?${params}`, '_blank');
+                window.open(`https://nexus.eliteal.info/contact.html?${params}`, '_blank');
 
                 // Variant C: Direct POST (best-effort, non-blocking)
                 const reportBlob = exportErrorReport();
@@ -227,7 +227,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                     body: JSON.stringify({
-                      _subject: 'Bug Report from OpenConstructionERP App',
+                      _subject: 'Bug Report from NEXUS App',
                       'App Version': data.app_version || APP_VERSION,
                       'Error Count': data.total_errors || 0,
                       Platform: data.platform || '',
@@ -247,7 +247,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
             </button>
             <a
               role="menuitem"
-              href="mailto:info@datadrivenconstruction.io?subject=OpenConstructionERP%20Issue%20Report"
+              href="mailto:info@datadrivenconstruction.io?subject=NEXUS%20Issue%20Report"
               className="flex w-full items-center gap-2.5 px-3 py-2 text-sm text-content-primary hover:bg-surface-secondary transition-colors"
               title={t('header.email_issue', { defaultValue: 'Email an issue to the team' })}
             >
@@ -263,7 +263,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
 
         {/* Documentation link */}
         <a
-          href="https://openconstructionerp.com/docs.html"
+          href="https://nexus.eliteal.info/docs.html"
           target="_blank"
           rel="noopener noreferrer"
           className={clsx(
@@ -289,7 +289,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
               const blobUrl = URL.createObjectURL(blob);
               const dl = document.createElement('a');
               dl.href = blobUrl;
-              dl.download = `openconstructionerp-log-${new Date().toISOString().slice(0, 10)}.json`;
+              dl.download = `nexus-log-${new Date().toISOString().slice(0, 10)}.json`;
               dl.click();
               URL.revokeObjectURL(blobUrl);
             }
@@ -300,7 +300,7 @@ export function Header({ title, onMenuClick }: HeaderProps) {
               feedback: 'true',
               app_version: APP_VERSION,
             });
-            window.open(`https://openconstructionerp.com/contact.html?${params}`, '_blank');
+            window.open(`https://nexus.eliteal.info/contact.html?${params}`, '_blank');
           }}
           className={clsx(
             'flex h-8 items-center gap-1.5 rounded-lg px-2.5',

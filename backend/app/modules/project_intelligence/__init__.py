@@ -1,7 +1,7 @@
 """‌⁠‍Project Intelligence module.
 
 AI-powered project completion analysis, scoring, gap detection,
-and guided recommendations for OpenConstructionERP.
+and guided recommendations for NEXUS.
 """
 
 MODULE_METADATA = {

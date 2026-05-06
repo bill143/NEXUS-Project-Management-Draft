@@ -3,7 +3,7 @@
 **Version 1.0 — April 2026**
 
 This document describes the state of readiness of
-OpenConstructionERP and of the DDC-operated hosted instance
+NEXUS and of the DDC-operated hosted instance
 against the AICPA Trust Services Criteria (TSC) 2017 (revised
 2022). It is intended for enterprise procurement teams asking
 "are you SOC 2 ready?".
@@ -15,10 +15,10 @@ against the AICPA Trust Services Criteria (TSC) 2017 (revised
 
 ## 1. Scope
 
-- Software: OpenConstructionERP (all modules distributed under
+- Software: NEXUS (all modules distributed under
   AGPL-3.0-or-later and the commercial licence).
 - Systems: the DDC-operated hosted instance at
-  <https://openconstructionerp.com> (if and when operated),
+  <https://nexus.eliteal.info> (if and when operated),
   including the production database, object storage, and
   release-automation pipeline.
 - Subservice organisations: Hetzner Online GmbH (or equivalent

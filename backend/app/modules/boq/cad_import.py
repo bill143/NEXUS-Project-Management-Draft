@@ -1,4 +1,4 @@
-# OpenConstructionERP — DataDrivenConstruction (DDC)
+# NEXUS — DataDrivenConstruction (DDC)
 # CAD2DATA Pipeline · CWICR Cost Database Engine
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 # AGPL-3.0 License · DDC-CWICR-OE-2026
@@ -36,7 +36,7 @@ CONVERTER_SEARCH_PATHS: list[Path] = [
     Path("converters/bin"),
     Path.home() / ".openestimator" / "converters",
     Path("/opt/openestimator/converters"),
-    Path("C:/ProgramData/OpenConstructionERP/converters"),
+    Path("C:/ProgramData/NEXUS/converters"),
 ]
 
 

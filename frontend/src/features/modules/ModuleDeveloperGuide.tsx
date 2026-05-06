@@ -104,7 +104,7 @@ export function ModuleDeveloperGuide() {
             <p className="text-sm text-content-secondary">
               {t('modules.dev_guide_subtitle', {
                 defaultValue:
-                  'A practical, 10-minute walkthrough for adding business features to OpenConstructionERP.‌⁠‍',
+                  'A practical, 10-minute walkthrough for adding business features to NEXUS.‌⁠‍',
               })}
             </p>
           </div>

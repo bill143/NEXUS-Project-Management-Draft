@@ -1,4 +1,4 @@
-# OpenConstructionERP — BUGS (Part 4)
+# NEXUS — BUGS (Part 4)
 
 **Дата:** 2026-04-18
 **Версия:** 1.9.0 · commit `767b38f232596cfb191f9790ce2053ab5108a7d4`

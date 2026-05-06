@@ -158,7 +158,7 @@ async def test_integration_config(
     if config is None or str(config.user_id) != str(user_id):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Config not found")
 
-    title = "OpenConstructionERP Test"
+    title = "NEXUS Test"
     message = "This is a test notification. If you see this, the integration is working correctly."
     action_url = None
     itype = config.integration_type
@@ -406,7 +406,7 @@ async def calendar_feed(
     lines: list[str] = [
         "BEGIN:VCALENDAR",
         "VERSION:2.0",
-        f"PRODID:-//OpenConstructionERP//v{version}//EN",
+        f"PRODID:-//NEXUS//v{version}//EN",
         "CALSCALE:GREGORIAN",
         "METHOD:PUBLISH",
         "X-WR-CALNAME:Project Calendar",

@@ -3,8 +3,8 @@
 **Date:** 2026-04-18
 **Environment:** http://127.0.0.1:8080
 **Tester:** Agent I (automated)
-**Test file:** `C:/Users/Artem/OpenConstructionERP/qa_output/generated_tests/test_p5_agent_i_roundtrip.py`
-**Artifacts:** `C:/Users/Artem/OpenConstructionERP/qa_output/agent_reports/part5/agent_i_artifacts/`
+**Test file:** `C:/Users/Artem/NEXUS/qa_output/generated_tests/test_p5_agent_i_roundtrip.py`
+**Artifacts:** `C:/Users/Artem/NEXUS/qa_output/agent_reports/part5/agent_i_artifacts/`
 
 ---
 

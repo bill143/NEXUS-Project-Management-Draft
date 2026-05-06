@@ -1,4 +1,4 @@
-OpenConstructionERP
+NEXUS
 Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 Contact: info@datadrivenconstruction.io
 
@@ -71,7 +71,7 @@ NRM is a trademark of the Royal Institution of Chartered Surveyors (RICS).
 MasterFormat(R) is a trademark of the Construction Specifications Institute (CSI).
 ISO is a registered trademark of the International Organization for Standardization.
 
-OpenConstructionERP is an independent project and is not affiliated with,
+NEXUS is an independent project and is not affiliated with,
 endorsed by, or sponsored by any of the trademark owners listed above.
 Comparative references to commercial products (e.g., RIB iTWO, Exactal
 CostX, Sage Estimating, Bluebeam) reflect publicly available feature
@@ -112,7 +112,7 @@ This software integrates with third-party Large Language Model APIs
 configured by the user. AI-generated cost estimates, classifications,
 and suggestions are preliminary and must be verified by a qualified
 construction-estimation professional before use in a binding commercial
-context. The authors and contributors of OpenConstructionERP disclaim
+context. The authors and contributors of NEXUS disclaim
 all liability for decisions made on the basis of AI-generated output.
 
 ------------------------------------------------------------------------

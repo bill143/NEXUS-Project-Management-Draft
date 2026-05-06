@@ -1,4 +1,4 @@
-"""‌⁠‍OpenConstructionERP CLI — run the platform from the command line.
+"""‌⁠‍NEXUS CLI — run the platform from the command line.
 
 Usage:
     openestimate serve   [--host HOST] [--port PORT] [--data-dir DIR] [--open]
@@ -9,7 +9,7 @@ Usage:
 
 The happy path for a new user is just three commands:
 
-    pip install openconstructionerp
+    pip install nexus
     openestimate init-db
     openestimate serve
 
@@ -52,8 +52,8 @@ DEFAULT_HOST = "127.0.0.1"
 DEFAULT_PORT = 8080
 MIN_PYTHON = (3, 12)
 
-DOCS_URL = "https://openconstructionerp.com/docs"
-TROUBLESHOOTING_URL = "https://openconstructionerp.com/docs#troubleshooting"
+DOCS_URL = "https://nexus.eliteal.info/docs"
+TROUBLESHOOTING_URL = "https://nexus.eliteal.info/docs#troubleshooting"
 ISSUES_URL = "https://github.com/datadrivenconstruction/OpenConstructionERP/issues"
 COMMUNITY_URL = "https://t.me/datadrivenconstruction"
 GITHUB_URL = "https://github.com/datadrivenconstruction/OpenConstructionERP"
@@ -147,7 +147,7 @@ def print_startup_banner(
     print()
     print(_amber(_BANNER_ART))
     print()
-    print(f"  {_bold('OpenConstructionERP')} {_dim('v' + version)}")
+    print(f"  {_bold('NEXUS')} {_dim('v' + version)}")
     print(f"  {_dim('Open-source construction cost estimation platform')}")
     print()
     print(f"  {_bold('Open in your browser:')}  {_amber(url)}")
@@ -240,14 +240,14 @@ def check_package_installed() -> Check:
     try:
         from importlib.metadata import version as _v
 
-        v = _v("openconstructionerp")
-        return Check("Package installed", "ok", f"openconstructionerp v{v}")
+        v = _v("nexus")
+        return Check("Package installed", "ok", f"nexus v{v}")
     except Exception:
         return Check(
             "Package installed",
             "warn",
             "running from source checkout (not pip-installed)",
-            "For production use: pip install openconstructionerp",
+            "For production use: pip install nexus",
         )
 
 
@@ -350,7 +350,7 @@ def check_core_tabular_deps() -> list[Check]:
 
     hint = (
         "Cost database import requires pandas + pyarrow. "
-        "Reinstall with: pip install --upgrade openconstructionerp"
+        "Reinstall with: pip install --upgrade nexus"
     )
     out: list[Check] = []
     for mod in ("pandas", "pyarrow"):
@@ -448,7 +448,7 @@ def check_optional_extras() -> list[Check]:
                 "Vector search [vector]",
                 "warn",
                 "not installed (LanceDB semantic search disabled)",
-                "pip install 'openconstructionerp[vector]'",
+                "pip install 'nexus[vector]'",
             )
         )
 
@@ -464,7 +464,7 @@ def check_optional_extras() -> list[Check]:
                 "Semantic search [semantic]",
                 "warn",
                 "not installed (RAG / embedding search disabled)",
-                "pip install 'openconstructionerp[semantic]'",
+                "pip install 'nexus[semantic]'",
             )
         )
 
@@ -477,7 +477,7 @@ def check_optional_extras() -> list[Check]:
                 "PDF takeoff [cv]",
                 "warn",
                 "not installed (PDF takeoff disabled)",
-                "pip install 'openconstructionerp[cv]'",
+                "pip install 'nexus[cv]'",
             )
         )
 
@@ -514,7 +514,7 @@ def run_preflight(
 
 # ── Commands ──────────────────────────────────────────────────────────────
 def cmd_serve(args: argparse.Namespace) -> None:
-    """Start the OpenConstructionERP server."""
+    """Start the NEXUS server."""
     data_dir = Path(args.data_dir).expanduser().resolve()
     _setup_env(data_dir, args.host, args.port)
 
@@ -529,8 +529,8 @@ def cmd_serve(args: argparse.Namespace) -> None:
     ]
     blocking = [c for c in fatal_checks if c.status == "error"]
     if blocking:
-        print(_red(_bold(_u("Cannot start OpenConstructionERP \u2014 pre-flight checks failed:",
-                              "Cannot start OpenConstructionERP - pre-flight checks failed:"))))
+        print(_red(_bold(_u("Cannot start NEXUS \u2014 pre-flight checks failed:",
+                              "Cannot start NEXUS - pre-flight checks failed:"))))
         print()
         for c in fatal_checks:
             c.print()
@@ -722,7 +722,7 @@ def cmd_init_db(args: argparse.Namespace) -> None:
                 "Schema may be incomplete. Reinstall the package or check the error above."
             )
         )
-        print(_dim(f"  {_u('\u2192', '->')} pip install --upgrade --force-reinstall openconstructionerp"))
+        print(_dim(f"  {_u('\u2192', '->')} pip install --upgrade --force-reinstall nexus"))
         print(_dim(f"  {_u('\u2192', '->')} Then run 'openestimate doctor' to verify."))
         sys.exit(1)
 
@@ -740,7 +740,7 @@ def cmd_doctor(args: argparse.Namespace) -> None:
     data_dir = Path(args.data_dir).expanduser().resolve()
 
     print()
-    print(_bold(_u("OpenConstructionERP \u2014 doctor", "OpenConstructionERP - doctor")))
+    print(_bold(_u("NEXUS \u2014 doctor", "NEXUS - doctor")))
     print(_dim(f"Checking install at {data_dir}"))
     print()
 
@@ -773,7 +773,7 @@ def cmd_version(_args: argparse.Namespace) -> None:
     try:
         from importlib.metadata import version as _v
 
-        version = _v("openconstructionerp")
+        version = _v("nexus")
     except Exception:
         try:
             from app.config import Settings
@@ -782,19 +782,19 @@ def cmd_version(_args: argparse.Namespace) -> None:
         except Exception:
             version = "unknown"
 
-    print(f"OpenConstructionERP v{version}")
+    print(f"NEXUS v{version}")
     print(f"Python {sys.version.split()[0]} ({sys.platform})")
     print(f"Site-packages: {Path(sys.executable).parent}")
     print(f"Docs: {DOCS_URL}")
 
 
 def cmd_upgrade(args: argparse.Namespace) -> None:
-    """Pip-upgrade openconstructionerp inside *this* interpreter's environment.
+    """Pip-upgrade nexus inside *this* interpreter's environment.
 
     Issue #96: users who installed via the Windows installer get a launcher
     (``start.bat``) that points at a private venv under
-    ``%LOCALAPPDATA%\\OpenConstructionERP\\venv``. Running ``pip install
-    --upgrade openconstructionerp`` in any other shell upgrades the user's
+    ``%LOCALAPPDATA%\\NEXUS\\venv``. Running ``pip install
+    --upgrade nexus`` in any other shell upgrades the user's
     GLOBAL Python — the venv keeps its old wheel, and the launcher keeps
     reporting the old version even though pip claims success. This command
     avoids the trap by always invoking ``sys.executable -m pip`` so the
@@ -803,11 +803,11 @@ def cmd_upgrade(args: argparse.Namespace) -> None:
     import subprocess
 
     print()
-    print(_bold(_u("OpenConstructionERP \u2014 upgrade", "OpenConstructionERP - upgrade")))
+    print(_bold(_u("NEXUS \u2014 upgrade", "NEXUS - upgrade")))
 
-    target = "openconstructionerp"
+    target = "nexus"
     if args.version:
-        target = f"openconstructionerp=={args.version}"
+        target = f"nexus=={args.version}"
 
     print(_dim(f"Interpreter: {sys.executable}"))
     print(_dim(f"Installing:  {target}"))
@@ -823,13 +823,13 @@ def cmd_upgrade(args: argparse.Namespace) -> None:
     if result.returncode != 0:
         print()
         print(_red(_bold(f"  Upgrade failed (exit {result.returncode})")))
-        print(_dim("Try: python -m pip install --upgrade openconstructionerp"))
+        print(_dim("Try: python -m pip install --upgrade nexus"))
         sys.exit(result.returncode)
 
     new_version = _resolve_version()
     print()
     print(_green(_bold(f"  Upgraded to v{new_version}")))
-    print(_dim("Restart your launcher (start.bat / openconstructionerp serve) to pick it up."))
+    print(_dim("Restart your launcher (start.bat / nexus serve) to pick it up."))
 
 
 def _resolve_version() -> str:
@@ -837,7 +837,7 @@ def _resolve_version() -> str:
     try:
         from importlib.metadata import version as _v
 
-        return _v("openconstructionerp")
+        return _v("nexus")
     except Exception:
         try:
             from app.config import Settings
@@ -859,7 +859,7 @@ def print_welcome(*, next_command_hint: bool = True) -> None:
     print()
     print(_amber(_BANNER_ART))
     print()
-    print(f"  {_bold('OpenConstructionERP')} {_dim('v' + version)}")
+    print(f"  {_bold('NEXUS')} {_dim('v' + version)}")
     print(f"  {_dim('Open-source construction cost estimation platform')}")
     print()
     print(f"  {_bold('Three commands get you running:')}")
@@ -970,7 +970,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         prog="openestimate",
         description=(
-            "OpenConstructionERP — open-source construction cost estimation platform.\n\n"
+            "NEXUS — open-source construction cost estimation platform.\n\n"
             "Quick start:\n"
             "    openestimate init-db\n"
             "    openestimate serve\n"
@@ -982,7 +982,7 @@ def main() -> None:
     subparsers = parser.add_subparsers(dest="command")
 
     # serve
-    serve_p = subparsers.add_parser("serve", help="Start the OpenConstructionERP server")
+    serve_p = subparsers.add_parser("serve", help="Start the NEXUS server")
     _add_common_server_args(serve_p)
     serve_p.add_argument("--open", action="store_true", help="Open browser after startup")
     serve_p.add_argument("--quiet", action="store_true", help="Suppress banner and info logs")
@@ -1025,7 +1025,7 @@ def main() -> None:
     # upgrade — pip-upgrade in *this* interpreter's env (Issue #96)
     upgrade_p = subparsers.add_parser(
         "upgrade",
-        help="Upgrade openconstructionerp in the same env this command runs in",
+        help="Upgrade nexus in the same env this command runs in",
     )
     upgrade_p.add_argument(
         "--version",
@@ -1069,7 +1069,7 @@ def main() -> None:
     elif args.command in ("welcome", "hello"):
         cmd_welcome(args)
     elif args.command is None:
-        # Default behaviour for bare ``openestimate`` / ``openconstructionerp``:
+        # Default behaviour for bare ``openestimate`` / ``nexus``:
         # * First run (no data dir yet) — show the welcome screen and an
         #   interactive "open in browser?" prompt so the user sees the URL,
         #   community link, and three-command quick start BEFORE uvicorn

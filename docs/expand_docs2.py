@@ -10,7 +10,7 @@ projects_section = '''</section>
 
 <section id="first-steps">
 <h2>First Steps After Installation</h2>
-<p>After installing OpenConstructionERP, follow these steps to set up your first project and create your first cost estimate. The entire process takes about 10 minutes.</p>
+<p>After installing NEXUS, follow these steps to set up your first project and create your first cost estimate. The entire process takes about 10 minutes.</p>
 
 <h3 id="fs-login">Step 1: Log In</h3>
 <p>Open your browser and navigate to <code>http://localhost:5173</code> (local development) or <code>http://localhost:8080</code> (Docker). You will see the login page with a "Demo Access" panel. Click on <strong>Admin</strong> to log in instantly with the demo account, or enter your own credentials if you registered a new account.</p>

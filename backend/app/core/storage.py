@@ -3,7 +3,7 @@
 Used by BIM geometry files, CAD uploads, takeoff PDFs, and generated
 reports — anything that today lives under ``data/`` on the local
 filesystem should eventually flow through this abstraction so operators
-can point OpenConstructionERP at an S3-compatible bucket instead.
+can point NEXUS at an S3-compatible bucket instead.
 
 Two implementations ship in-tree:
 
@@ -12,7 +12,7 @@ Two implementations ship in-tree:
   v1.3.x on-disk layout byte-for-byte.
 - :class:`S3StorageBackend` — writes to an S3-compatible bucket via
   ``aioboto3``.  ``aioboto3`` is declared as an optional dependency
-  (``pip install openconstructionerp[s3]``); importing the class
+  (``pip install nexus[s3]``); importing the class
   without it raises a clear :class:`ImportError` only when the user
   actually tries to instantiate it.
 
@@ -776,7 +776,7 @@ class S3StorageBackend(StorageBackend):
 
     Works with AWS S3, MinIO, Backblaze B2, DigitalOcean Spaces, and any
     other S3-protocol service.  Requires the ``aioboto3`` optional
-    dependency — install it via ``pip install openconstructionerp[s3]``.
+    dependency — install it via ``pip install nexus[s3]``.
     """
 
     _STREAM_CHUNK_SIZE: int = 1024 * 1024  # 1 MiB
@@ -795,7 +795,7 @@ class S3StorageBackend(StorageBackend):
         except ImportError as exc:  # pragma: no cover - exercised at runtime
             raise ImportError(
                 "S3StorageBackend requires the 'aioboto3' package. "
-                "Install it with: pip install 'openconstructionerp[s3]'"
+                "Install it with: pip install 'nexus[s3]'"
             ) from exc
 
         self._endpoint: str = endpoint

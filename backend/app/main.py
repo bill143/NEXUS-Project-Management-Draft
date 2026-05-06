@@ -1,4 +1,4 @@
-# OpenConstructionERP — DataDrivenConstruction (DDC)
+# NEXUS — DataDrivenConstruction (DDC)
 # CWICR Cost Database Engine · CAD2DATA Pipeline
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 # AGPL-3.0 License · DDC-CWICR-OE-2026
@@ -89,7 +89,7 @@ def configure_logging(settings: Settings) -> None:
 def _init_vector_db() -> None:
     """‌⁠‍Initialize vector database on startup (non-blocking, never fatal).
 
-    Vector search is an important feature of OpenConstructionERP —
+    Vector search is an important feature of NEXUS —
     it powers semantic cost-item matching, BOQ auto-classification,
     and assembly suggestions. We support two backends:
 
@@ -127,7 +127,7 @@ def _init_vector_db() -> None:
         else:
             logger.warning(
                 "LanceDB init failed (%s). Semantic search is disabled. "
-                "Install the embedded vector backend with: pip install openconstructionerp[vector]",
+                "Install the embedded vector backend with: pip install nexus[vector]",
                 error,
             )
     except Exception as exc:  # noqa: BLE001 — intentional: never fatal
@@ -670,7 +670,7 @@ def create_app() -> FastAPI:
         )
         cors_origins = [o for o in cors_origins if o != "*"]
         if not cors_origins:
-            cors_origins = ["https://openconstructionerp.com"]
+            cors_origins = ["https://nexus.eliteal.info"]
 
     app.add_middleware(
         CORSMiddleware,
@@ -985,7 +985,7 @@ def create_app() -> FastAPI:
 
         As required by AGPL-3.0, this endpoint provides access to the
         complete corresponding source code of this application.
-        DataDrivenConstruction · OpenConstructionERP · DDC-CWICR-OE-2026
+        DataDrivenConstruction · NEXUS · DDC-CWICR-OE-2026
         """
         return {
             "license": "AGPL-3.0",
@@ -1414,7 +1414,7 @@ def create_app() -> FastAPI:
 
     @app.on_event("startup")
     async def startup() -> None:
-        _section("OpenConstructionERP")
+        _section("NEXUS")
         logger.info(
             "Starting %s v%s (env=%s)",
             settings.app_name,
@@ -1893,7 +1893,7 @@ def create_app() -> FastAPI:
         _cli_data_dir = os.environ.get("OE_CLI_DATA_DIR")
         if _cli_host and _cli_port:
             _url = f"http://{_cli_host}:{_cli_port}"
-            logger.info("OpenConstructionERP is ready at %s", _url)
+            logger.info("NEXUS is ready at %s", _url)
             # Demo passwords are now per-installation (BUG-D01 fix). The
             # actual values were either supplied via DEMO_*_PASSWORD env
             # vars or generated in ``_seed_demo_account`` and persisted to
@@ -1907,7 +1907,7 @@ def create_app() -> FastAPI:
             )
             if _cli_data_dir:
                 logger.info("Data directory: %s", _cli_data_dir)
-            logger.info("Press Ctrl+C to stop. Docs: https://openconstructionerp.com/docs")
+            logger.info("Press Ctrl+C to stop. Docs: https://nexus.eliteal.info/docs")
         else:
             logger.info("Application started successfully")
 

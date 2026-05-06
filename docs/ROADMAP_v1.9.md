@@ -1,6 +1,6 @@
-# OpenConstructionERP v1.9 Roadmap
+# NEXUS v1.9 Roadmap
 
-**Source:** `~/Downloads/openconstructionerp-17-04-2026.md` (33 items)
+**Source:** `~/Downloads/nexus-17-04-2026.md` (33 items)
 **Started:** 2026-04-17
 **Principles:** offline-first, max test depth, incremental releases per round, self-directed RFCs
 **Policy reference:** `.claude/projects/.../memory/feedback_v19_workflow.md`
@@ -287,11 +287,11 @@ Each item: screenshot-before → patch → screenshot-after. Visual regression i
 ## 9. Round 5 — VPS deploy
 
 After user approves all 4 rounds locally:
-1. `ssh root@openconstructionerp.com`
-2. `cd /root/OpenConstructionERP && git pull origin main`
+1. `ssh root@nexus.eliteal.info`
+2. `cd /root/NEXUS && git pull origin main`
 3. `source venv/bin/activate && pip install -r requirements.txt`
 4. `cd frontend && npm install --legacy-peer-deps && npx vite build`
-5. `systemctl restart openconstructionerp`
+5. `systemctl restart nexus`
 6. Health check + smoke test all 33 items on prod URL.
 
 ---

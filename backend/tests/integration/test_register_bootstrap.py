@@ -146,7 +146,7 @@ async def test_demo_admin_seed_does_not_block_bootstrap(session):
     """The seeded demo admin (demo@openestimator.io) must not block the
     first real registrant from claiming admin.
 
-    Without this carve-out, every fresh ``pip install openconstructionerp``
+    Without this carve-out, every fresh ``pip install nexus``
     leaves the user permanently dormant: ``_seed_demo_account`` puts an
     ``admin`` row at boot, ``has_admin()`` returns True, and in the
     default ``admin-approve`` mode the next self-registered user is

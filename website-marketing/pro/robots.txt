@@ -2,7 +2,7 @@ User-agent: *
 Allow: /
 
 # Full sitemap for /pro section
-Sitemap: https://openconstructionerp.com/pro/sitemap.xml
+Sitemap: https://nexus.eliteal.info/pro/sitemap.xml
 
 # Crawl politeness
 Crawl-delay: 1

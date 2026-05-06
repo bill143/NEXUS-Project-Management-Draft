@@ -71,7 +71,7 @@ class ModelService:
                 detail=(
                     "Training requires the [analytics] extras "
                     "(scikit-learn, pandas, joblib). Install via: "
-                    "pip install 'openconstructionerp[analytics]'"
+                    "pip install 'nexus[analytics]'"
                 ),
             ) from e
 

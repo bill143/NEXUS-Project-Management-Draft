@@ -320,7 +320,7 @@ def _github_list_directory(repo_path: str) -> list[dict[str, Any]]:
         api_url,
         headers={
             "Accept": "application/vnd.github+json",
-            "User-Agent": "OpenConstructionERP-converter-installer",
+            "User-Agent": "NEXUS-converter-installer",
         },
     )
     try:

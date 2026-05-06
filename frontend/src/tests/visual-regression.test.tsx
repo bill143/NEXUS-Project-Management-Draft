@@ -521,11 +521,6 @@ describe('Visual Regression — Logo', () => {
     const { container } = render(<LogoWithText />);
     expect(container).toMatchSnapshot();
   });
-
-  it('LogoWithText — without version', () => {
-    const { container } = render(<LogoWithText showVersion={false} />);
-    expect(container).toMatchSnapshot();
-  });
 });
 
 /* ═══════════════════════════════════════════════════════════════════════

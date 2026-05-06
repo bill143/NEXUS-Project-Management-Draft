@@ -673,7 +673,7 @@ test.describe('Full Journey Audit', () => {
     const txtPath = path.resolve(__dirname, '..', 'test-results', 'audit-findings.txt');
     const lines: string[] = [];
     lines.push('='.repeat(80));
-    lines.push('OpenConstructionERP — Full Journey Audit Findings');
+    lines.push('NEXUS — Full Journey Audit Findings');
     lines.push(`Generated: ${new Date().toISOString()}`);
     lines.push(`User: ${cachedAuth?.email} (role=${cachedAuth?.role})`);
     lines.push(`New admin-attempt: ${cachedAuth?.newAdminEmail}`);

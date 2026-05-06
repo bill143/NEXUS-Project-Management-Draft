@@ -6,7 +6,7 @@
     "0x200d"
   ],
   "pepper_description": "ZWNJ + WJ + ZWJ -- invisible 3-codepoint authorship fingerprint",
-  "owner": "OpenConstructionERP / DataDrivenConstruction · Artem Boiko",
+  "owner": "NEXUS / DataDrivenConstruction · Artem Boiko",
   "license": "AGPL-3.0-or-later",
   "total_marks": 3931,
   "py_files_marked": 784,

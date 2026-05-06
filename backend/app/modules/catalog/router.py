@@ -99,7 +99,7 @@ async def import_catalog_from_github(
             url,
             headers={
                 "User-Agent": (
-                    "OpenConstructionERP "
+                    "NEXUS "
                     "(+https://datadrivenconstruction.io; DDC-CWICR-OE-2026)"
                 )
             },

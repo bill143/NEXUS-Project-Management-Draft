@@ -1,4 +1,4 @@
-// OpenConstructionERP — DataDrivenConstruction (DDC)
+// NEXUS — DataDrivenConstruction (DDC)
 // CAD2DATA Pipeline · PDF Takeoff Module
 // Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 // DDC-CWICR-OE-2026

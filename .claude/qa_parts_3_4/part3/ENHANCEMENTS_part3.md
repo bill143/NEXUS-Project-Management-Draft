@@ -1,4 +1,4 @@
-# OpenConstructionERP — ENHANCEMENTS (Part 3)
+# NEXUS — ENHANCEMENTS (Part 3)
 
 **Дата:** 2026-04-18
 **Предыдущие части:**

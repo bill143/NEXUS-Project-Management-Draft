@@ -30,7 +30,6 @@ import {
   FileText,
   Calendar,
   Upload,
-  ExternalLink,
   AlertTriangle,
   TrendingUp,
   Users,
@@ -1703,27 +1702,6 @@ export function DashboardPage() {
           <h1 className="text-3xl font-bold tracking-tight gradient-text">
             {t('dashboard.welcome')}
           </h1>
-          <a
-            href="https://datadrivenconstruction.io/?utm_source=erp"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center gap-3 mt-2.5 animate-stagger-in group/ddc"
-            style={{ animationDelay: '100ms' }}
-          >
-            <img
-              src="/brand/ddc-logo.webp"
-              alt="DataDrivenConstruction"
-              className="h-[34px] w-auto opacity-75 group-hover/ddc:opacity-100 transition-opacity shrink-0"
-            />
-            <div className="flex flex-col leading-tight">
-              <span className="text-xs font-semibold text-content-secondary">
-                {t('dashboard.subtitle')}
-              </span>
-              <span className="text-[11px] text-content-tertiary">
-                {t('dashboard.subtitle_2', { defaultValue: 'Smart resource planning for your construction projects' })}
-              </span>
-            </div>
-          </a>
         </div>
         <div className="flex items-center gap-2 flex-wrap animate-stagger-in" style={{ animationDelay: '150ms' }}>
           <Button
@@ -1799,24 +1777,6 @@ export function DashboardPage() {
 
       {/* ─── 2. Stats row ────────────────────────────────────────────── */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-        {/* Open-source badge */}
-        <a
-          href="https://github.com/datadrivenconstruction/OpenConstructionERP"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2.5 rounded-xl bg-gradient-to-r from-oe-blue/8 via-violet-500/8 to-emerald-500/8 border border-oe-blue/15 py-1.5 px-3 hover:shadow-md hover:border-oe-blue/30 transition-all animate-stagger-in shrink-0"
-          style={{ animationDelay: '200ms' }}
-        >
-          <span className="relative flex h-2.5 w-2.5 shrink-0">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
-          </span>
-          <span className="text-sm font-bold bg-gradient-to-r from-oe-blue via-violet-600 to-emerald-600 bg-clip-text text-transparent">
-            {t('dashboard.open_source_erp', { defaultValue: 'Erste Open-Source Bau-ERP' })}
-          </span>
-          <ExternalLink size={12} className="text-oe-blue opacity-50 shrink-0" />
-        </a>
-        {/* Stat pills */}
         <SystemStatusSummary projects={projects} boqs={allBoqs} />
       </div>
       <InfoHint text={t('dashboard.kpi_hint', { defaultValue: 'Summary across all projects. Values update as you add estimates and schedule activities.' })} />

@@ -1,5 +1,5 @@
 """
-Stealth watermark injector / verifier for OpenConstructionERP.
+Stealth watermark injector / verifier for NEXUS.
 
 Adds Layer-3 authorship fingerprints on top of the visible+stealth markers
 documented in `~/.claude/.../identity_markers.md`. The point: even if a
@@ -277,7 +277,7 @@ def cmd_inject() -> None:
         "pepper_hex": PEPPER_HEX,
         "pepper_codepoints": [hex(ord(c)) for c in PEPPER],
         "pepper_description": "ZWNJ + WJ + ZWJ -- invisible 3-codepoint authorship fingerprint",
-        "owner": "OpenConstructionERP / DataDrivenConstruction · Artem Boiko",
+        "owner": "NEXUS / DataDrivenConstruction · Artem Boiko",
         "license": "AGPL-3.0-or-later",
         "total_marks": len(all_marks),
         "py_files_marked": py_files_marked,

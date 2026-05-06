@@ -1,6 +1,6 @@
 # Agent B — DB Schema / SQLAlchemy Models Audit
 
-**Target:** OpenConstructionERP (a.k.a. OpenEstimate) backend
+**Target:** NEXUS (a.k.a. OpenEstimate) backend
 **Scope:** `backend/app/modules/*/models.py` + live SQLite DB at
 `C:/Users/Artem/.openestimate/openestimate.db`
 **Migrations:** `backend/alembic/versions/` (8 revisions; single `alembic`

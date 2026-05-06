@@ -11,7 +11,7 @@ import sys
 
 
 def main() -> None:
-    """‌⁠‍Start the OpenConstructionERP backend server."""
+    """‌⁠‍Start the NEXUS backend server."""
     import uvicorn
 
     # Parse CLI args: --host X --port Y
@@ -37,7 +37,7 @@ def main() -> None:
         os.environ.setdefault("APP_ENV", "production")
         os.environ.setdefault("APP_DEBUG", "false")
 
-    print(f"Starting OpenConstructionERP on http://{host}:{port}")
+    print(f"Starting NEXUS on http://{host}:{port}")
 
     # Use direct app import for PyInstaller compatibility
     from app.main import create_app

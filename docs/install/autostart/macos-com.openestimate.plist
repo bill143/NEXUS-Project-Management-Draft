@@ -6,7 +6,7 @@
     <string>com.openestimate.serve</string>
 
     <!-- Replace /Users/USERNAME with your home dir; replace .venv path with
-         your actual venv (where `pip install openconstructionerp` ran). -->
+         your actual venv (where `pip install nexus` ran). -->
     <key>ProgramArguments</key>
     <array>
         <string>/Users/USERNAME/.venv/bin/openestimate</string>

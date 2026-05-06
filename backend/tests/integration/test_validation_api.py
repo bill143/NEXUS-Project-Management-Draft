@@ -235,7 +235,7 @@ async def test_get_report_sarif(
     levels = {r["level"] for r in run["results"]}
     assert "error" in levels
     assert "warning" in levels
-    assert run["tool"]["driver"]["name"] == "OpenConstructionERP"
+    assert run["tool"]["driver"]["name"] == "NEXUS"
     encoded_msg = " ".join(r["message"]["text"] for r in run["results"])
     assert "Außenwände" in encoded_msg
 

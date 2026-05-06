@@ -1,4 +1,4 @@
-# OpenConstructionERP — DataDrivenConstruction (DDC)
+# NEXUS — DataDrivenConstruction (DDC)
 # CWICR Cost Database Engine · CAD2DATA Pipeline
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 # AGPL-3.0 License · DDC-CWICR-OE-2026
@@ -49,14 +49,14 @@ class DDCFingerprintMiddleware(BaseHTTPMiddleware):
 
     async def dispatch(self, request: Request, call_next) -> Response:
         response = await call_next(request)
-        response.headers["X-Powered-By"] = "OpenConstructionERP"
+        response.headers["X-Powered-By"] = "NEXUS"
         response.headers["X-DDC-Engine"] = "CWICR/1.0"
         # Authorship markers — always present, production-safe.
         # Useful when investigating an unauthorised deployment: a
         # `curl -I` of any endpoint will surface the DDC origin and
         # author e-mail without requiring source-code access.
         response.headers["X-DDC-Origin"] = (
-            "DataDrivenConstruction/OpenConstructionERP/CWICR"
+            "DataDrivenConstruction/NEXUS/CWICR"
         )
         response.headers["X-DDC-Author"] = (
             "Artem Boiko <info@datadrivenconstruction.io>"

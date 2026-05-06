@@ -1936,7 +1936,7 @@ def _download_to_file(url: str, dest: Path, timeout: float = 120.0) -> None:
         url,
         follow_redirects=True,
         timeout=timeout,
-        headers={"User-Agent": "openconstructionerp"},
+        headers={"User-Agent": "nexus"},
     ) as resp:
         resp.raise_for_status()
         with open(dest, "wb") as f:
@@ -1960,7 +1960,7 @@ def _download_cwicr_from_github_sync(db_id: str) -> Path | None:
     if not github_path:
         _LAST_DOWNLOAD_ERROR[db_id] = (
             f"backend has no GitHub mapping for '{db_id}'. Upgrade with "
-            f"`pip install --upgrade openconstructionerp` (≥ v2.6.23 added "
+            f"`pip install --upgrade nexus` (≥ v2.6.23 added "
             f"the 19 new regions; older backends know only the original 11)."
         )
         return None

@@ -34,7 +34,7 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 # a fixed UUID5 seed so the value is reproducible across rebuilds.
 # A drift here usually means someone hand-edited the constant.
 _EXPECTED_NAMESPACE = str(
-    uuid.uuid5(uuid.NAMESPACE_URL, "datadrivenconstruction.io/openconstructionerp")
+    uuid.uuid5(uuid.NAMESPACE_URL, "datadrivenconstruction.io/nexus")
 )
 
 

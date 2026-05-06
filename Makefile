@@ -8,7 +8,7 @@ DOCKER_COMPOSE = docker compose
 # ─── Help ───────────────────────────────────────────────────────────────────
 help: ## Show this help
 	@echo ""
-	@echo "  OpenConstructionERP — Construction Cost Estimation Platform"
+	@echo "  NEXUS — Construction Cost Estimation Platform"
 	@echo "  ─────────────────────────────────────────────────────────────"
 	@echo ""
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | \
@@ -35,7 +35,7 @@ dev-frontend: ## Start frontend dev server
 	cd $(FRONTEND_DIR) && npm run dev
 
 dev: ## Show how to start dev (cross-platform: two terminals)
-	@echo "OpenConstructionERP local dev needs two terminals (cross-platform safe):"
+	@echo "NEXUS local dev needs two terminals (cross-platform safe):"
 	@echo "  Terminal 1:  make dev-backend   (http://localhost:8000)"
 	@echo "  Terminal 2:  make dev-frontend  (http://localhost:5173)"
 	@echo ""
@@ -45,7 +45,7 @@ dev: ## Show how to start dev (cross-platform: two terminals)
 # Does NOT work in Windows cmd.exe or MSYS2 make — use `make dev-backend`
 # and `make dev-frontend` in two terminals instead.
 dev-unix: infra ## Start backend (background) + frontend — POSIX shells only
-	@echo "Starting OpenConstructionERP (POSIX dev)..."
+	@echo "Starting NEXUS (POSIX dev)..."
 	@echo "  Backend:  http://localhost:8000"
 	@echo "  Frontend: http://localhost:5173"
 	@echo ""

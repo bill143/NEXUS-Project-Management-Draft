@@ -2,21 +2,21 @@
 
 **Version 2.0 — Effective April 2026**
 
-## OpenConstructionERP Individual Contributor License Agreement
+## NEXUS Individual Contributor License Agreement
 
-Thank you for your interest in contributing to OpenConstructionERP,
+Thank you for your interest in contributing to NEXUS,
 created and maintained by Artem Boiko under the
 DataDrivenConstruction brand ("Project Owner").
 
 By submitting a contribution (code, documentation, or other
-materials) to the OpenConstructionERP project, you agree to the
+materials) to the NEXUS project, you agree to the
 following terms.
 
 ### 1. Definitions
 
 - **"Contribution"** means any original work of authorship,
   including modifications or additions to existing work, that you
-  submit to the OpenConstructionERP project via pull request,
+  submit to the NEXUS project via pull request,
   patch, issue, or any other means.
 
 - **"You"** (or **"Contributor"**) means the individual or legal
@@ -44,7 +44,7 @@ works thereof **under any licence, including
 AGPL-3.0-or-later and any proprietary or commercial licence of
 the Project Owner's choosing**.
 
-This broad grant is required because OpenConstructionERP is
+This broad grant is required because NEXUS is
 dual-licensed (AGPL-3.0-or-later for open-source users,
 commercial licences for customers who need to avoid AGPL
 obligations). Without this grant, the Project Owner cannot
@@ -66,7 +66,7 @@ the project.
 ### 4. Dual Licensing Right
 
 You understand and agree that the Project Owner may distribute
-OpenConstructionERP (including your Contributions) under:
+NEXUS (including your Contributions) under:
 
 - The **GNU Affero General Public License v3.0 or later**
   (AGPL-3.0-or-later) for the open-source community edition, AND
@@ -167,7 +167,7 @@ Enforcement is handled by the CLA Assistant integration
 ---
 
 **Project Owner:** Artem Boiko / DataDrivenConstruction.io
-**Project:** OpenConstructionERP
+**Project:** NEXUS
 (<https://github.com/datadrivenconstruction/OpenConstructionERP>)
 **Contact:** `info@datadrivenconstruction.io`
 

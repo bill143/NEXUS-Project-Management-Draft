@@ -3,7 +3,7 @@
 **Version 1.0 — Effective April 2026**
 
 This policy explains how the names, logos, and product marks
-associated with OpenConstructionERP may be used.
+associated with NEXUS may be used.
 
 ## 1. DataDrivenConstruction marks (the "DDC Marks")
 
@@ -11,14 +11,14 @@ The following are trademarks or service marks of
 Artem Boiko / DataDrivenConstruction.io ("Licensor"), whether
 or not registered in any particular jurisdiction:
 
-- **OpenConstructionERP**, **OCERP**
+- **NEXUS**, **OCERP**
 - **OpenEstimate** (legacy brand preserved for trademark
   protection)
 - **DataDrivenConstruction**, **DDC**
 - **CWICR** (Construction Work Items, Costs & Resources)
 - Associated logos, stylised wordmarks, and the colour-and-
   layout presentation on <https://datadrivenconstruction.io>
-  and on the OpenConstructionERP hosted instance.
+  and on the NEXUS hosted instance.
 
 Registration status: some marks are registered with the EUIPO
 and with national trademark offices. Unregistered marks are
@@ -32,10 +32,10 @@ both registered and unregistered marks of Licensor.
 You may use the DDC Marks without prior written permission only
 for factual, descriptive reference - for example:
 
-- "built on OpenConstructionERP"
+- "built on NEXUS"
 - "powered by OCERP"
 - "imports CWICR data"
-- "compatible with OpenConstructionERP 2.x"
+- "compatible with NEXUS 2.x"
 - academic citation of the project
 
 Such use must:
@@ -53,11 +53,11 @@ Such use must:
 Without prior written permission from Licensor you may NOT:
 
 (a) use the DDC Marks in a product name, company name, or
-    domain name (e.g. `openconstructionerp-cloud.io`,
+    domain name (e.g. `nexus-cloud.io`,
     `ocerp-enterprise.com`, `cwicr-pro.io`);
 (b) reproduce, modify, or stylise DDC logos or wordmarks
     beyond the nominative references described in Section 2;
-(c) sell, licence, resell, or monetise OpenConstructionERP
+(c) sell, licence, resell, or monetise NEXUS
     (including modified versions) under a name that is
     confusingly similar to a DDC Mark, whether as a hosted
     service, an on-premises distribution, or an OEM product;
@@ -85,7 +85,7 @@ under AGPL, but:
   user-facing UI, product name, and marketing if you
   distribute a modified version;
 - retaining the DDC Marks to credit the upstream project
-  (e.g. "based on OpenConstructionERP") is permitted under
+  (e.g. "based on NEXUS") is permitted under
   Section 2 (nominative fair use) but the modified product
   must not be named using a DDC Mark.
 
@@ -112,7 +112,7 @@ Forks made under AGPL-3.0-or-later must:
   source files and in the project README;
 - **change the product name** if the fork is distributed,
   marketed, or hosted as a separate product (do not publish a
-  fork as "OpenConstructionERP-\<anything\>" on package
+  fork as "NEXUS-\<anything\>" on package
   registries, app stores, or container registries);
 - not imply endorsement by Licensor.
 

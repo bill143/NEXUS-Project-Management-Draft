@@ -14,7 +14,7 @@
 
 ## 1. Context
 
-`OCE_TECH_SPEC_GLOBAL.md` is a 1941-line specification of six fundamental modules that constitute the technical core of OpenConstructionERP. About 60–70 % of its surface already exists in the codebase in some form; the remaining 30–40 % is either missing entirely or implemented at a much shallower level than the spec demands.
+`OCE_TECH_SPEC_GLOBAL.md` is a 1941-line specification of six fundamental modules that constitute the technical core of NEXUS. About 60–70 % of its surface already exists in the codebase in some form; the remaining 30–40 % is either missing entirely or implemented at a much shallower level than the spec demands.
 
 This RFC is the **strategic integration plan** that locks decisions, names the gaps, sequences the work into waves, and defines the per-ticket acceptance criteria. Per-module RFCs (35–40) are intentionally NOT created here — each module gets its own RFC at the start of its wave, with the deep schema and algorithm details. RFC 34 is the umbrella.
 

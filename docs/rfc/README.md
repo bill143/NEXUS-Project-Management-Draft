@@ -1,4 +1,4 @@
-# RFCs — Architecture decision records for OpenConstructionERP v1.9+
+# RFCs — Architecture decision records for NEXUS v1.9+
 
 Each RFC captures the **rationale** behind a non-trivial design decision. Format:
 

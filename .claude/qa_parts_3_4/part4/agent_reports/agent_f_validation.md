@@ -114,7 +114,7 @@ per rule set on tiny BOQs.
 
 ## Files
 
-- Test source: `C:/Users/Artem/OpenConstructionERP/qa_output/generated_tests/test_p4_agent_f_validation.py` (374 lines)
-- Rule source: `C:/Users/Artem/OpenConstructionERP/backend/app/core/validation/rules/__init__.py` (all 42 rules)
-- Service (latent-rule root cause for currency): `C:/Users/Artem/OpenConstructionERP/backend/app/modules/validation/service.py:243`
-- Schema (latent-rule root cause for negative/empty/total): `C:/Users/Artem/OpenConstructionERP/backend/app/modules/boq/schemas.py:102`
+- Test source: `C:/Users/Artem/NEXUS/qa_output/generated_tests/test_p4_agent_f_validation.py` (374 lines)
+- Rule source: `C:/Users/Artem/NEXUS/backend/app/core/validation/rules/__init__.py` (all 42 rules)
+- Service (latent-rule root cause for currency): `C:/Users/Artem/NEXUS/backend/app/modules/validation/service.py:243`
+- Schema (latent-rule root cause for negative/empty/total): `C:/Users/Artem/NEXUS/backend/app/modules/boq/schemas.py:102`

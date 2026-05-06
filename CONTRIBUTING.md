@@ -1,6 +1,6 @@
-# Contributing to OpenConstructionERP
+# Contributing to NEXUS
 
-Thank you for your interest in contributing! OpenConstructionERP is an open-source platform
+Thank you for your interest in contributing! NEXUS is an open-source platform
 for construction cost estimation, and we welcome contributions of all kinds.
 
 ## Quick Start
@@ -8,7 +8,7 @@ for construction cost estimation, and we welcome contributions of all kinds.
 ```bash
 # 1. Fork and clone
 git clone https://github.com/YOUR_USERNAME/OpenConstructionERP.git
-cd OpenConstructionERP
+cd NEXUS
 
 # 2. Start dev environment
 docker compose up -d   # PostgreSQL + Redis
@@ -103,7 +103,7 @@ See existing modules (`boq`, `costs`, `projects`) for reference implementations.
 
 ## Contributor License Agreement (CLA)
 
-OpenConstructionERP uses dual licensing (AGPL-3.0 + Commercial). By submitting a PR,
+NEXUS uses dual licensing (AGPL-3.0 + Commercial). By submitting a PR,
 you agree that your contribution can be distributed under both licenses.
 
 First-time contributors will be asked to sign a CLA via a GitHub bot.

@@ -14,8 +14,8 @@ from __future__ import annotations
 
 from functools import lru_cache
 
-_LOGO_URL = "https://openconstructionerp.com/logo-128.png"
-_APP_NAME = "OpenConstructionERP"
+_LOGO_URL = "https://nexus.eliteal.info/logo-128.png"
+_APP_NAME = "NEXUS"
 
 
 @lru_cache(maxsize=1)
@@ -131,7 +131,7 @@ def template_password_reset(
     to copy-paste or forwarded-email attack paths.
     """
     greeting = f"Hi {recipient_name}," if recipient_name else "Hello,"
-    subject = "Reset your OpenConstructionERP password"
+    subject = "Reset your NEXUS password"
     body = (
         f"<p>{greeting}</p>"
         f"<p>We received a request to reset the password on your "

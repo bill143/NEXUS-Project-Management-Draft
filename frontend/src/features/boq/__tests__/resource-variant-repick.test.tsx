@@ -1,4 +1,4 @@
-// DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+// DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 // Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 //
 // EditableResourceRow contract tests for the v2.6.26 per-resource variant

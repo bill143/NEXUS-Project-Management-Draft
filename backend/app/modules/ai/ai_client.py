@@ -1,4 +1,4 @@
-# OpenConstructionERP — DataDrivenConstruction (DDC)
+# NEXUS — DataDrivenConstruction (DDC)
 # CWICR AI Estimation Engine
 # Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 # AGPL-3.0 License · DDC-CWICR-OE-2026
@@ -239,7 +239,7 @@ _OPENAI_COMPAT_CONFIG = {
     "openrouter": {
         "url": "https://openrouter.ai/api/v1/chat/completions",
         "model": OPENROUTER_MODEL,
-        "extra_headers": {"HTTP-Referer": "https://openconstructionerp.com"},
+        "extra_headers": {"HTTP-Referer": "https://nexus.eliteal.info"},
     },
     "mistral": {
         "url": "https://api.mistral.ai/v1/chat/completions",

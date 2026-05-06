@@ -217,7 +217,7 @@ export function useUpdateCheck(): ReleaseInfo | null {
           notes: data.body ?? '',
           url:
             data.html_url ??
-            'https://github.com/datadrivenconstruction/openconstructionerp/releases',
+            'https://github.com/datadrivenconstruction/nexus/releases',
           publishedAt: data.published_at ?? '',
         };
         writeCache(info);
@@ -494,7 +494,7 @@ function UpdateFullModal({
       key: 'pip',
       title: t('update.method_pip', { defaultValue: 'pip / PyPI' }),
       subtitle: t('update.method_pip_sub', { defaultValue: 'Recommended for Python installs' }),
-      cmd: 'pip install --upgrade openconstructionerp',
+      cmd: 'pip install --upgrade nexus',
     },
     {
       key: 'source',

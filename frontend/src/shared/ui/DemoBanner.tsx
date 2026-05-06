@@ -1,6 +1,6 @@
 /**
  * DemoBanner — persistent warning banner shown only on the public hosted
- * demo (https://openconstructionerp.com), driven by the backend's
+ * demo (https://nexus.eliteal.info), driven by the backend's
  * `OE_DEMO_MODE=true` env var. Tells visitors:
  *
  *   1. This is a demo. Do not upload real data or confidential documents.
@@ -65,7 +65,7 @@ export function DemoBanner() {
           locally:
         </span>
         <code className="px-1.5 py-0.5 rounded bg-amber-900/15 text-amber-950 font-mono text-[11px]">
-          pip install openconstructionerp
+          pip install nexus
         </code>
         <button
           type="button"
@@ -114,7 +114,7 @@ export function DemoBanner() {
               <p>
                 You're looking at the public hosted demo of{' '}
                 <strong className="text-content-primary">
-                  OpenConstructionERP
+                  NEXUS
                 </strong>
                 . It runs on a single small VPS and is shared with everyone in
                 the world who clicks the demo link, so:
@@ -157,7 +157,7 @@ export function DemoBanner() {
                   Install locally — 3 commands
                 </div>
                 <code className="block font-mono text-[12px] text-content-primary leading-relaxed">
-                  pip install openconstructionerp
+                  pip install nexus
                   <br />
                   openestimate init-db
                   <br />
@@ -178,7 +178,7 @@ export function DemoBanner() {
                 GitHub
               </a>
               <a
-                href="https://pypi.org/project/openconstructionerp/"
+                href="https://pypi.org/project/nexus/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 px-3 py-2 text-xs font-medium text-content-secondary hover:text-content-primary border border-border-light rounded-lg hover:bg-surface-secondary transition-colors"

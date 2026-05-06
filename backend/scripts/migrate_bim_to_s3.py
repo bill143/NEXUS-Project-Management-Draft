@@ -16,7 +16,7 @@ Usage::
     #    S3_REGION=us-east-1
     #
     # 2. Install the optional dependency
-    #    pip install 'openconstructionerp[s3]'
+    #    pip install 'nexus[s3]'
     #
     # 3. Run the migration (from the backend/ directory)
     #    python scripts/migrate_bim_to_s3.py

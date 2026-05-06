@@ -1,4 +1,4 @@
-# OpenConstructionERP — Master Plan v2.7+
+# NEXUS — Master Plan v2.7+
 
 **Дата сборки:** 2026-04-27
 **Источник:** консолидация трёх документов

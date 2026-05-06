@@ -173,7 +173,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     en: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Open-source construction cost estimation",
         },
         "nav": {
@@ -316,7 +316,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
             "update": "Update",
         },
         "dashboard": {
-            "welcome": "Welcome to OpenConstructionERP",
+            "welcome": "Welcome to NEXUS",
             "subtitle": "Your construction estimation workspace",
             "recent_projects": "Recent Projects",
             "system_status": "System Status",
@@ -360,7 +360,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     de: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Open-Source Baukalkulation",
         },
         "nav": {
@@ -480,7 +480,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
             "update": "Aktualisieren",
         },
         "dashboard": {
-            "welcome": "Willkommen bei OpenConstructionERP",
+            "welcome": "Willkommen bei NEXUS",
             "subtitle": "Open-Source Baukalkulation-Plattform",
             "recent_projects": "Aktuelle Projekte",
             "system_status": "Systemstatus",
@@ -507,7 +507,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     ru: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Open-source \u0441\u043c\u0435\u0442\u043d\u043e\u0435 \u0434\u0435\u043b\u043e",
         },
         "nav": {
@@ -694,7 +694,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     fr: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Estimation des co\u00fbts de construction open-source",
         },
         "nav": {
@@ -840,7 +840,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     es: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Presupuesto de construcci\u00f3n de c\u00f3digo abierto",
         },
         "nav": {
@@ -986,7 +986,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     pt: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Or\u00e7amento de constru\u00e7\u00e3o de c\u00f3digo aberto",
         },
         "nav": {
@@ -1132,7 +1132,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     it: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Stima dei costi di costruzione open-source",
         },
         "nav": {
@@ -1278,7 +1278,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     nl: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Open-source bouwkostencalculatie",
         },
         "nav": {
@@ -1424,7 +1424,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     pl: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Kosztorysowanie budowlane open-source",
         },
         "nav": {
@@ -1570,7 +1570,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     cs: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Open-source rozpo\u010dtov\u00e1n\u00ed staveb",
         },
         "nav": {
@@ -1716,7 +1716,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     tr: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "A\u00e7\u0131k kaynak in\u015faat maliyet tahmini",
         },
         "nav": {
@@ -1862,7 +1862,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     sv: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Byggkalkylering med \u00f6ppen k\u00e4llkod",
         },
         "nav": {
@@ -2008,7 +2008,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     no: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Byggekalkyle med \u00e5pen kildekode",
         },
         "nav": {
@@ -2154,7 +2154,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     da: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Byggekalkulation med \u00e5ben kildekode",
         },
         "nav": {
@@ -2300,7 +2300,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     fi: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "Avoimen l\u00e4hdekoodin rakennuskustannuslaskenta",
         },
         "nav": {
@@ -2446,7 +2446,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     ar: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "\u062a\u0642\u062f\u064a\u0631 \u062a\u0643\u0627\u0644\u064a\u0641 \u0627\u0644\u0628\u0646\u0627\u0621 \u0645\u0641\u062a\u0648\u062d \u0627\u0644\u0645\u0635\u062f\u0631",
         },
         "nav": {
@@ -2614,7 +2614,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     zh: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "\u5f00\u6e90\u5efa\u7b51\u5de5\u7a0b\u9020\u4ef7",
         },
         "nav": {
@@ -2760,7 +2760,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     ja: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "\u30aa\u30fc\u30d7\u30f3\u30bd\u30fc\u30b9\u5efa\u8a2d\u30b3\u30b9\u30c8\u898b\u7a4d",
         },
         "nav": {
@@ -2906,7 +2906,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     ko: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "\uc624\ud508\uc18c\uc2a4 \uac74\uc124 \uc6d0\uac00 \uc0b0\uc815",
         },
         "nav": {
@@ -3052,7 +3052,7 @@ def _generate_default_locales(locales_dir: Path) -> None:
     # -------------------------------------------------------------------------
     hi: dict[str, dict[str, str]] = {
         "app": {
-            "name": "OpenConstructionERP",
+            "name": "NEXUS",
             "tagline": "\u0913\u092a\u0928 \u0938\u094b\u0930\u094d\u0938 \u0928\u093f\u0930\u094d\u092e\u093e\u0923 \u0932\u093e\u0917\u0924 \u0905\u0928\u0941\u092e\u093e\u0928",
         },
         "nav": {

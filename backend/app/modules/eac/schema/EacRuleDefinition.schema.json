@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://openconstructionerp.io/schemas/eac/EacRuleDefinition.schema.json",
+  "$id": "https://nexus.io/schemas/eac/EacRuleDefinition.schema.json",
   "title": "EacRuleDefinition",
   "description": "Canonical declarative description of an EAC v2 rule. Body of the eac_rules.definition_json column. Spec §1.5 of OCE_EAC_Implementation_Spec_v2.",
   "type": "object",

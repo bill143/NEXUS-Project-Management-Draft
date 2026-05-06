@@ -288,7 +288,7 @@ def _make_header_footer(
         # Left side: brand
         canvas.setFont("Helvetica", 7)
         canvas.setFillColor(colors.HexColor("#999999"))
-        canvas.drawString(MARGIN_LEFT, 10 * mm, f"OpenConstructionERP  |  Generated: {generated_date}")
+        canvas.drawString(MARGIN_LEFT, 10 * mm, f"NEXUS  |  Generated: {generated_date}")
         # Right side: page number
         if getattr(doc, "page_count", 0) > 0:
             page_text = f"Page {doc.page} of {doc.page_count}"
@@ -334,7 +334,7 @@ def _build_cover_page(
     elements.append(Spacer(1, 30 * mm))
 
     # Brand
-    elements.append(Paragraph("OpenConstructionERP", styles["brand"]))
+    elements.append(Paragraph("NEXUS", styles["brand"]))
     elements.append(Spacer(1, 10 * mm))
 
     # Decorative line
@@ -838,11 +838,11 @@ def generate_boq_pdf(
         topMargin=MARGIN_TOP,
         bottomMargin=MARGIN_BOTTOM,
         title=f"Cost Estimate - {boq_data.name}",
-        author="OpenConstructionERP",
+        author="NEXUS",
         subject="Bill of Quantities · DDC-CWICR-OE",
-        creator="OpenConstructionERP · DataDrivenConstruction",
-        producer="OpenConstructionERP / reportlab · datadrivenconstruction.io",
-        keywords="DDC-CWICR-OE-2026,OpenConstructionERP,BOQ,DataDrivenConstruction",
+        creator="NEXUS · DataDrivenConstruction",
+        producer="NEXUS / reportlab · datadrivenconstruction.io",
+        keywords="DDC-CWICR-OE-2026,NEXUS,BOQ,DataDrivenConstruction",
     )
     doc.addPageTemplates([cover_template, table_template])
 
@@ -875,11 +875,11 @@ def generate_boq_pdf(
         topMargin=MARGIN_TOP,
         bottomMargin=MARGIN_BOTTOM,
         title=f"Cost Estimate - {boq_data.name}",
-        author="OpenConstructionERP",
+        author="NEXUS",
         subject="Bill of Quantities · DDC-CWICR-OE",
-        creator="OpenConstructionERP · DataDrivenConstruction",
-        producer="OpenConstructionERP / reportlab · datadrivenconstruction.io",
-        keywords="DDC-CWICR-OE-2026,OpenConstructionERP,BOQ,DataDrivenConstruction",
+        creator="NEXUS · DataDrivenConstruction",
+        producer="NEXUS / reportlab · datadrivenconstruction.io",
+        keywords="DDC-CWICR-OE-2026,NEXUS,BOQ,DataDrivenConstruction",
     )
     doc2.page_count = total_pages
     doc2.addPageTemplates([cover_template, table_template])
@@ -987,11 +987,11 @@ def generate_boq_pdf_simple(
         topMargin=MARGIN_TOP,
         bottomMargin=MARGIN_BOTTOM,
         title=f"Cost Estimate - {boq_data.name} (Summary)",
-        author="OpenConstructionERP",
+        author="NEXUS",
         subject="Bill of Quantities · DDC-CWICR-OE",
-        creator="OpenConstructionERP · DataDrivenConstruction",
-        producer="OpenConstructionERP / reportlab · datadrivenconstruction.io",
-        keywords="DDC-CWICR-OE-2026,OpenConstructionERP,BOQ,DataDrivenConstruction",
+        creator="NEXUS · DataDrivenConstruction",
+        producer="NEXUS / reportlab · datadrivenconstruction.io",
+        keywords="DDC-CWICR-OE-2026,NEXUS,BOQ,DataDrivenConstruction",
     )
     doc.addPageTemplates([cover_template, table_template])
 

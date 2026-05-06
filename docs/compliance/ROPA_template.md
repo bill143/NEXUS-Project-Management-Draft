@@ -4,13 +4,13 @@
 **Basis:** GDPR Article 30(1) / (2)
 
 This template helps **organisations deploying
-OpenConstructionERP on their own infrastructure** compile the
+NEXUS on their own infrastructure** compile the
 Record of Processing Activities that Article 30 of the General
 Data Protection Regulation (Regulation (EU) 2016/679) requires
 of most controllers and processors.
 
 > **Scope note.**
-> When you self-host OpenConstructionERP, **you are the
+> When you self-host NEXUS, **you are the
 > controller** for the personal data you process. DDC has no
 > access to that data and is not a processor. This template is
 > provided as a starting point for *your own* RoPA; it is not
@@ -101,7 +101,7 @@ Duplicate the following block for each activity.
 ## Part B — Processor record (Art. 30(2))
 
 *Fill in only if you act as a processor for a third-party
-controller, e.g. if you host OpenConstructionERP on behalf of a
+controller, e.g. if you host NEXUS on behalf of a
 client.*
 
 | Field | Value |
@@ -110,7 +110,7 @@ client.*
 | Controllers served | *Client name(s) or contract identifier(s)* |
 | Categories of processing | *Hosting, support, backup* |
 | International transfers | *Specify* |
-| TOMs | *Reference your ISMS; inherit OpenConstructionERP defaults* |
+| TOMs | *Reference your ISMS; inherit NEXUS defaults* |
 
 ## Part C — Review and approval
 

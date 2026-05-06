@@ -1,7 +1,7 @@
 [project]
-name = "openconstructionerp"
+name = "nexus"
 version = "2.8.8"
-description = "NEXUS-Project-Management-Draft — federal-pivot fork of OpenConstructionERP with DDC consolidation (CO₂ embodied carbon, ML price prediction, federal compliance). BOQ, 4D/5D, AI, CAD/BIM takeoff. After install, run: openestimate"
+description = "NEXUS-Project-Management-Draft — federal-pivot fork of NEXUS with DDC consolidation (CO₂ embodied carbon, ML price prediction, federal compliance). BOQ, 4D/5D, AI, CAD/BIM takeoff. After install, run: openestimate"
 license = "AGPL-3.0-or-later"
 requires-python = ">=3.12"
 authors = [
@@ -92,11 +92,11 @@ dependencies = [
 
 [project.scripts]
 openestimate = "app.cli:main"
-openconstructionerp = "app.cli:main"
+nexus = "app.cli:main"
 
 [project.urls]
 Homepage = "https://datadrivenconstruction.io/erp"
-Documentation = "https://openconstructionerp.com/docs"
+Documentation = "https://nexus.eliteal.info/docs"
 Repository = "https://github.com/datadrivenconstruction/OpenConstructionERP"
 Issues = "https://github.com/datadrivenconstruction/OpenConstructionERP/issues"
 Changelog = "https://github.com/datadrivenconstruction/OpenConstructionERP/blob/main/CHANGELOG.md"
@@ -128,9 +128,9 @@ semantic = [
     "sentence-transformers>=3.3.0",
 ]
 # Backwards-compat alias. Deprecated since v1.3.14 — prefer `[semantic]`.
-# Kept so existing `pip install openconstructionerp[ai]` commands still work.
+# Kept so existing `pip install nexus[ai]` commands still work.
 ai = [
-    "openconstructionerp[semantic]",
+    "nexus[semantic]",
 ]
 # Computer vision for PDF takeoff
 cv = [
@@ -141,7 +141,7 @@ cv = [
     "Pillow>=12.1.1",
 ]
 # Deprecated alias since v2.5.0 — `duckdb` is in base deps now.
-# Kept so existing `pip install openconstructionerp[analytics]` commands
+# Kept so existing `pip install nexus[analytics]` commands
 # continue to work without failing.
 analytics = []
 # S3-compatible object storage backend (MinIO / AWS S3 / Backblaze B2 /
@@ -152,7 +152,7 @@ s3 = [
 ]
 # Everything
 all = [
-    "openconstructionerp[server,vector,semantic,cv,s3,analytics]",
+    "nexus[server,vector,semantic,cv,s3,analytics]",
 ]
 # Development tools
 dev = [

@@ -1,6 +1,6 @@
 # Part 4 / Agent C — Deep Security Audit
 
-Target: OpenConstructionERP V4 on `http://127.0.0.1:8080` (dev install).
+Target: NEXUS V4 on `http://127.0.0.1:8080` (dev install).
 Test file: `qa_output/generated_tests/test_p4_agent_c_security_deep.py`.
 Run: `pytest -v --tb=short -p no:cacheprovider`.
 

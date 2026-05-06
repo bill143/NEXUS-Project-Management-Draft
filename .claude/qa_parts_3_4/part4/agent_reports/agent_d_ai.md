@@ -1,6 +1,6 @@
 # Agent D — AI Module Audit
 
-Target: `C:/Users/Artem/OpenConstructionERP/backend/app/modules/ai/`
+Target: `C:/Users/Artem/NEXUS/backend/app/modules/ai/`
 Server: http://127.0.0.1:8080  (no API keys configured)
 Tests:  `qa_output/generated_tests/test_p4_agent_d_ai.py` — **24 passed in 12.14s**
 

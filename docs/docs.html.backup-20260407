@@ -3,12 +3,12 @@
 <head>
  <meta charset="UTF-8">
  <meta name="viewport" content="width=device-width, initial-scale=1.0">
- <title>Documentation — OpenConstructionERP | Free Construction Cost Estimation Software</title>
- <meta name="description" content="Complete documentation for OpenConstructionERP — installation guide, BOQ editor, cost database (55K+ items), AI estimation, 4D/5D planning, CAD/BIM takeoff, validation, tendering. Step-by-step tutorials with screenshots.">
- <meta name="keywords" content="OpenConstructionERP documentation, construction ERP guide, BOQ editor tutorial, cost estimation software, DIN 276 guide, NRM tutorial, MasterFormat, GAEB XML, AI construction estimation, quantity surveying software, Baukalkulation Anleitung">
+ <title>Documentation — NEXUS | Free Construction Cost Estimation Software</title>
+ <meta name="description" content="Complete documentation for NEXUS — installation guide, BOQ editor, cost database (55K+ items), AI estimation, 4D/5D planning, CAD/BIM takeoff, validation, tendering. Step-by-step tutorials with screenshots.">
+ <meta name="keywords" content="NEXUS documentation, construction ERP guide, BOQ editor tutorial, cost estimation software, DIN 276 guide, NRM tutorial, MasterFormat, GAEB XML, AI construction estimation, quantity surveying software, Baukalkulation Anleitung">
  <meta name="robots" content="index, follow">
  <meta name="author" content="Data Driven Construction">
- <link rel="canonical" href="https://openconstructionerp.com/docs">
+ <link rel="canonical" href="https://nexus.com/docs">
  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
  <!-- Google Analytics -->
@@ -22,22 +22,22 @@
 
  <!-- Open Graph -->
  <meta property="og:type" content="article">
- <meta property="og:title" content="OpenConstructionERP Documentation — Free Construction ERP">
+ <meta property="og:title" content="NEXUS Documentation — Free Construction ERP">
  <meta property="og:description" content="Step-by-step guide: BOQ editor, 55K+ cost items, AI estimation, 4D/5D, CAD/BIM takeoff. 21 languages, 20 standards.">
- <meta property="og:url" content="https://openconstructionerp.com/docs">
- <meta property="og:site_name" content="OpenConstructionERP">
+ <meta property="og:url" content="https://nexus.com/docs">
+ <meta property="og:site_name" content="NEXUS">
 
  <!-- Structured Data -->
  <script type="application/ld+json">
  {
    "@context": "https://schema.org",
    "@type": "TechArticle",
-   "headline": "OpenConstructionERP Documentation",
+   "headline": "NEXUS Documentation",
    "description": "Complete documentation for the free open-source construction cost estimation platform",
-   "url": "https://openconstructionerp.com/docs",
+   "url": "https://nexus.com/docs",
    "author": {"@type": "Organization", "name": "Data Driven Construction", "url": "https://datadrivenconstruction.io"},
    "publisher": {"@type": "Organization", "name": "Data Driven Construction"},
-   "about": {"@type": "SoftwareApplication", "name": "OpenConstructionERP"}
+   "about": {"@type": "SoftwareApplication", "name": "NEXUS"}
  }
  </script>
  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -183,18 +183,18 @@ document.querySelectorAll('.sidebar a').forEach(a=>{
 });
 </script>
 
-<nav class="nav"><div class="nav-i"><a href="/" class="nav-l">OpenConstructionERP</a><div class="nav-r"><a href="/">Home</a><a href="/docs.html" style="color:var(--blue)">Docs</a><a href="https://github.com/datadrivenconstruction/OpenConstructionERP" target="_blank">GitHub</a><a href="/contact.html">Contact</a></div></div></nav>
+<nav class="nav"><div class="nav-i"><a href="/" class="nav-l">NEXUS</a><div class="nav-r"><a href="/">Home</a><a href="/docs.html" style="color:var(--blue)">Docs</a><a href="https://github.com/datadrivenconstruction/OpenConstructionERP" target="_blank">GitHub</a><a href="/contact.html">Contact</a></div></div></nav>
 
-<div class="hero"><div class="ctr"><div style="margin-bottom:16px"><span class="bdg bdg-b">v0.2.0</span> <span class="bdg bdg-g">Open Source</span></div><h1><span>Documentation</span></h1><p>Everything you need to install, configure, and use OpenConstructionERP for professional construction cost estimation.</p></div></div>
+<div class="hero"><div class="ctr"><div style="margin-bottom:16px"><span class="bdg bdg-b">v0.2.0</span> <span class="bdg bdg-g">Open Source</span></div><h1><span>Documentation</span></h1><p>Everything you need to install, configure, and use NEXUS for professional construction cost estimation.</p></div></div>
 
 <div class="ctr">
 <div class="toc" style="margin-left:0"><h3>Contents</h3><ol><li><a href="#overview">Platform Overview</a></li><li><a href="#install">Installation Guide</a></li><li><a href="#boq">BOQ Editor</a></li><li><a href="#costs">Cost Database</a></li><li><a href="#takeoff">CAD/BIM &amp; PDF Takeoff</a></li><li><a href="#ai">AI Estimation</a></li><li><a href="#planning">4D Schedule &amp; 5D Cost Model</a></li><li><a href="#settings">Configuration</a></li><li><a href="#api">API Reference</a></li><li><a href="#support">Support</a></li></ol></div>
 
-<section id="overview"><h2>Platform Overview</h2><p>OpenConstructionERP is a complete construction cost estimation and project management platform that runs entirely on your machine. It replaces expensive enterprise tools like iTWO, CostX, Sage Estimating, and Bluebeam with an open, self-hosted alternative. The platform covers the entire estimation workflow — from initial feasibility studies and quantity takeoff to detailed BOQ preparation, tendering, and bid comparison. All your data stays on your server. No cloud dependency, no subscriptions, no per-seat fees.</p><div class="ss"><img src="/doc-01-dashboard.png" alt="Dashboard"><div class="ss-c">Dashboard with project KPIs, Getting Started steps, recent projects, and system status panel</div></div><div class="g2"><div class="cd"><h4>BOQ Management</h4><p>Hierarchical Bills of Quantities with sections, positions, resources, assemblies, and automatic markups.</p></div><div class="cd"><h4>55K+ Cost Items</h4><p>CWICR database with 11 regional pricing sets covering DACH, UK, US, France, Spain, Brazil, Russia, UAE, China, India, Canada.</p></div><div class="cd"><h4>AI Estimation</h4><p>Generate BOQ from text, photos, PDFs, Excel, or CAD/BIM models using any LLM provider.</p></div><div class="cd"><h4>CAD/BIM Takeoff</h4><p>Extract quantities from Revit, IFC, AutoCAD, MicroStation via DDC converters.</p></div><div class="cd"><h4>4D/5D Planning</h4><p>Gantt scheduling with CPM, Earned Value Management, S-curve, Monte Carlo simulation.</p></div><div class="cd"><h4>21 Languages</h4><p>Full UI translation with RTL support. 20 regional standards (DIN 276, NRM, MasterFormat, GAEB, etc.).</p></div></div></section>
+<section id="overview"><h2>Platform Overview</h2><p>NEXUS is a complete construction cost estimation and project management platform that runs entirely on your machine. It replaces expensive enterprise tools like iTWO, CostX, Sage Estimating, and Bluebeam with an open, self-hosted alternative. The platform covers the entire estimation workflow — from initial feasibility studies and quantity takeoff to detailed BOQ preparation, tendering, and bid comparison. All your data stays on your server. No cloud dependency, no subscriptions, no per-seat fees.</p><div class="ss"><img src="/doc-01-dashboard.png" alt="Dashboard"><div class="ss-c">Dashboard with project KPIs, Getting Started steps, recent projects, and system status panel</div></div><div class="g2"><div class="cd"><h4>BOQ Management</h4><p>Hierarchical Bills of Quantities with sections, positions, resources, assemblies, and automatic markups.</p></div><div class="cd"><h4>55K+ Cost Items</h4><p>CWICR database with 11 regional pricing sets covering DACH, UK, US, France, Spain, Brazil, Russia, UAE, China, India, Canada.</p></div><div class="cd"><h4>AI Estimation</h4><p>Generate BOQ from text, photos, PDFs, Excel, or CAD/BIM models using any LLM provider.</p></div><div class="cd"><h4>CAD/BIM Takeoff</h4><p>Extract quantities from Revit, IFC, AutoCAD, MicroStation via DDC converters.</p></div><div class="cd"><h4>4D/5D Planning</h4><p>Gantt scheduling with CPM, Earned Value Management, S-curve, Monte Carlo simulation.</p></div><div class="cd"><h4>21 Languages</h4><p>Full UI translation with RTL support. 20 regional standards (DIN 276, NRM, MasterFormat, GAEB, etc.).</p></div></div></section>
 
 <section id="first-steps">
 <h2>First Steps After Installation</h2>
-<p>After installing OpenConstructionERP, follow these steps to set up your first project and create your first cost estimate. The entire process takes about 10 minutes.</p>
+<p>After installing NEXUS, follow these steps to set up your first project and create your first cost estimate. The entire process takes about 10 minutes.</p>
 
 <h3 id="fs-login">Step 1: Log In</h3>
 <p>Open your browser and navigate to <code>http://localhost:5173</code> (local development) or <code>http://localhost:8080</code> (Docker). You will see the login page with a "Demo Access" panel. Click on <strong>Admin</strong> to log in instantly with the demo account, or enter your own credentials if you registered a new account.</p>
@@ -233,14 +233,14 @@ document.querySelectorAll('.sidebar a').forEach(a=>{
 <p>The <strong>Total</strong> column calculates automatically (Quantity x Unit Rate). You can also search the cost database by clicking the database icon next to any position to find and apply a rate from the 55,000+ CWICR items.</p>
 </section>
 
-<section id="install"><h2>Installation Guide</h2><p>OpenConstructionERP is designed to be easy to install regardless of your technical background. Choose the method that matches your setup — all options take less than 5 minutes. The application uses SQLite by default, so you do not need to install or configure any database server. Everything works out of the box.</p><h3 id="install-oneline">Option A: One-Line Install</h3><pre><code># Linux / macOS
+<section id="install"><h2>Installation Guide</h2><p>NEXUS is designed to be easy to install regardless of your technical background. Choose the method that matches your setup — all options take less than 5 minutes. The application uses SQLite by default, so you do not need to install or configure any database server. Everything works out of the box.</p><h3 id="install-oneline">Option A: One-Line Install</h3><pre><code># Linux / macOS
 curl -sSL https://raw.githubusercontent.com/datadrivenconstruction/OpenConstructionERP/main/scripts/install.sh | bash
 
 # Windows (PowerShell)
 irm https://raw.githubusercontent.com/datadrivenconstruction/OpenConstructionERP/main/scripts/install.ps1 | iex</code></pre><p>Auto-detects Docker / Python / uv and runs at <code>http://localhost:8080</code></p><h3 id="install-docker">Option B: Docker</h3><pre><code>git clone https://github.com/datadrivenconstruction/OpenConstructionERP.git
-cd OpenConstructionERP
+cd NEXUS
 make quickstart</code></pre><p>Opens at <code>http://localhost:8080</code> (~2 min first build).</p><h3 id="install-local">Option C: Local Development</h3><pre><code>git clone https://github.com/datadrivenconstruction/OpenConstructionERP.git
-cd OpenConstructionERP
+cd NEXUS
 
 # Backend (SQLite, zero config)
 cd backend &amp;&amp; pip install -r requirements.txt
@@ -476,11 +476,11 @@ cd frontend &amp;&amp; npm install &amp;&amp; npm run dev</code></pre><p>Backend
 
 <section id="settings"><h2>Configuration</h2><div class="ss"><img src="/doc-06-settings.png" alt="Settings"><div class="ss-c">Settings page with profile management, Simple/Advanced interface mode toggle, and module configuration</div></div><table><tr><th>Variable</th><th>Default</th><th>Description</th></tr><tr><td><code>DATABASE_URL</code></td><td>sqlite:///./openestimate.db</td><td>Database (SQLite or PostgreSQL)</td></tr><tr><td><code>JWT_SECRET</code></td><td>dev-key</td><td>JWT secret (change in production!)</td></tr><tr><td><code>SEED_DEMO</code></td><td>true</td><td>Create demo accounts</td></tr><tr><td><code>VECTOR_BACKEND</code></td><td>lancedb</td><td>Vector search backend</td></tr></table></section>
 
-<section id="api"><h2>API Reference</h2><p>OpenConstructionERP exposes a comprehensive REST API that powers the frontend and can be used for integrations, automation, and custom workflows. Every action available in the UI — creating projects, editing BOQs, running AI estimates, searching costs — is available as an API endpoint. Interactive Swagger documentation with try-it-out buttons is available at <code>/api/docs</code> when running the backend.</p><table><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr><tr><td>POST</td><td><code>/api/v1/users/auth/login</code></td><td>Login</td></tr><tr><td>GET</td><td><code>/api/v1/projects/</code></td><td>List projects</td></tr><tr><td>GET</td><td><code>/api/v1/boq/boqs/?project_id=...</code></td><td>List BOQs</td></tr><tr><td>GET</td><td><code>/api/v1/costs/?q=concrete</code></td><td>Search costs</td></tr><tr><td>POST</td><td><code>/api/v1/ai/quick-estimate</code></td><td>AI estimation</td></tr><tr><td>POST</td><td><code>/api/v1/takeoff/cad-extract</code></td><td>CAD extraction</td></tr><tr><td>GET</td><td><code>/api/health</code></td><td>Health check</td></tr></table></section>
+<section id="api"><h2>API Reference</h2><p>NEXUS exposes a comprehensive REST API that powers the frontend and can be used for integrations, automation, and custom workflows. Every action available in the UI — creating projects, editing BOQs, running AI estimates, searching costs — is available as an API endpoint. Interactive Swagger documentation with try-it-out buttons is available at <code>/api/docs</code> when running the backend.</p><table><tr><th>Method</th><th>Endpoint</th><th>Description</th></tr><tr><td>POST</td><td><code>/api/v1/users/auth/login</code></td><td>Login</td></tr><tr><td>GET</td><td><code>/api/v1/projects/</code></td><td>List projects</td></tr><tr><td>GET</td><td><code>/api/v1/boq/boqs/?project_id=...</code></td><td>List BOQs</td></tr><tr><td>GET</td><td><code>/api/v1/costs/?q=concrete</code></td><td>Search costs</td></tr><tr><td>POST</td><td><code>/api/v1/ai/quick-estimate</code></td><td>AI estimation</td></tr><tr><td>POST</td><td><code>/api/v1/takeoff/cad-extract</code></td><td>CAD extraction</td></tr><tr><td>GET</td><td><code>/api/health</code></td><td>Health check</td></tr></table></section>
 
 <section id="support"><h2>Support &amp; Contributing</h2><div class="g2"><div class="cd"><h4>Star on GitHub</h4><p><a href="https://github.com/datadrivenconstruction/OpenConstructionERP" target="_blank">Star the repository</a> to help others discover the project.</p></div><div class="cd"><h4>Report Issues</h4><p><a href="https://github.com/datadrivenconstruction/OpenConstructionERP/issues" target="_blank">Open an issue</a> on GitHub.</p></div><div class="cd"><h4>Discussions</h4><p><a href="https://t.me/datadrivenconstruction" target="_blank">Join Telegram community</a> to ask questions.</p></div><div class="cd"><h4>Consulting</h4><p><a href="https://datadrivenconstruction.io/contact-support/" target="_blank">Contact us</a> for deployment and training.</p></div></div><p><strong>License:</strong> AGPL-3.0. Commercial licensing: <a href="mailto:info@datadrivenconstruction.io">info@datadrivenconstruction.io</a></p></section>
 </div>
 
-<div class="ft"><div class="ctr"><p><strong>OpenConstructionERP</strong></p><p>Created by <a href="https://www.linkedin.com/in/boikoartem/" target="_blank">Artem Boiko</a> / <a href="https://datadrivenconstruction.io" target="_blank">Data Driven Construction</a></p><p style="margin-top:12px;font-size:.75rem;color:#6b7280">2026 Data Driven Construction. AGPL-3.0</p></div></div>
+<div class="ft"><div class="ctr"><p><strong>NEXUS</strong></p><p>Created by <a href="https://www.linkedin.com/in/boikoartem/" target="_blank">Artem Boiko</a> / <a href="https://datadrivenconstruction.io" target="_blank">Data Driven Construction</a></p><p style="margin-top:12px;font-size:.75rem;color:#6b7280">2026 Data Driven Construction. AGPL-3.0</p></div></div>
 </body>
 </html>

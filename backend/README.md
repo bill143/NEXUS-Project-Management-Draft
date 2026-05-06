@@ -1,4 +1,4 @@
-# OpenConstructionERP
+# NEXUS
 
 **The #1 open-source platform for construction cost estimation**
 
@@ -17,7 +17,7 @@ Professional BOQ, 4D scheduling, 5D cost model, AI-powered estimation, CAD/BIM t
 ## Quick Start
 
 ```bash
-pip install --upgrade openconstructionerp
+pip install --upgrade nexus
 openestimate                 # welcome screen + o-to-open-browser + server
 ```
 
@@ -44,7 +44,7 @@ openestimate welcome         # re-print the welcome screen + support links
 
 - **Community chat (Telegram):** https://t.me/datadrivenconstruction
 - **Bug reports / feature requests:** https://github.com/datadrivenconstruction/OpenConstructionERP/issues
-- **Docs:** https://openconstructionerp.com/docs
+- **Docs:** https://nexus.eliteal.info/docs
 
 ## Features
 
@@ -68,11 +68,11 @@ openestimate seed    [--demo]            # Load demo project data
 openestimate version                     # Show version info
 ```
 
-The `openconstructionerp` command is also available as a longer alias for both binaries.
+The `nexus` command is also available as a longer alias for both binaries.
 
 ## Links
 
-- [Documentation](https://openconstructionerp.com/docs)
+- [Documentation](https://nexus.eliteal.info/docs)
 - [GitHub](https://github.com/datadrivenconstruction/OpenConstructionERP)
 - [Telegram Community](https://t.me/datadrivenconstruction)
 

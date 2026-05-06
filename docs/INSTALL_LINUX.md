@@ -1,6 +1,6 @@
-# Installing OpenConstructionERP on Linux (Ubuntu / Debian)
+# Installing NEXUS on Linux (Ubuntu / Debian)
 
-This page covers the Linux-specific gotchas that the generic `pip install openconstructionerp` instruction does not. If you are on Ubuntu 23.04 or newer (including Ubuntu 26), read this first — `pip install` directly to system Python will fail.
+This page covers the Linux-specific gotchas that the generic `pip install nexus` instruction does not. If you are on Ubuntu 23.04 or newer (including Ubuntu 26), read this first — `pip install` directly to system Python will fail.
 
 Tested on Ubuntu 22.04, 24.04, 26.04 and Debian 12.
 
@@ -13,7 +13,7 @@ sudo apt update
 sudo apt install -y python3.12 python3.12-venv build-essential libpq-dev libjpeg-dev zlib1g-dev libgeos-dev
 python3.12 -m venv ~/openestimate-venv
 source ~/openestimate-venv/bin/activate
-pip install --upgrade openconstructionerp
+pip install --upgrade nexus
 openestimate --version
 openestimate
 ```
@@ -38,7 +38,7 @@ This is intentional and protects your OS. There are two correct fixes — pick o
 ```bash
 python3.12 -m venv ~/openestimate-venv
 source ~/openestimate-venv/bin/activate
-pip install --upgrade openconstructionerp
+pip install --upgrade nexus
 ```
 
 The venv is isolated from the system. Reactivate it in any new shell with `source ~/openestimate-venv/bin/activate`.
@@ -48,7 +48,7 @@ The venv is isolated from the system. Reactivate it in any new shell with `sourc
 ```bash
 sudo apt install -y pipx
 pipx ensurepath
-pipx install openconstructionerp
+pipx install nexus
 ```
 
 pipx creates a private venv per-tool and exposes the `openestimate` command on your `PATH`. Restart the shell after `ensurepath`.
@@ -59,14 +59,14 @@ Do **not** use `pip install --break-system-packages` — it can corrupt your sys
 
 ## 2. Python 3.12 vs 3.13 on Ubuntu 26
 
-OpenConstructionERP requires Python 3.12 or newer (`requires-python = ">=3.12"`). Ubuntu 26 ships with `python3.13` as the default `python3`, which works, but some heavy wheels (pyarrow, opencv-python-headless) may lag a release behind on 3.13. If `pip install` complains about missing wheels on 3.13, fall back to 3.12 explicitly:
+NEXUS requires Python 3.12 or newer (`requires-python = ">=3.12"`). Ubuntu 26 ships with `python3.13` as the default `python3`, which works, but some heavy wheels (pyarrow, opencv-python-headless) may lag a release behind on 3.13. If `pip install` complains about missing wheels on 3.13, fall back to 3.12 explicitly:
 
 ```bash
 sudo apt install -y python3.12 python3.12-venv
 python3.12 -m venv ~/openestimate-venv
 source ~/openestimate-venv/bin/activate
 python --version   # Python 3.12.x
-pip install --upgrade openconstructionerp
+pip install --upgrade nexus
 ```
 
 On Ubuntu 22.04 / Debian 12 where 3.12 is not in the default repos, use the deadsnakes PPA:
@@ -81,7 +81,7 @@ sudo apt install -y python3.12 python3.12-venv
 
 ## 3. System packages for source-build fallback
 
-OpenConstructionERP depends on pandas, pyarrow, opencv-python-headless, Pillow, asyncpg, psycopg2-binary, cryptography. All of these publish manylinux wheels, so a fresh `pip install` on a supported architecture downloads pre-built binaries — no compiler needed.
+NEXUS depends on pandas, pyarrow, opencv-python-headless, Pillow, asyncpg, psycopg2-binary, cryptography. All of these publish manylinux wheels, so a fresh `pip install` on a supported architecture downloads pre-built binaries — no compiler needed.
 
 If pip falls back to building from source (uncommon CPU architecture, very new Python, locked-down corporate mirror), install the development headers first:
 
@@ -135,7 +135,7 @@ For a long-running deployment, drop a unit file at `/etc/systemd/system/openesti
 
 ```ini
 [Unit]
-Description=OpenConstructionERP
+Description=NEXUS
 After=network.target
 
 [Service]
@@ -170,4 +170,4 @@ journalctl -u openestimate -f
 | `Address already in use` | Port 8080 taken | `ss -tlnp \| grep 8080` then `--port 9090` (section 5) |
 | `openestimate: command not found` after pipx | Path not refreshed | `pipx ensurepath` then open a new shell |
 
-If you still cannot install, run `openestimate doctor` (or `python -m openconstructionerp doctor`) and open an issue with the full output: https://github.com/datadrivenconstruction/OpenConstructionERP/issues
+If you still cannot install, run `openestimate doctor` (or `python -m nexus doctor`) and open an issue with the full output: https://github.com/datadrivenconstruction/OpenConstructionERP/issues

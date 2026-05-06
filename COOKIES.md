@@ -2,7 +2,7 @@
 
 **Effective date:** 2026-04-18
 
-This Cookie Policy explains how OpenConstructionERP ("the Software") and
+This Cookie Policy explains how NEXUS ("the Software") and
 the hosted instance operated by DataDrivenConstruction ("DDC") use
 cookies and similar browser-storage technologies. It is intended to
 satisfy the baseline transparency obligations of the EU ePrivacy

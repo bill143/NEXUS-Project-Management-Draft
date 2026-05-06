@@ -437,7 +437,7 @@ def _warn_missing_backend(operation: str) -> None:
     """Single rate-limited log line when a vector op is skipped."""
     logger.info(
         "cost-vector adapter: skipping %s — install the [vector] extra "
-        "(`pip install openconstructionerp[vector]`) to enable cost "
+        "(`pip install nexus[vector]`) to enable cost "
         "semantic indexing.",
         operation,
     )

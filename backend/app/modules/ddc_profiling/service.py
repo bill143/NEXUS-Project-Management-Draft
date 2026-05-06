@@ -25,7 +25,7 @@ class AnalyticsExtrasMissing(RuntimeError):
     def __init__(self) -> None:
         super().__init__(
             "Profiling requires the [analytics] extras (pandas + numpy). "
-            "Install via: pip install 'openconstructionerp[analytics]'",
+            "Install via: pip install 'nexus[analytics]'",
         )
 
 

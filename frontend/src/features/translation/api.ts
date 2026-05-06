@@ -1,4 +1,4 @@
-// DDC-CWICR-OE: DataDrivenConstruction · OpenConstructionERP
+// DDC-CWICR-OE: DataDrivenConstruction · NEXUS
 // Copyright (c) 2026 Artem Boiko / DataDrivenConstruction
 
 /**
@@ -39,7 +39,7 @@ import type {
 export const IATE_ALLOWED_PREFIXES: readonly string[] = [
   'https://iate.europa.eu/',
   'https://datadrivenconstruction.io/',
-  'https://openconstructionerp.com/',
+  'https://nexus.eliteal.info/',
   'https://github.com/datadrivenconstruction/',
   'https://raw.githubusercontent.com/datadrivenconstruction/',
 ];

@@ -29,7 +29,7 @@ const CHANGELOG: ChangelogEntry[] = [
       'Add: Delete / Backspace keyboard shortcut to remove the selected measurement (matches CAD/design tool convention)',
       'Fix: Makefile `make seed` and `make db-reset` no longer fail with ModuleNotFoundError — pointed at the actual seed_demo_showcase script',
       'Fix: requirements.txt win32_setctime now has sys_platform marker — pip install on Linux/macOS no longer aborts',
-      'Verified: prod E2E confirms Next button advances 1/31 → 2/31 → 7/31 (no 0/31 regression) on https://openconstructionerp.com',
+      'Verified: prod E2E confirms Next button advances 1/31 → 2/31 → 7/31 (no 0/31 regression) on https://nexus.eliteal.info',
     ],
   },
   {

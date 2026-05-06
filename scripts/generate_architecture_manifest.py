@@ -537,7 +537,7 @@ def generate_manifest(root: Path) -> dict[str, Any]:
     manifest: dict[str, Any] = {
         "_meta": {
             "generator": "generate_architecture_manifest.py",
-            "description": "Auto-generated architecture manifest for OpenConstructionERP",
+            "description": "Auto-generated architecture manifest for NEXUS",
             "version": "1.0.0",
         },
         "modules": [],
@@ -698,7 +698,7 @@ def generate_manifest(root: Path) -> dict[str, Any]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Generate architecture manifest for OpenConstructionERP."
+        description="Generate architecture manifest for NEXUS."
     )
     parser.add_argument(
         "--root",

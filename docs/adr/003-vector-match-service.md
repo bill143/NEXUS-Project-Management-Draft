@@ -7,7 +7,7 @@
 
 ## Context
 
-OpenConstructionERP needed a way to take a CAD/BIM/PDF/photo element (Revit wall, IFC slab, takeoff measurement, photo of a brick wall) and surface ranked CWICR cost-position candidates so an estimator can link them with one click instead of searching the 55k-item catalog manually.
+NEXUS needed a way to take a CAD/BIM/PDF/photo element (Revit wall, IFC slab, takeoff measurement, photo of a brick wall) and surface ranked CWICR cost-position candidates so an estimator can link them with one click instead of searching the 55k-item catalog manually.
 
 Constraints from the user / existing platform:
 - Multilingual: CWICR ships per-region in 9 source languages (en, de, ru, lt, fr, es, it, pl, pt). Element data may be in a different language than the catalog the project targets.

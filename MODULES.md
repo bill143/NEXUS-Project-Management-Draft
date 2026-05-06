@@ -1,8 +1,8 @@
 # Modules — Developer Guide
 
-How to build, install, and publish modules for OpenConstructionERP.
+How to build, install, and publish modules for NEXUS.
 
-OpenConstructionERP is modular by design: every business feature (BOQ, BIM,
+NEXUS is modular by design: every business feature (BOQ, BIM,
 Takeoff, Schedule, CDE, regional BOQ packs…) is a self-contained module that
 can be enabled, disabled, installed, or replaced without touching the core.
 

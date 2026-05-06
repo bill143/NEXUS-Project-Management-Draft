@@ -318,5 +318,5 @@ POST /ncr/{id}/close/     → 200 (closed)
 
 ## Artifacts produced
 
-- **Test file:** `C:/Users/Artem/OpenConstructionERP/qa_output/generated_tests/test_p5_agent_l_workflows.py` — 20 tests, all cleanly teardowning created projects.
+- **Test file:** `C:/Users/Artem/NEXUS/qa_output/generated_tests/test_p5_agent_l_workflows.py` — 20 tests, all cleanly teardowning created projects.
 - **Test run:** 19 passed, 1 skipped. All created resources cleaned up via project DELETE cascade.

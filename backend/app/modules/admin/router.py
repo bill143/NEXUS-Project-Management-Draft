@@ -301,7 +301,7 @@ async def cost_vector_reindex(
                     "code": "vector_extra_missing",
                     "message": (
                         "lancedb not installed; install the [vector] extra "
-                        "(pip install openconstructionerp[vector])."
+                        "(pip install nexus[vector])."
                     ),
                 },
             )

@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in OpenConstructionERP,
+If you discover a security vulnerability in NEXUS,
 please report it responsibly.
 
 **DO NOT** open a public GitHub issue for security vulnerabilities.
@@ -57,7 +57,7 @@ keep the latest stable plus the previous minor for six months.
 - Frontend web application (`frontend/`)
 - Desktop client (`desktop/`)
 - Official Docker images published by DataDrivenConstruction and
-  the DDC-operated instance at `https://openconstructionerp.com`
+  the DDC-operated instance at `https://nexus.eliteal.info`
 - CLI tools distributed with the project
 - Build and release automation that produces signed artefacts
   (`.github/workflows/release*.yml`, `signatures/`)
@@ -78,7 +78,7 @@ keep the latest stable plus the previous minor for six months.
 
 ## Self-Hosting Security Checklist
 
-If you deploy OpenConstructionERP on your own infrastructure:
+If you deploy NEXUS on your own infrastructure:
 
 - [ ] Change `JWT_SECRET` from the default value
 - [ ] Use HTTPS (TLS 1.2+) in production — never expose HTTP

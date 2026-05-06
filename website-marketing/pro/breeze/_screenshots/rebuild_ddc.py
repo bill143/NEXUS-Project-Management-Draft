@@ -130,7 +130,7 @@ GH_REPOS = [
         ["LLM", "Python"],
     ),
     (
-        "OpenConstructionERP",
+        "NEXUS",
         "https://github.com/datadrivenconstruction/OpenConstructionERP",
         "This product, in source. AGPL-3.0 platform with BOQ, takeoff, validation, 18+ modules and 21 languages baked in.",
         ["AGPL-3.0", "this repo"],

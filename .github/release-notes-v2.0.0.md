@@ -1,9 +1,9 @@
-# OpenConstructionERP v2.0.0 — Second stable release
+# NEXUS v2.0.0 — Second stable release
 
 The second major stable release. Supersedes the entire 1.x line and
 establishes the platform baseline going forward.
 
-`pip install --upgrade openconstructionerp`
+`pip install --upgrade nexus`
 
 ## 🔧 Reliability
 
@@ -63,14 +63,14 @@ See [CHANGELOG.md](https://github.com/datadrivenconstruction/OpenConstructionERP
 ## 💾 Install
 
 ```bash
-pip install openconstructionerp==2.0.0
+pip install nexus==2.0.0
 ```
 
 or
 
 ```bash
 git clone https://github.com/datadrivenconstruction/OpenConstructionERP.git
-cd OpenConstructionERP
+cd NEXUS
 docker compose up -d
 ```
 

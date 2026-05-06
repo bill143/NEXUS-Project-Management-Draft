@@ -1,4 +1,4 @@
-name: "OpenConstructionERP CodeQL Config"
+name: "NEXUS CodeQL Config"
 
 # Keep the security-extended pack from the workflow; we only narrow scope and
 # silence rule-classes that are systematically false-positive in this repo.

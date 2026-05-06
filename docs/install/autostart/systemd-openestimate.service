@@ -1,5 +1,5 @@
 [Unit]
-Description=OpenConstructionERP — open-source construction cost estimation
+Description=NEXUS — open-source construction cost estimation
 After=network.target
 
 [Service]
@@ -8,7 +8,7 @@ User=openestimate
 Group=openestimate
 WorkingDirectory=/home/openestimate
 
-# Path to the venv that has `pip install openconstructionerp` in it.
+# Path to the venv that has `pip install nexus` in it.
 # Replace with your install location.
 ExecStart=/home/openestimate/.venv/bin/openestimate serve --host 0.0.0.0 --port 8000
 

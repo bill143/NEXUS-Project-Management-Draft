@@ -44,7 +44,7 @@ def _detect_version() -> str:
     ``cd backend && python -m uvicorn app.main:create_app --factory``),
     the *source* file is what's actually executing — but
     ``importlib.metadata.version`` returns whatever is in ``site-packages``
-    if a stale ``pip install openconstructionerp==X`` happened earlier.
+    if a stale ``pip install nexus==X`` happened earlier.
     That made ``/api/health`` claim a wrong version after every dev
     edit and made it impossible to tell, in a QA session, whether a
     just-edited file was actually serving requests.
@@ -53,7 +53,7 @@ def _detect_version() -> str:
       1. If ``app/__init__.py`` lives outside ``site-packages`` and a
          ``pyproject.toml`` is on disk above it, read that — the source
          tree is the source of truth.
-      2. Otherwise, ``importlib.metadata.version("openconstructionerp")``.
+      2. Otherwise, ``importlib.metadata.version("nexus")``.
       3. ``0.0.0+local`` sentinel when all else fails.
     """
     here = Path(__file__).resolve()
@@ -62,7 +62,7 @@ def _detect_version() -> str:
         if from_source:
             return from_source
     try:
-        return _pkg_version("openconstructionerp")
+        return _pkg_version("nexus")
     except PackageNotFoundError:
         return _read_pyproject_version() or "0.0.0+local"
 
@@ -85,7 +85,7 @@ def _find_env_file() -> list[str]:
 
 
 class Settings(BaseSettings):
-    """OpenConstructionERP application settings."""
+    """NEXUS application settings."""
 
     model_config = SettingsConfigDict(
         env_file=_find_env_file() or ".env",
@@ -95,7 +95,7 @@ class Settings(BaseSettings):
     )
 
     # ── App ──────────────────────────────────────────────────────────────
-    app_name: str = "OpenConstructionERP"
+    app_name: str = "NEXUS"
     app_version: str = Field(default_factory=_detect_version)
     app_env: Literal["development", "staging", "production"] = "development"
     app_debug: bool = True
@@ -218,7 +218,7 @@ class Settings(BaseSettings):
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
-    smtp_from: str = "notifications@openconstructionerp.com"
+    smtp_from: str = "notifications@nexus.eliteal.info"
     smtp_tls: bool = True
     # Public URL used to build password-reset and notification links.
     # Falls back to the first CORS origin so dev installs work without

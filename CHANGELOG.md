@@ -1,6 +1,6 @@
 # Changelog
 
-All notable changes to OpenConstructionERP are documented here.
+All notable changes to NEXUS are documented here.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
@@ -44,7 +44,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [2.8.5] — 2026-05-04
 
 ### Fixed
-- Fresh-install registration: the seeded `demo@openestimator.io` admin no longer blocks the bootstrap path. First real self-registered user is now correctly promoted to admin and `is_active=True`, regardless of `OE_REGISTRATION_MODE`. Previously, every `pip install openconstructionerp` left new users dormant with no path forward.
+- Fresh-install registration: the seeded `demo@openestimator.io` admin no longer blocks the bootstrap path. First real self-registered user is now correctly promoted to admin and `is_active=True`, regardless of `OE_REGISTRATION_MODE`. Previously, every `pip install nexus` left new users dormant with no path forward.
 - `/projects/:projectId/boq` only fetches that project's BOQs instead of fanning out to every project, cutting skeleton time on prod (50+ projects) from ~2 s to one round-trip.
 
 ### Tests
@@ -434,7 +434,7 @@ Phase 3 + Phase 4 of vector match + concurrent-match perf hardening, shipped tog
 ## [2.6.38] — 2026-05-01
 
 ### Changed
-- `privacy-policy.html` and `terms.html` shipped with the local self-hosted app rewritten — now state explicitly that data stays on the operator's server, that DataDrivenConstruction is not Controller / Processor of project data, and list every outbound network call (AI APIs you configure, GitHub releases for converters / CWICR, PyPI for upgrades). The marketing-site versions at openconstructionerp.com keep their SaaS-style copy because that one *is* operated by us. Self-hosted vs demo distinction made unambiguous.
+- `privacy-policy.html` and `terms.html` shipped with the local self-hosted app rewritten — now state explicitly that data stays on the operator's server, that DataDrivenConstruction is not Controller / Processor of project data, and list every outbound network call (AI APIs you configure, GitHub releases for converters / CWICR, PyPI for upgrades). The marketing-site versions at nexus.eliteal.info keep their SaaS-style copy because that one *is* operated by us. Self-hosted vs demo distinction made unambiguous.
 
 ## [2.6.37] — 2026-05-01
 
@@ -576,7 +576,7 @@ Phase 3 + Phase 4 of vector match + concurrent-match perf hardening, shipped tog
 - **Unit "ton" rejected on CWICR add** — "Failed to add positions, unit 'ton' is not in the approved BOQ unit catalogue". Added a canonical alias map: `ton`/`tons`/`tonne`/`tonnes`/`mt` → `t`, `metre`/`metres`/`meter`/`meters` → `m`, `sqm`/`sq.m`/`cum`/`cu.m` → `m2`/`m3`, `each`/`piece(s)` → `ea`/`pcs`, `lump sum`/`lumpsum` → `lsum`, `hours`/`week`/`days`/`mo` → canonical forms. Aggregations stay coherent (everything buckets into the canonical unit) without rejecting common spellings.
 - **Country flags missing on cost-database regions** — `<CountryFlag code="DE_BERLIN" />` returned null because the lookup used the full lowercased key. The component now extracts the country prefix from region keys (`DE_BERLIN` → `de`, `AU_SYDNEY` → `au`) and maps non-ISO prefixes (`USA_USD` → `us`, `ENG_TORONTO` → `ca`, `SP_BARCELONA` → `es`, `PT_SAOPAULO` → `br`, `AR_DUBAI` → `ae`, `ZH_SHANGHAI` → `cn`, `HI_MUMBAI` → `in`, `CS_PRAGUE` → `cz`, `JA_TOKYO` → `jp`, `KO_SEOUL` → `kr`, `SV_STOCKHOLM` → `se`, `VI_HANOI` → `vn`) so all 30 CWICR regions render with proper flags everywhere.
 - **BIM converter status panel could not be dismissed on /bim** — `BIMPage` mounted the banner without `dismissible`, so the X button was never rendered. Now passed; banner can be closed and the dismissed flag persists in localStorage.
-- **Re-check: "Operation failed Not Found"** — the verify endpoint (`POST /v1/takeoff/converters/{id}/verify/`) only landed in v2.6.23. When users on stale backends click Re-check, the 404 now surfaces a clear "Backend version too old, run `pip install --upgrade openconstructionerp`" toast instead of a bare error.
+- **Re-check: "Operation failed Not Found"** — the verify endpoint (`POST /v1/takeoff/converters/{id}/verify/`) only landed in v2.6.23. When users on stale backends click Re-check, the 404 now surfaces a clear "Backend version too old, run `pip install --upgrade nexus`" toast instead of a bare error.
 
 ## [2.6.25] — 2026-04-28
 
@@ -607,7 +607,7 @@ Phase 3 + Phase 4 of vector match + concurrent-match perf hardening, shipped tog
 - **Abstract resource variants polished to ship-quality.** Default = mean rate when applying a CWICR cost item with multiple price variants (closest-to-mean entry chosen when no exact match). Inline variant picker (`▾ N options`) on every BOQ unit_rate cell; opens the same `VariantPicker` used at apply time. Position metadata stamps a `variant_snapshot = {code, rate, currency, captured_at}` so subsequent CWICR re-imports don't silently rewrite the position's rate. Visual markers: 4px left-edge bar (blue for explicit pick, amber for default = mean) plus an Abstract pill in the description cell. Excel export gains a "Variant" column. 6 backend tests + 8 frontend tests; all green.
 
 ### Fixed
-- **VPS source-dir shadowed wheel for ALL modules, not just `_frontend_dist`.** The systemd `WorkingDirectory=/root/OpenConstructionERP/backend` puts the source `app/` tree ahead of the installed wheel on `sys.path`, so every Python module updated in a new wheel was silently shadowed by the old source. Caught when the v2.6.22 demo-login route returned 404 despite the wheel containing it. Deploy procedure now rsyncs the entire wheel `app/` over `backend/app/` after every `pip install`.
+- **VPS source-dir shadowed wheel for ALL modules, not just `_frontend_dist`.** The systemd `WorkingDirectory=/root/NEXUS/backend` puts the source `app/` tree ahead of the installed wheel on `sys.path`, so every Python module updated in a new wheel was silently shadowed by the old source. Caught when the v2.6.22 demo-login route returned 404 despite the wheel containing it. Deploy procedure now rsyncs the entire wheel `app/` over `backend/app/` after every `pip install`.
 - **BOQ cell edits jumped back to old value before re-updating** (lag bug at `/boq/{id}`). The `updateMutation` in `BOQEditorPage.tsx` performed an optimistic `setQueryData` write but didn't `cancelQueries` on the in-flight refetch issued by sibling mutations (add/reorder/catalog/etc.) — so the GET landed AFTER the optimistic write, clobbered the cache with stale server data, and the new value reappeared only when the PATCH eventually returned. Added `await queryClient.cancelQueries({ queryKey: ['boq', boqId] })` in `onMutate`, snapshot+rollback in `onError`, invalidation moved from `onSuccess` to `onSettled` (fires once per mutation). Cell edits now feel instant.
 
 ## [2.6.22] — 2026-04-28
@@ -701,7 +701,7 @@ Phase 3 + Phase 4 of vector match + concurrent-match perf hardening, shipped tog
 ## [2.6.15] — 2026-04-27
 
 ### Added
-- Provenance markers across exporters and runtime artifacts so a forked deploy can be traced back. COBie/IDS/Excel/PDF/SARIF exports stamp `OpenConstructionERP · DDC-CWICR-OE-2026` in document metadata; SVG favicon carries an RDF authorship block; JWT tokens include `iss: openconstructionerp`; outbound catalog HTTP requests advertise the project User-Agent.
+- Provenance markers across exporters and runtime artifacts so a forked deploy can be traced back. COBie/IDS/Excel/PDF/SARIF exports stamp `NEXUS · DDC-CWICR-OE-2026` in document metadata; SVG favicon carries an RDF authorship block; JWT tokens include `iss: nexus`; outbound catalog HTTP requests advertise the project User-Agent.
 
 ## [2.6.14] — 2026-04-27
 
@@ -735,7 +735,7 @@ Phase 3 + Phase 4 of vector match + concurrent-match perf hardening, shipped tog
 
 
 ### Fixed — Issue #96 (CLI / installer)
-- **`openconstructionerp upgrade`** new command that pip-installs into the *same* Python env it's running in (uses `sys.executable -m pip`). The Windows installer creates a private venv at `%LOCALAPPDATA%\OpenConstructionERP\venv`; running `pip install --upgrade openconstructionerp` from any other shell upgraded the user's global Python instead, leaving the launcher's venv pinned to the old wheel — so the startup banner kept reporting the old version even though pip claimed success. The new command always lands in the right env. `version` now also prints `Site-packages: …` so users can see which interpreter the launcher is actually using.
+- **`nexus upgrade`** new command that pip-installs into the *same* Python env it's running in (uses `sys.executable -m pip`). The Windows installer creates a private venv at `%LOCALAPPDATA%\NEXUS\venv`; running `pip install --upgrade nexus` from any other shell upgraded the user's global Python instead, leaving the launcher's venv pinned to the old wheel — so the startup banner kept reporting the old version even though pip claimed success. The new command always lands in the right env. `version` now also prints `Site-packages: …` so users can see which interpreter the launcher is actually using.
 
 ### Fixed — BOQ editor
 - **VAT row no longer hardcoded.** Removed the German-19% fallback in `boqHelpers.ts`. The Net→VAT→Gross footer is now driven from the `tax`-category row in Markups & Overheads (single source of truth, matches the backend PDF/Excel exporters). When no tax markup exists, the VAT and Gross Total rows are hidden; adding any tax markup re-introduces them with the correct rate.
@@ -1065,7 +1065,7 @@ Hotfix release for installer regression on Windows (issue #87).
 - `install.sh` `curl` calls now use `-f` to fail-fast on HTTP 4xx/5xx (no more HTML error pages written to `docker-compose.yml`).
 - `install.sh` Python detection picks the first interpreter actually ≥3.12 instead of falling back to whatever `python3` resolves to.
 - `install.sh` and `install.ps1` honour `OE_VERSION` env var for pip/uv paths.
-- Marketing site: replaced dead `get.openconstructionerp.com` install CTAs with raw GitHub install-script URL on hero + final CTA.
+- Marketing site: replaced dead `get.nexus.eliteal.info` install CTAs with raw GitHub install-script URL on hero + final CTA.
 
 ## [2.5.0] — 2026-04-25
 
@@ -1710,7 +1710,7 @@ sidebar's normal items.
 ``README.md`` was rewritten to a 53-line minimal version in d3d2319
 that dropped the Table of Contents menu, the comparison table, the
 feature gallery, and the workflow diagram.  This release restores
-the rich 450-line version (badges, ToC table, why-OpenConstructionERP
+the rich 450-line version (badges, ToC table, why-NEXUS
 table, vendor comparison, complete-estimation-workflow diagram, 12
 feature blocks with screenshots, regional standards table, tech
 stack, architecture diagram) — bumped to v1.4.6 in the version
@@ -2468,7 +2468,7 @@ in one click.
   ``frontend/package.json`` but not the Python package.  ``/api/health``
   has therefore been reporting ``version: "1.3.31"`` across the entire
   v1.4.x series because ``app.config.Settings.app_version`` reads from
-  ``importlib.metadata.version("openconstructionerp")``.  Bumped
+  ``importlib.metadata.version("nexus")``.  Bumped
   directly to ``1.4.3`` so the next deploy reports the real version.
 - ``bim_hub/router.py`` CAD upload handler referenced ``cad_path`` and
   ``cad_dir`` variables that were never defined after the storage
@@ -2846,7 +2846,7 @@ in one click.
 ### Added
 - **Pluggable storage backend** (`app/core/storage.py`) with
   `LocalStorageBackend` (default) and `S3StorageBackend` (opt-in via
-  `pip install openconstructionerp[s3]`). Supports MinIO / AWS / Backblaze /
+  `pip install nexus[s3]`). Supports MinIO / AWS / Backblaze /
   DigitalOcean Spaces.
 - **BIM Element Groups** — new `oe_bim_element_group` table for saved
   selections. Dynamic groups recompute members from a filter; static
@@ -3096,7 +3096,7 @@ in one click.
 - Trademark disclaimer on comparison table
 
 ### Changed
-- CLI command renamed from `openestimate` to `openconstructionerp`
+- CLI command renamed from `openestimate` to `nexus`
 - DDC Toolkit → DDC cad2data in all references
 - README screenshots use real PNG files (not placeholder JPGs)
 

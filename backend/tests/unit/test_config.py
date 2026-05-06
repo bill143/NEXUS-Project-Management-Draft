@@ -23,11 +23,11 @@ class TestSettingsDefaults:
         )
 
     def test_app_name_default(self, settings):
-        assert settings.app_name == "OpenConstructionERP"
+        assert settings.app_name == "NEXUS"
 
     def test_app_version_default(self, settings):
         # app_version is read from installed package metadata via
-        # importlib.metadata.version("openconstructionerp"), so the
+        # importlib.metadata.version("nexus"), so the
         # exact value depends on what's currently installed. Just
         # verify it's populated and looks like a semver-shaped string.
         import re
