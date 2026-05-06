@@ -20,7 +20,7 @@ from typing import Sequence, Union
 from alembic import op
 
 
-revision: str = "v2i0_cost_region_null_not_distinct"
+revision: str = "v2i0_null_not_distinct"
 down_revision: Union[str, Sequence[str], None] = "v2h0_merge_heads"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
