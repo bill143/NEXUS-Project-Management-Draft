@@ -85,13 +85,16 @@ class CostItemRepository:
         exist for different regions.  When *region* is None the query matches
         rows where region IS NULL.
         """
-        stmt = select(CostItem).where(CostItem.code == code)
+        # .first() instead of .scalar_one_or_none(): Postgres treats NULL != NULL
+        # in UNIQUE, so legacy data may have duplicate (code, NULL) rows from
+        # earlier failed bulk imports. Existence check is all callers need.
+        stmt = select(CostItem).where(CostItem.code == code).limit(1)
         if region is None:
             stmt = stmt.where(CostItem.region.is_(None))
         else:
             stmt = stmt.where(CostItem.region == region)
         result = await self.session.execute(stmt)
-        return result.scalar_one_or_none()
+        return result.scalars().first()
 
     async def get_by_codes(self, codes: list[str]) -> list[CostItem]:
         """Get multiple cost items by their codes."""
