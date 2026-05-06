@@ -609,7 +609,18 @@ class UserService:
         return user
 
     async def update_profile(self, user_id: uuid.UUID, **fields: object) -> User:
-        """Update user profile fields."""
+        """Update user profile fields.
+
+        The DB column ``metadata`` collides with SQLAlchemy's reserved
+        ``Base.metadata`` registry, so the ORM model maps the column to the
+        Python attribute ``metadata_``. Callers may pass either ``metadata=...``
+        (ergonomic) or ``metadata_=...`` (explicit); we translate to the
+        attribute name before the repository reaches ``update().values()``,
+        which would otherwise crash with
+        ``AttributeError: 'MetaData' object has no attribute '_bulk_update_tuples'``.
+        """
+        if "metadata" in fields and "metadata_" not in fields:
+            fields["metadata_"] = fields.pop("metadata")
         await self.user_repo.update_fields(user_id, **fields)
         user = await self.user_repo.get_by_id(user_id)
         if user is None:
