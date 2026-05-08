@@ -22,8 +22,12 @@ import {
   Pencil,
   Save,
   Lock,
+  Globe,
+  ArrowRight,
 } from 'lucide-react';
 import { Card, CardHeader, CardContent, CardFooter, Button, Badge, InfoHint, Skeleton, Breadcrumb } from '@/shared/ui';
+import { MODULE_REGISTRY } from '@/modules/_registry';
+import { useModuleStore } from '@/stores/useModuleStore';
 import { UpdateNotification } from '@/shared/ui/UpdateChecker';
 import { apiGet, apiPatch, apiPost } from '@/shared/lib/api';
 import { SUPPORTED_LANGUAGES } from '@/app/i18n';
@@ -713,6 +717,75 @@ function AppearanceCard({ animationDelay }: { animationDelay: string }) {
   );
 }
 
+// ── Regional Standards Card ─────────────────────────────────────────────────
+//
+// Lists every regional BOQ/cost-classification exchange module (UK NRM, US
+// MasterFormat, DACH DIN 276, etc.) as a clickable tile. Modules that aren't
+// enabled in the user's workspace show an "Enable" hint pointing at the
+// Modules page; enabled modules link straight into their tool. The list is
+// derived from MODULE_REGISTRY filtered on category === 'regional', so adding
+// a new regional manifest automatically surfaces it here.
+
+function RegionalStandardsCard({ animationDelay }: { animationDelay: string }) {
+  const { t } = useTranslation();
+  const isModuleEnabled = useModuleStore((s) => s.isModuleEnabled);
+
+  const regionalModules = MODULE_REGISTRY
+    .filter((m) => m.category === 'regional')
+    .sort((a, b) => a.name.localeCompare(b.name));
+
+  return (
+    <Card className="animate-card-in" style={{ animationDelay }}>
+      <CardHeader
+        title={t('settings.regional_standards_title', { defaultValue: 'Regional Standards' })}
+        subtitle={t('settings.regional_standards_subtitle', {
+          defaultValue: 'Bills of Quantities, cost classifications, and exchange formats by region',
+        })}
+      />
+      <CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
+          {regionalModules.map((mod) => {
+            const Icon = mod.icon ?? Globe;
+            const enabled = isModuleEnabled(mod.id);
+            const primaryRoute = mod.routes[0]?.path ?? '/modules';
+            const target = enabled ? primaryRoute : `/modules?focus=${mod.id}`;
+
+            return (
+              <Link
+                key={mod.id}
+                to={target}
+                className="group flex items-center gap-3 rounded-lg border border-border-light bg-surface-primary px-3 py-2.5 hover:border-oe-blue/40 hover:bg-surface-secondary/60 transition-all"
+              >
+                <span className="shrink-0 flex h-9 w-9 items-center justify-center rounded-md bg-oe-blue/10 text-oe-blue group-hover:bg-oe-blue group-hover:text-white transition-colors">
+                  <Icon size={16} strokeWidth={1.75} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-medium text-content-primary truncate">
+                    {mod.name}
+                  </span>
+                  <span className="block text-xs text-content-tertiary truncate">
+                    {enabled
+                      ? t('settings.regional_open', { defaultValue: 'Open' })
+                      : t('settings.regional_enable_hint', { defaultValue: 'Enable in Modules' })}
+                  </span>
+                </span>
+                <ArrowRight size={14} className="shrink-0 text-content-quaternary group-hover:text-oe-blue transition-colors" />
+              </Link>
+            );
+          })}
+        </div>
+        <Link
+          to="/modules"
+          className="mt-4 inline-flex items-center gap-1.5 text-xs font-medium text-oe-blue hover:underline"
+        >
+          {t('settings.regional_manage_modules', { defaultValue: 'Manage regional modules' })}
+          <ArrowRight size={12} />
+        </Link>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ── Main Settings Page ───────────────────────────────────────────────────────
 
 export function SettingsPage() {
@@ -919,6 +992,9 @@ export function SettingsPage() {
 
       {/* Regional Settings */}
       <RegionalSettings animationDelay="280ms" />
+
+      {/* Regional Standards (BOQ / cost-classification exchange modules) */}
+      <RegionalStandardsCard animationDelay="290ms" />
 
       {/* Appearance */}
       <AppearanceCard animationDelay="330ms" />

@@ -198,16 +198,8 @@ const navGroups: NavGroup[] = [
       // sustainability + cost-benchmark injected dynamically from module registry
     ],
   },
-  {
-    id: 'regional',
-    labelKey: 'modules.cat_regional',
-    descriptionKey: 'modules.cat_regional_desc',
-    defaultOpen: false,
-    hideInSimple: true,
-    items: [
-      // All regional exchange modules injected dynamically from module registry
-    ],
-  },
+  // Regional exchange modules (UK NRM, US MasterFormat, etc.) live under
+  // Settings → Regional Standards rather than the sidebar.
 ];
 
 const bottomNav: NavItem[] = [
