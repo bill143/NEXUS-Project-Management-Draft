@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/shared/ui';
 import { APP_VERSION } from '@/shared/lib/version';
-import { UpdateNotification } from '@/shared/ui/UpdateChecker';
 import { Changelog } from './Changelog';
 
 export function AboutPage() {
@@ -19,10 +18,6 @@ export function AboutPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      <div className="-mx-4 sm:-mx-7">
-        <UpdateNotification forceShow hideDismiss />
-      </div>
-
       {/* Header */}
       <div className="text-center py-6">
         <a

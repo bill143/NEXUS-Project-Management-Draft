@@ -48,7 +48,6 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { useModuleStore } from '@/stores/useModuleStore';
-import { UpdateNotification } from '@/shared/ui/UpdateChecker';
 import { useViewModeStore } from '@/stores/useViewModeStore';
 import { useRecentStore } from '@/stores/useRecentStore';
 import { getModuleNavItems } from '@/modules/_registry';
@@ -380,10 +379,6 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
           ))}
         </ul>
 
-        {/* Update notification — compact clickable card in the sidebar; the
-            whole card opens a full-screen modal with highlights + install
-            commands when the user clicks it. */}
-        <UpdateNotification />
       </div>
     </aside>
   );

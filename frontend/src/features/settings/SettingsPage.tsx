@@ -28,7 +28,6 @@ import {
 import { Card, CardHeader, CardContent, CardFooter, Button, Badge, InfoHint, Skeleton, Breadcrumb } from '@/shared/ui';
 import { MODULE_REGISTRY } from '@/modules/_registry';
 import { useModuleStore } from '@/stores/useModuleStore';
-import { UpdateNotification } from '@/shared/ui/UpdateChecker';
 import { apiGet, apiPatch, apiPost } from '@/shared/lib/api';
 import { SUPPORTED_LANGUAGES } from '@/app/i18n';
 import { useAuthStore } from '@/stores/useAuthStore';
@@ -845,13 +844,6 @@ export function SettingsPage() {
         { label: t('nav.dashboard', 'Dashboard'), to: '/' },
         { label: t('nav.settings', 'Settings') },
       ]} className="mb-2" />
-
-      {/* Update notification — surfaced in Settings so users see new
-          versions even if they dismissed the sidebar widget for the session. */}
-      <div className="-mx-4 sm:-mx-7">
-        <UpdateNotification forceShow hideDismiss />
-      </div>
-
 
       <div className="animate-card-in" style={{ animationDelay: '0ms' }}>
         <h1 className="text-2xl font-bold text-content-primary">{t('nav.settings', 'Settings')}</h1>
