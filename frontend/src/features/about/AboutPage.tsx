@@ -1,12 +1,12 @@
 /**
- * AboutPage — Application info, author, license, consulting services.
+ * AboutPage — Platform info, team story, services, and support.
  */
 
-import { Trans, useTranslation } from 'react-i18next';
+import { useTranslation } from 'react-i18next';
 import {
   Mail, Shield, BookOpen, Users, Award,
   Code2, Building2, Briefcase, Globe, ExternalLink,
-  Linkedin, Youtube, Star, Coffee, Rocket, ArrowRight, Handshake,
+  Star, Coffee, Rocket, ArrowRight, Handshake,
   MessageCircle,
 } from 'lucide-react';
 import { Card, Button, Badge } from '@/shared/ui';
@@ -19,8 +19,6 @@ export function AboutPage() {
 
   return (
     <div className="max-w-3xl mx-auto space-y-6 animate-fade-in">
-      {/* Update notification — always shown on About so users see it
-          when they navigate here looking for "what's new". */}
       <div className="-mx-4 sm:-mx-7">
         <UpdateNotification forceShow hideDismiss />
       </div>
@@ -46,31 +44,29 @@ export function AboutPage() {
         </div>
         <h1 className="text-3xl font-bold text-content-primary tracking-tight">NEXUS</h1>
         <p className="mt-2 text-base text-content-secondary">
-          {t('about.tagline', { defaultValue: 'The #1 open-source platform for construction cost estimation‌⁠‍' })}
+          {t('about.tagline', { defaultValue: 'The #1 open-source platform for construction cost estimation' })}
         </p>
         <div className="mt-3 flex items-center justify-center gap-3 text-sm text-content-tertiary">
           <span className="font-mono">v{APP_VERSION}</span>
           <span>&middot;</span>
           <span>2026</span>
-          <span>&middot;</span>
-          <Badge variant="blue" size="sm">AGPL-3.0</Badge>
         </div>
       </div>
 
-      {/* Platform Stats — first, so user sees what the platform offers */}
+      {/* Platform Stats */}
       <Card className="animate-card-in" style={{ animationDelay: '50ms' }}>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Award size={18} className="text-amber-500" />
             <h2 className="text-lg font-semibold text-content-primary">
-              {t('about.platform_title', { defaultValue: 'Platform Capabilities‌⁠‍' })}
+              {t('about.platform_title', { defaultValue: 'Platform Capabilities' })}
             </h2>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {[
-              { value: '55K+', label: t('about.stat_costs', { defaultValue: 'Cost Items (CWICR)‌⁠‍' }) },
-              { value: '20+', label: t('about.stat_langs', { defaultValue: 'Languages‌⁠‍' }) },
-              { value: '11', label: t('about.stat_regions', { defaultValue: 'Regional Databases‌⁠‍' }) },
+              { value: '55K+', label: t('about.stat_costs', { defaultValue: 'Cost Items (CWICR)' }) },
+              { value: '20+', label: t('about.stat_langs', { defaultValue: 'Languages' }) },
+              { value: '11', label: t('about.stat_regions', { defaultValue: 'Regional Databases' }) },
               { value: '4', label: t('about.stat_cad_formats', { defaultValue: 'CAD/BIM formats supported' }) },
             ].map((s, i) => (
               <div key={i} className="text-center rounded-xl bg-surface-secondary/50 p-4">
@@ -82,96 +78,53 @@ export function AboutPage() {
           <p className="mt-4 text-sm text-content-secondary leading-relaxed">
             {t('about.platform_desc', { defaultValue: 'NEXUS covers the full construction estimation workflow — BOQ editing, 4D scheduling, 5D cost modeling, AI-powered estimation, CAD/BIM quantity takeoff (RVT, IFC, DWG, DGN), tendering, and reporting. Supports regional classification standards and custom schemas.' })}
           </p>
+        </div>
+      </Card>
 
-          {/* Community — invite for feedback & ideas */}
-          <div className="mt-5 rounded-xl border border-oe-blue/20 bg-gradient-to-br from-oe-blue/5 via-transparent to-blue-50/40 dark:from-blue-950/20 dark:via-transparent dark:to-slate-900/30 p-5">
-            <div className="flex items-start gap-3 mb-4">
-              <div className="shrink-0 h-9 w-9 rounded-xl bg-oe-blue/10 text-oe-blue flex items-center justify-center">
-                <MessageCircle size={18} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <h3 className="text-sm font-semibold text-content-primary">
-                  {t('about.community_title', { defaultValue: 'Join the community — your feedback shapes the roadmap' })}
-                </h3>
-                <p className="text-xs text-content-secondary mt-1 leading-relaxed">
-                  {t('about.community_desc', {
-                    defaultValue:
-                      'Share what works, what breaks, and what you want next. Every release in the changelog started as a user request. Pick the channel you already use — we read all three.',
-                  })}
-                </p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
-              <a
-                href="https://www.linkedin.com/company/78381569"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2.5 rounded-lg border border-border-light bg-surface-primary px-3 py-2.5 hover:border-[#0A66C2]/50 hover:bg-[#0A66C2]/[0.04] transition-all"
-              >
-                <span className="shrink-0 h-8 w-8 rounded-md bg-[#0A66C2]/10 text-[#0A66C2] flex items-center justify-center">
-                  <Linkedin size={15} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-content-primary leading-tight">
-                    LinkedIn
-                  </p>
-                  <p className="text-[10px] text-content-tertiary truncate">
-                    {t('about.community_linkedin', { defaultValue: 'Industry discussions' })}
-                  </p>
-                </div>
-                <ExternalLink size={11} className="text-content-quaternary group-hover:text-[#0A66C2] shrink-0" />
-              </a>
-
-              <a
-                href="https://t.me/datadrivenconstruction"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2.5 rounded-lg border border-border-light bg-surface-primary px-3 py-2.5 hover:border-[#26A5E4]/50 hover:bg-[#26A5E4]/[0.04] transition-all"
-              >
-                <span className="shrink-0 h-8 w-8 rounded-md bg-[#26A5E4]/10 text-[#26A5E4] flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
-                    <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71l-4.14-3.06-1.99 1.93c-.23.23-.42.42-.83.42z"/>
-                  </svg>
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-content-primary leading-tight">
-                    Telegram
-                  </p>
-                  <p className="text-[10px] text-content-tertiary truncate">
-                    {t('about.community_telegram', { defaultValue: 'Live chat & support' })}
-                  </p>
-                </div>
-                <ExternalLink size={11} className="text-content-quaternary group-hover:text-[#26A5E4] shrink-0" />
-              </a>
-
-              <a
-                href="https://x.com/datadrivenconst"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group flex items-center gap-2.5 rounded-lg border border-border-light bg-surface-primary px-3 py-2.5 hover:border-slate-700 hover:bg-slate-900/[0.04] dark:hover:border-slate-300 transition-all"
-              >
-                <span className="shrink-0 h-8 w-8 rounded-md bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 flex items-center justify-center">
-                  <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden>
-                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z"/>
-                  </svg>
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold text-content-primary leading-tight">
-                    X / Twitter
-                  </p>
-                  <p className="text-[10px] text-content-tertiary truncate">
-                    {t('about.community_x', { defaultValue: 'Release announcements' })}
-                  </p>
-                </div>
-                <ExternalLink size={11} className="text-content-quaternary group-hover:text-content-primary shrink-0" />
-              </a>
-            </div>
-
-            <p className="mt-4 text-[11px] text-content-tertiary text-center">
-              {t('about.community_cta', {
+      {/* Our Story — Team narrative */}
+      <Card className="animate-card-in" style={{ animationDelay: '100ms' }}>
+        <div className="p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Users size={18} className="text-oe-blue" />
+            <h2 className="text-lg font-semibold text-content-primary">
+              {t('about.story_title', { defaultValue: 'Built by Practitioners, for Practitioners' })}
+            </h2>
+          </div>
+          <div className="space-y-3 text-sm text-content-secondary leading-relaxed">
+            <p>
+              {t('about.story_p1', {
                 defaultValue:
-                  'Have a feature idea? A bug? A workflow we haven\'t thought of? Drop a message — we reply.',
+                  'NEXUS was not conceived in a boardroom or a startup accelerator. It was born on active construction sites, inside estimating departments, and across late-night data reconciliation sessions — the places where the real pain of fragmented tooling is felt every day.',
+              })}
+            </p>
+            <p>
+              {t('about.story_p2', {
+                defaultValue:
+                  'A dedicated team of construction professionals, engineers, and software developers spanning three countries and bringing over 40 years of combined hands-on experience made this platform possible. Every feature, every data model, and every workflow in NEXUS reflects lessons learned from direct involvement in real-world projects — from federal infrastructure programs to large-scale commercial builds.',
+              })}
+            </p>
+            <p>
+              {t('about.story_p3', {
+                defaultValue:
+                  'Years of field experience revealed a consistent truth: data is not a byproduct of construction — it is the foundation for every cost, schedule, and delivery decision. Existing tools either locked teams into proprietary ecosystems or failed to address the full estimation lifecycle. The team set out to change that.',
+              })}
+            </p>
+            <p>
+              {t('about.story_p4', {
+                defaultValue:
+                  'The work began long before this platform existed — with open-source CAD/BIM data converters for Revit, IFC, DWG, and DGN formats, and with the CWICR multilingual database of over 55,000 construction work items across 11 languages. These foundational efforts, shaped by thousands of hours of research, testing, and iteration across major construction firms and consulting practices, became the building blocks of NEXUS.',
+              })}
+            </p>
+            <p>
+              {t('about.story_p5', {
+                defaultValue:
+                  'The recent generation of AI tooling finally made it feasible to consolidate that collective expertise — methodology, data models, and prior implementations — into a single, cohesive platform. Today, NEXUS is public, open source, and actively maintained by the same team that built it from the ground up.',
+              })}
+            </p>
+            <p className="border-l-2 border-oe-blue/40 pl-3 italic text-content-primary">
+              {t('about.story_quote', {
+                defaultValue:
+                  'Progress is born from dialogue — from the clash of perspectives and openness to new approaches. We invite you to participate in building a more transparent, data-driven future for construction estimation.',
               })}
             </p>
           </div>
@@ -179,13 +132,16 @@ export function AboutPage() {
       </Card>
 
       {/* Company */}
-      <Card className="animate-card-in" style={{ animationDelay: '100ms' }}>
+      <Card className="animate-card-in" style={{ animationDelay: '150ms' }}>
         <div className="p-6">
-          <h2 className="text-lg font-semibold text-content-primary mb-3">
-            {"O'Neill Contractors, Inc."}
-          </h2>
+          <div className="flex items-center gap-2 mb-3">
+            <Building2 size={18} className="text-oe-blue" />
+            <h2 className="text-lg font-semibold text-content-primary">
+              {"O'Neill Contractors, Inc."}
+            </h2>
+          </div>
           <p className="text-sm text-content-secondary leading-relaxed mb-4">
-            Federal construction management serving SDVOSB, VOSB, and EDWOSB certified projects across the United States.
+            {t('about.company_desc', { defaultValue: 'Federal construction management serving SDVOSB, VOSB, and EDWOSB certified projects across the United States.' })}
           </p>
           <a
             href="https://nexus.eliteal.info"
@@ -199,147 +155,77 @@ export function AboutPage() {
         </div>
       </Card>
 
-      {/* Founder & Creator */}
-      <Card className="animate-card-in" style={{ animationDelay: '150ms' }}>
+      {/* Community */}
+      <Card className="animate-card-in" style={{ animationDelay: '175ms' }}>
         <div className="p-6">
-          <div className="flex items-start gap-5">
-            <img
-              src="/brand/artem-boiko-avatar.png"
-              alt={t('about.founder_name', { defaultValue: 'Artem Boiko' })}
-              className="h-20 w-20 shrink-0 rounded-2xl object-cover bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-800 dark:to-slate-900 ring-1 ring-border-light shadow-lg"
-              loading="lazy"
-            />
+          <div className="flex items-start gap-3 mb-4">
+            <div className="shrink-0 h-9 w-9 rounded-xl bg-oe-blue/10 text-oe-blue flex items-center justify-center">
+              <MessageCircle size={18} />
+            </div>
             <div className="min-w-0 flex-1">
-              <h2 className="text-lg font-bold text-content-primary">
-                {t('about.founder_name', { defaultValue: 'Artem Boiko' })}
-              </h2>
-              <p className="text-sm text-oe-blue font-medium">
-                {t('about.founder_role', { defaultValue: 'Consultant for Automation & Data in Construction' })}
+              <h3 className="text-sm font-semibold text-content-primary">
+                {t('about.community_title', { defaultValue: 'Join the Community' })}
+              </h3>
+              <p className="text-xs text-content-secondary mt-1 leading-relaxed">
+                {t('about.community_desc', {
+                  defaultValue: 'Your feedback shapes the roadmap. Every release in the changelog started as a user request.',
+                })}
               </p>
-              <div className="mt-3 space-y-3 text-sm text-content-secondary leading-relaxed">
-                <p>
-                  {t('about.founder_bio_p1', {
-                    defaultValue:
-                      'Over the past ten years, I have been deeply involved in resource management for construction projects. This journey inevitably led me to study the history of the technologies that have shaped the industry — from the earliest attempts at design automation to modern ERP platforms (the series of articles "The Lobbyists\' Wars and the Development of BIM" and "The History of the BIM Map"). Without understanding where we came from, it is impossible to see where we are going.',
-                  })}
-                </p>
-                <p>
-                  <Trans
-                    i18nKey="about.founder_bio_p2"
-                    defaults='Over the years, dozens of articles have come off my desk, read by millions of professionals around the world. At the same time, I&rsquo;ve consulted with major construction and consulting firms, developers, and software vendors themselves on data management in projects — helping them navigate processes where data is not a byproduct but the foundation for decision-making. This work gave me a rare opportunity to see the industry from both sides: through the eyes of those who create the tools and through the eyes of those who use them in real projects every day. Many of these observations and reflections are collected in my book <book>Data-Driven Construction</book>, which is now available in 16 languages — <books>datadrivenconstruction.io/books</books>.'
-                    components={{
-                      book: (
-                        <a
-                          href="https://datadrivenconstruction.io/books"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-oe-blue hover:underline italic font-medium"
-                        />
-                      ),
-                      books: (
-                        <a
-                          href="https://datadrivenconstruction.io/books"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-oe-blue hover:underline"
-                        />
-                      ),
-                    }}
-                  />
-                </p>
-                <p>
-                  <Trans
-                    i18nKey="about.founder_bio_p3"
-                    defaults='Two other things have kept me busy: helping non-developers get into proprietary formats that were never meant to be opened, and finding a cleaner way to describe construction work through a resource model. These efforts have resulted in free tools — <cad>DDC CAD/BIM data converters</cad> (Revit, IFC, DWG, DGN → structured data), <gh>available on GitHub</gh>, and the multilingual <cwicr>CWICR database</cwicr> of construction works and resources — over 55,000 items in 11 languages, published as <cwicr>OpenConstructionEstimate-DDC-CWICR</cwicr>. All of this was a necessary step toward an idea I&rsquo;ve been pursuing for the past decade — an open-source modular ERP for the construction industry.'
-                    components={{
-                      cad: (
-                        <a
-                          href="https://github.com/datadrivenconstruction/cad2data-Revit-IFC-DWG-DGN-pipeline-with-conversion-validation-qto"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-oe-blue hover:underline font-medium"
-                        />
-                      ),
-                      gh: (
-                        <a
-                          href="https://github.com/datadrivenconstruction"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-oe-blue hover:underline"
-                        />
-                      ),
-                      cwicr: (
-                        <a
-                          href="https://github.com/datadrivenconstruction/OpenConstructionEstimate-DDC-CWICR"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-oe-blue hover:underline font-medium"
-                        />
-                      ),
-                    }}
-                  />
-                </p>
-                <p>
-                  {t('about.founder_bio_p4', {
-                    defaultValue:
-                      "The recent generation of AI tooling finally made it feasible to consolidate that work — methodology, data models, and prior implementations — into a single platform. It's now public and open source.",
-                  })}
-                </p>
-                <p className="border-l-2 border-oe-blue/40 pl-3 italic text-content-primary">
-                  {t('about.founder_bio_p5', {
-                    defaultValue:
-                      'Progress is born from dialogue — from the clash of perspectives and openness to new approaches. I would be grateful if you would be willing to participate in this conversation on the inevitable Uberization of the construction industry and the transparency of cost and time estimation processes for construction projects.',
-                  })}
-                </p>
-                <p className="text-content-primary font-medium">
-                  {t('about.founder_bio_signoff', { defaultValue: '— Artem Boiko' })}
-                </p>
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2">
-                <a
-                  href="https://www.linkedin.com/in/boikoartem/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#0A66C2] px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#004182] transition-colors"
-                >
-                  <Linkedin size={14} />
-                  LinkedIn
-                </a>
-                <a
-                  href="https://www.youtube.com/@datadrivenconstruction"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-[#FF0000] px-3.5 py-2 text-sm font-medium text-white shadow-sm hover:bg-[#CC0000] transition-colors"
-                >
-                  <Youtube size={14} />
-                  YouTube
-                </a>
-                <a
-                  href="https://datadrivenconstruction.io"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3.5 py-2 text-sm font-medium text-content-primary hover:bg-surface-secondary transition-colors"
-                >
-                  <Globe size={14} />
-                  Website
-                </a>
-                <a
-                  href="https://github.com/datadrivenconstruction"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3.5 py-2 text-sm font-medium text-content-primary hover:bg-surface-secondary transition-colors"
-                >
-                  <Code2 size={14} />
-                  GitHub
-                </a>
-              </div>
             </div>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <a
+              href="https://t.me/nexus.eliteal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2.5 rounded-lg border border-border-light bg-surface-primary px-3 py-2.5 hover:border-[#26A5E4]/50 hover:bg-[#26A5E4]/[0.04] transition-all"
+            >
+              <span className="shrink-0 h-8 w-8 rounded-md bg-[#26A5E4]/10 text-[#26A5E4] flex items-center justify-center">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
+                  <path d="M9.78 18.65l.28-4.23 7.68-6.92c.34-.31-.07-.46-.52-.19L7.74 13.3 3.64 12c-.88-.25-.89-.86.2-1.3l15.97-6.16c.73-.33 1.43.18 1.15 1.3l-2.72 12.81c-.19.91-.74 1.13-1.5.71l-4.14-3.06-1.99 1.93c-.23.23-.42.42-.83.42z" />
+                </svg>
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-content-primary leading-tight">Telegram</p>
+                <p className="text-[10px] text-content-tertiary truncate">
+                  {t('about.community_telegram', { defaultValue: 'Live chat & support' })}
+                </p>
+              </div>
+              <ExternalLink size={11} className="text-content-quaternary group-hover:text-[#26A5E4] shrink-0" />
+            </a>
+
+            <a
+              href="https://x.com/nexus.eliteal"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group flex items-center gap-2.5 rounded-lg border border-border-light bg-surface-primary px-3 py-2.5 hover:border-slate-700 hover:bg-slate-900/[0.04] dark:hover:border-slate-300 transition-all"
+            >
+              <span className="shrink-0 h-8 w-8 rounded-md bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900 flex items-center justify-center">
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-3.5 w-3.5" aria-hidden>
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231 5.45-6.231zm-1.161 17.52h1.833L7.084 4.126H5.117l11.966 15.644z" />
+                </svg>
+              </span>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-content-primary leading-tight">X / Twitter</p>
+                <p className="text-[10px] text-content-tertiary truncate">
+                  {t('about.community_x', { defaultValue: 'Release announcements' })}
+                </p>
+              </div>
+              <ExternalLink size={11} className="text-content-quaternary group-hover:text-content-primary shrink-0" />
+            </a>
+          </div>
+
+          <p className="mt-4 text-[11px] text-content-tertiary text-center">
+            {t('about.community_cta', {
+              defaultValue: 'Have a feature idea or found a bug? Reach out — we respond to every message.',
+            })}
+          </p>
         </div>
       </Card>
 
       {/* Consulting Services */}
-      <Card>
+      <Card className="animate-card-in" style={{ animationDelay: '200ms' }}>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-4">
             <Briefcase size={18} className="text-oe-blue" />
@@ -348,7 +234,7 @@ export function AboutPage() {
             </h2>
           </div>
           <p className="text-sm text-content-secondary leading-relaxed mb-4">
-            {t('about.services_desc', { defaultValue: 'Data Driven Construction offers professional consulting services for construction companies, cost estimators, and technology teams worldwide.' })}
+            {t('about.services_desc', { defaultValue: 'Professional consulting services for construction companies, cost estimators, and technology teams worldwide.' })}
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -369,7 +255,7 @@ export function AboutPage() {
           </div>
 
           <div className="mt-4 flex items-center gap-3">
-            <a href="https://datadrivenconstruction.io/contact-support/" target="_blank" rel="noopener noreferrer">
+            <a href="https://nexus.eliteal.info/contact-support/" target="_blank" rel="noopener noreferrer">
               <Button variant="primary" size="sm" icon={<Mail size={14} />}>
                 {t('about.contact_us', { defaultValue: 'Contact Us' })}
               </Button>
@@ -410,19 +296,17 @@ export function AboutPage() {
         </div>
       </Card>
 
-      {/* Support the Project — edge-to-edge gradient, no inner padding */}
+      {/* Support NEXUS */}
       <Card
         padding="none"
         className="animate-card-in overflow-hidden"
         style={{ animationDelay: '250ms' }}
       >
         <div className="relative">
-          {/* Richer gradient so the full-bleed feels intentional */}
           <div className="absolute inset-0 bg-gradient-to-br from-amber-500/[0.10] via-orange-500/[0.06] to-rose-500/[0.10]" />
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_0%,rgba(251,191,36,0.12),transparent_50%),radial-gradient(circle_at_90%_100%,rgba(244,63,94,0.12),transparent_55%)]" />
 
           <div className="relative">
-            {/* Hero — no horizontal padding, text centered on gradient */}
             <div className="text-center pt-8 pb-6 px-6">
               <div className="inline-flex items-center gap-2.5 mb-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-full bg-white/70 dark:bg-white/5 shadow-sm ring-1 ring-black/[0.04] dark:ring-white/[0.06]">
@@ -433,15 +317,13 @@ export function AboutPage() {
                 </h2>
               </div>
               <p className="text-sm text-content-secondary leading-relaxed max-w-xl mx-auto">
-                {t('about.support_desc', { defaultValue: 'This project is free and open-source — built by construction professionals, for construction professionals. Your support keeps it alive and growing. Every star, share, and contribution helps us build better tools for the industry.' })}
+                {t('about.support_desc', { defaultValue: 'This project is free and open-source — built by construction professionals, for construction professionals. Your support keeps it alive and growing.' })}
               </p>
             </div>
 
-            {/* Support options — flush to card edges, no side gaps */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-border-light/60 dark:bg-white/[0.06]">
-              {/* Star on GitHub */}
               <a
-                href="https://github.com/datadrivenconstruction/OpenConstructionERP"
+                href="https://github.com/nexus.eliteal"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative flex flex-col items-center gap-2 bg-surface-primary/80 backdrop-blur-sm px-5 py-6 hover:bg-amber-50/70 dark:hover:bg-amber-900/15 transition-colors"
@@ -451,13 +333,12 @@ export function AboutPage() {
                   {t('about.support_star', { defaultValue: 'Star on GitHub' })}
                 </span>
                 <span className="text-2xs text-content-tertiary text-center leading-snug">
-                  {t('about.support_star_desc', { defaultValue: 'Show your support — it takes 2 seconds and helps others discover the project' })}
+                  {t('about.support_star_desc', { defaultValue: 'Help others discover the project' })}
                 </span>
               </a>
 
-              {/* Sponsor */}
               <a
-                href="https://github.com/sponsors/datadrivenconstruction"
+                href="https://github.com/sponsors/nexus.eliteal"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative flex flex-col items-center gap-2 bg-surface-primary/80 backdrop-blur-sm px-5 py-6 hover:bg-rose-50/70 dark:hover:bg-rose-900/15 transition-colors"
@@ -467,13 +348,12 @@ export function AboutPage() {
                   {t('about.support_sponsor', { defaultValue: 'Become a Sponsor' })}
                 </span>
                 <span className="text-2xs text-content-tertiary text-center leading-snug">
-                  {t('about.support_sponsor_desc', { defaultValue: 'Fund new features, regional databases, and keep the project free for everyone' })}
+                  {t('about.support_sponsor_desc', { defaultValue: 'Fund new features and keep the project free' })}
                 </span>
               </a>
 
-              {/* Consulting */}
               <a
-                href="https://datadrivenconstruction.io/contact-support/"
+                href="https://nexus.eliteal.info/contact-support/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group relative flex flex-col items-center gap-2 bg-surface-primary/80 backdrop-blur-sm px-5 py-6 hover:bg-oe-blue/[0.06] dark:hover:bg-blue-900/15 transition-colors"
@@ -483,12 +363,11 @@ export function AboutPage() {
                   {t('about.support_consulting', { defaultValue: 'Order Consulting' })}
                 </span>
                 <span className="text-2xs text-content-tertiary text-center leading-snug">
-                  {t('about.support_consulting_desc', { defaultValue: 'Need custom features, deployment, or training? We deliver professional solutions worldwide' })}
+                  {t('about.support_consulting_desc', { defaultValue: 'Custom features, deployment, or training worldwide' })}
                 </span>
               </a>
             </div>
 
-            {/* Enables footer — also edge-to-edge */}
             <div className="px-6 py-5 border-t border-border-light/60 dark:border-white/[0.06]">
               <p className="text-xs font-semibold uppercase tracking-wider text-content-tertiary mb-3 flex items-center gap-1.5">
                 <Rocket size={12} className="text-oe-blue" />
@@ -525,11 +404,10 @@ export function AboutPage() {
             <Badge variant="blue" size="sm">Free Download</Badge>
           </div>
           <a
-            href="https://datadrivenconstruction.io/books/"
+            href="https://nexus.eliteal.info/books/"
             target="_blank"
             rel="noopener noreferrer"
             className="group mb-4 block overflow-hidden rounded-xl bg-gradient-to-br from-slate-50 via-white to-blue-50 dark:from-slate-900 dark:via-slate-900 dark:to-slate-800 border border-border-light hover:border-oe-blue/40 hover:shadow-lg transition-all"
-            title={t('about.book_cta', { defaultValue: 'Pick your language on datadrivenconstruction.io' })}
           >
             <img
               src="/brand/ddc-book.png"
@@ -539,57 +417,39 @@ export function AboutPage() {
             />
           </a>
           <p className="text-sm text-content-secondary leading-relaxed mb-4">
-            {t('about.book_desc', { defaultValue: 'A comprehensive guide to digital transformation in the construction industry. Learn about project data management, requirements gathering, Data workflows, cost estimation automation, AI in construction, data-driven decision making, and how to build efficient digital pipelines for construction projects.' })}
+            {t('about.book_desc', { defaultValue: 'A comprehensive guide to digital transformation in the construction industry. Covers project data management, cost estimation automation, AI in construction, and data-driven decision making.' })}
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-            <div className="rounded-lg border border-border-light bg-surface-secondary/30 p-3 text-center">
-              <div className="text-xs font-semibold text-content-primary">Data Management & Requirements</div>
-              <div className="text-2xs text-content-tertiary mt-1">Project data pipelines, requirements gathering, and structured information management</div>
-            </div>
-            <div className="rounded-lg border border-border-light bg-surface-secondary/30 p-3 text-center">
-              <div className="text-xs font-semibold text-content-primary">AI in Construction</div>
-              <div className="text-2xs text-content-tertiary mt-1">Machine learning for cost estimation and quantity takeoff</div>
-            </div>
-            <div className="rounded-lg border border-border-light bg-surface-secondary/30 p-3 text-center">
-              <div className="text-xs font-semibold text-content-primary">Cost Databases</div>
-              <div className="text-2xs text-content-tertiary mt-1">Building and managing construction pricing databases</div>
-            </div>
-          </div>
           <a
-            href="https://datadrivenconstruction.io/books/"
+            href="https://nexus.eliteal.info/books/"
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 rounded-lg bg-oe-blue px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 transition-colors shadow-sm"
           >
-            <BookOpen size={16} />
-            {t('about.book_download', { defaultValue: 'Download Free Guidebook' })}
-            <ExternalLink size={14} />
+            <BookOpen size={14} />
+            {t('about.book_download', { defaultValue: 'Download Free Guide' })}
+            <ExternalLink size={12} />
           </a>
         </div>
       </Card>
 
       {/* License */}
-      <Card>
+      <Card className="animate-card-in" style={{ animationDelay: '350ms' }}>
         <div className="p-6">
           <div className="flex items-center gap-2 mb-3">
             <Shield size={18} className="text-emerald-500" />
             <h2 className="text-lg font-semibold text-content-primary">
-              {t('about.license_title', { defaultValue: 'License & Open Source' })}
+              {t('about.license_title', { defaultValue: 'License & Freedom' })}
             </h2>
           </div>
           <p className="text-sm text-content-secondary leading-relaxed mb-3">
-            {t('about.license_desc', { defaultValue: 'NEXUS is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). This means you can freely use, modify, and distribute the software, as long as any modifications are also made available under the same license.' })}
+            {t('about.license_desc', { defaultValue: 'NEXUS is free and open-source software. Deploy it on your own infrastructure with full control over your data.' })}
           </p>
           <div className="flex flex-wrap gap-2">
             <Badge variant="success" size="sm">Free to use</Badge>
             <Badge variant="success" size="sm">Open source</Badge>
             <Badge variant="success" size="sm">Self-hosted</Badge>
             <Badge variant="success" size="sm">No vendor lock-in</Badge>
-            <Badge variant="blue" size="sm">AGPL-3.0</Badge>
           </div>
-          <p className="text-xs text-content-quaternary mt-3">
-            {t('about.license_commercial', { defaultValue: 'For commercial licensing (proprietary use without AGPL obligations), enterprise support, or SLA agreements, please contact us.' })}
-          </p>
         </div>
       </Card>
 
@@ -600,16 +460,11 @@ export function AboutPage() {
         </div>
       </Card>
 
-      {/* Credits */}
+      {/* Footer */}
       <div className="text-center py-4 text-xs text-content-quaternary">
         <p className="flex items-center justify-center gap-1">
-          {t('about.built_by', { defaultValue: 'Created by Artem Boiko' })}
-          {' · '}
-          <a href="https://datadrivenconstruction.io" target="_blank" rel="noopener noreferrer" className="hover:text-oe-blue transition-colors">
-            datadrivenconstruction.io
-          </a>
+          &copy; {new Date().getFullYear()} O&apos;Neill Contractors, Inc. &middot; All rights reserved.
         </p>
-        <p className="mt-1">&copy; 2026 Data Driven Construction. All rights reserved.</p>
       </div>
     </div>
   );

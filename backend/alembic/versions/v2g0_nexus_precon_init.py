@@ -455,16 +455,57 @@ def upgrade() -> None:
         ["rfq_id", "status"],
     )
 
+    # ── 5b. oe_tendering_package + oe_tendering_bid (gap-fill) ─────────────
+    # These tables are defined in app.modules.tendering.models but were never
+    # created by any prior migration (v090 only created oe_rfq_rfq / oe_rfq_bid).
+    # Create them now (idempotent) so that step 6 ALTER can succeed.
+    _create_if_not_exists(
+        "oe_tendering_package",
+        sa.Column("id", sa.String(36), primary_key=True),
+        sa.Column("project_id", sa.String(36), nullable=False),
+        sa.Column("boq_id", sa.String(36), nullable=True),
+        sa.Column("name", sa.String(255), nullable=False),
+        sa.Column("description", sa.Text(), nullable=False, server_default=""),
+        sa.Column("status", sa.String(50), nullable=False, server_default="draft"),
+        sa.Column("deadline", sa.String(100), nullable=True),
+        sa.Column("metadata", sa.JSON(), nullable=False, server_default="{}"),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+    )
+    _create_index_if_not_exists("ix_tendering_package_project_id", "oe_tendering_package", ["project_id"])
+    _create_index_if_not_exists("ix_tendering_package_boq_id", "oe_tendering_package", ["boq_id"])
+    _create_index_if_not_exists("ix_tendering_package_status", "oe_tendering_package", ["status"])
+
+    _create_if_not_exists(
+        T_TENDERING_BID,
+        sa.Column("id", sa.String(36), primary_key=True),
+        sa.Column("package_id", sa.String(36), sa.ForeignKey("oe_tendering_package.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("company_name", sa.String(255), nullable=False),
+        sa.Column("contact_email", sa.String(255), nullable=False, server_default=""),
+        sa.Column("total_amount", sa.String(50), nullable=False, server_default="0"),
+        sa.Column("currency", sa.String(10), nullable=False, server_default="EUR"),
+        sa.Column("submitted_at", sa.String(100), nullable=True),
+        sa.Column("status", sa.String(50), nullable=False, server_default="pending"),
+        sa.Column("notes", sa.Text(), nullable=False, server_default=""),
+        sa.Column("line_items", sa.JSON(), nullable=False, server_default="[]"),
+        sa.Column("metadata", sa.JSON(), nullable=False, server_default="{}"),
+        sa.Column("created_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+        sa.Column("updated_at", sa.DateTime(timezone=True), server_default=sa.func.now(), nullable=False),
+    )
+    _create_index_if_not_exists("ix_tendering_bid_package_id", T_TENDERING_BID, ["package_id"])
+
     # ── 6. oe_tendering_bid — add nullable contact_id FK (SC-03) ────────────
     # Backward-compatible: all existing rows keep contact_id = NULL.
     # Service layer populates on new bids; existing bids reconciled manually.
+    # NOTE: SQLite cannot ALTER TABLE to add FK constraints, so we add the
+    # column without an inline ForeignKey.  The ORM model defines the
+    # relationship; the FK is advisory only on SQLite.
     if not _has_column(T_TENDERING_BID, "contact_id"):
         op.add_column(
             T_TENDERING_BID,
             sa.Column(
                 "contact_id",
                 sa.String(36),
-                sa.ForeignKey("oe_contacts_contact.id", ondelete="SET NULL"),
                 nullable=True,
             ),
         )
