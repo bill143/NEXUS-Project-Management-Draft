@@ -107,6 +107,7 @@ screenshots/
 qa-tests/
 ux-review/
 QA_*.md
+!docs/audits/QA_*.md
 UX_*.md
 TESTING_PLAN.md
 TAKEOFF_TESTING_PLAN.md
