@@ -385,15 +385,6 @@ export function Sidebar({ onClose }: { onClose?: () => void }) {
             whole card opens a full-screen modal with highlights + install
             commands when the user clicks it. */}
         <UpdateNotification />
-
-        {/* Version + AGPL notice */}
-        <div className="px-3 pb-2 text-center">
-          <span className="text-2xs text-content-quaternary/50">v{APP_VERSION}</span>
-          <span className="text-2xs text-content-quaternary/30 mx-1">·</span>
-          <a href="/api/source" target="_blank" rel="noopener noreferrer" className="text-2xs text-content-quaternary/40 hover:text-content-quaternary transition-colors">
-            AGPL-3.0
-          </a>
-        </div>
       </div>
     </aside>
   );
