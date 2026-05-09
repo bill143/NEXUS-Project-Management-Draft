@@ -52,7 +52,6 @@ import { UpdateNotification } from '@/shared/ui/UpdateChecker';
 import { useViewModeStore } from '@/stores/useViewModeStore';
 import { useRecentStore } from '@/stores/useRecentStore';
 import { getModuleNavItems } from '@/modules/_registry';
-import { APP_VERSION } from '@/shared/lib/version';
 import { useSidebarBadges } from '@/shared/hooks/useSidebarBadges';
 
 
