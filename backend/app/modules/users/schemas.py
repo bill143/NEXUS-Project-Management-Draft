@@ -103,7 +103,22 @@ class RefreshRequest(BaseModel):
 
 
 class UserCreate(BaseModel):
-    """Create a new user."""
+    """Public self-registration payload for ``POST /auth/register/``.
+
+    The ``role`` field on the request is informational only — the actual role
+    assigned is decided server-side by the registration policy:
+
+    * **Bootstrap path** (no real admin in the DB, ignoring seeded
+      ``@openestimator.io`` accounts): the new user is created as
+      ``admin`` and active. Used so a fresh install has a way in.
+    * **Subsequent registrations**: the new user is created with role
+      ``OE_DEFAULT_REGISTRATION_ROLE`` (default ``viewer``). Never ``admin``.
+      In ``closed`` / ``admin-approve`` registration modes the row is also
+      created inactive until an admin flips it on.
+
+    See ``UserService.register`` and ``UserRepository.has_admin`` for the
+    authoritative implementation.
+    """
 
     email: EmailStr = Field(..., description="Valid email address (used for login)")
     password: str = Field(
@@ -119,9 +134,13 @@ class UserCreate(BaseModel):
         description="Full display name (HTML tags are stripped)",
     )
     role: str = Field(
-        default="editor",
-        pattern=r"^(admin|manager|editor|viewer)$",
-        description="User role. Must be one of: admin, manager, editor, viewer",
+        default="viewer",
+        pattern=r"^(admin|manager|editor|estimator|viewer)$",
+        description=(
+            "Requested role (informational — the bootstrap policy may override). "
+            "Canonical roles: admin, manager, editor, viewer. The construction-"
+            "industry alias 'estimator' is also accepted (resolves to 'editor')."
+        ),
     )
     locale: str = Field(
         default="en", max_length=10, description="Preferred locale code (e.g. en, de, fr)"
@@ -175,8 +194,8 @@ class AdminUserCreate(BaseModel):
 
     Constraints versus ``UserCreate``:
       - ``role`` is a strict ``Literal`` whitelist — admin / manager /
-        estimator / viewer — so unknown values produce 422 instead of being
-        silently persisted as the literal string.
+        editor / estimator / viewer — so unknown values produce 422 instead
+        of being silently persisted as the literal string.
       - ``password`` minimum length is bumped to 12 (admins can mint
         long-lived elevated accounts; weak passwords are unacceptable here
         even though the public flow tolerates 8-char passwords).
@@ -198,9 +217,13 @@ class AdminUserCreate(BaseModel):
         max_length=255,
         description="Full display name (HTML tags are stripped)",
     )
-    role: Literal["admin", "manager", "estimator", "viewer"] = Field(
+    role: Literal["admin", "manager", "editor", "estimator", "viewer"] = Field(
         default="viewer",
-        description="User role. One of: admin, manager, estimator, viewer.",
+        description=(
+            "User role. Canonical: admin, manager, editor, viewer. "
+            "The 'estimator' alias is also accepted and resolves to 'editor' "
+            "for permission checks."
+        ),
     )
     locale: str = Field(default="en", max_length=10)
     is_active: bool = Field(default=True)
