@@ -25,10 +25,12 @@ Example::
 
 Backends supported out of the box (pick via ``EMAIL_BACKEND``):
 
-    console — log to app logger at INFO (default for local dev)
-    smtp    — real SMTP delivery (production)
-    noop    — drop silently (CI)
-    memory  — capture into a list for test assertions
+    console     — log to app logger at INFO (default for local dev)
+    smtp        — real SMTP delivery (production, where outbound 587 is open)
+    resend_api  — real HTTPS delivery via Resend's API (production on PaaS
+                  hosts that block outbound SMTP — Railway, Render, Vercel)
+    noop        — drop silently (CI)
+    memory      — capture into a list for test assertions
 
 Add a new transport by subclassing ``EmailBackend`` and wiring it into
 ``service._resolve_backend``.
@@ -38,6 +40,7 @@ from .base import DeliveryResult, EmailBackend, EmailMessage
 from .console import ConsoleEmailBackend
 from .memory import MemoryEmailBackend
 from .noop import NoopEmailBackend
+from .resend_backend import ResendApiEmailBackend
 from .service import EmailService, get_email_service, reset_email_service_cache
 from .smtp import SmtpEmailBackend
 from .templates import (
@@ -57,6 +60,7 @@ __all__ = [
     "EmailService",
     "MemoryEmailBackend",
     "NoopEmailBackend",
+    "ResendApiEmailBackend",
     "SmtpEmailBackend",
     "get_email_service",
     "reset_email_service_cache",

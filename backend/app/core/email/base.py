@@ -77,7 +77,7 @@ class DeliveryResult:
         return cls(ok=False, backend=backend, reason=reason)
 
 
-BackendName = Literal["console", "smtp", "noop", "memory"]
+BackendName = Literal["console", "smtp", "noop", "memory", "resend_api"]
 
 
 class EmailBackend(ABC):

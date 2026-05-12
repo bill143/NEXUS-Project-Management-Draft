@@ -208,18 +208,24 @@ class Settings(BaseSettings):
     # ``email_backend`` picks the transport for outbound email.  Dev
     # defaults to ``console`` so a fresh checkout can exercise the
     # password-reset flow without MSA credentials; production should set
-    # ``smtp`` plus the SMTP fields below.
+    # ``resend_api`` (preferred on Railway/Vercel/Render where outbound
+    # SMTP is blocked) or ``smtp`` plus the corresponding credentials.
     #
     # ``noop`` and ``memory`` are for automated tests — the service
     # layer in ``app.core.email`` resolves these names into concrete
     # backends.
-    email_backend: Literal["console", "smtp", "noop", "memory"] = "console"
+    email_backend: Literal["console", "smtp", "noop", "memory", "resend_api"] = "console"
     smtp_host: str = ""
     smtp_port: int = 587
     smtp_user: str = ""
     smtp_password: str = ""
     smtp_from: str = "notifications@nexus.eliteal.info"
     smtp_tls: bool = True
+    # Resend HTTP-API key (https://resend.com/api-keys). Pairs with
+    # ``email_backend=resend_api``. The ``smtp_from`` address above is
+    # reused as the ``From:`` for Resend sends — same sender identity,
+    # different transport, so we do not duplicate the field.
+    resend_api_key: str = ""
     # Public URL used to build password-reset and notification links.
     # Falls back to the first CORS origin so dev installs work without
     # an explicit setting.

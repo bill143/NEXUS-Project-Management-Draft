@@ -88,6 +88,11 @@ dependencies = [
     # engine and 5 test files import simpleeval but the OCE pyproject did
     # not declare it.
     "simpleeval>=1.0.0",
+    # Resend HTTP-API email backend. Required because Railway (and most
+    # PaaS hosts) block outbound SMTP on ports 25/465/587, so the smtp
+    # backend times out after 30s. The HTTP API runs on 443, which is
+    # always open. See app/core/email/resend_backend.py.
+    "resend>=2.0.0,<3",
 ]
 
 [project.scripts]

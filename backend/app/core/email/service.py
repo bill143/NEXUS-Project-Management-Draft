@@ -32,6 +32,7 @@ from .base import BackendName, DeliveryResult, EmailBackend, EmailMessage
 from .console import ConsoleEmailBackend
 from .memory import MemoryEmailBackend
 from .noop import NoopEmailBackend
+from .resend_backend import ResendApiEmailBackend
 from .smtp import SmtpEmailBackend
 from .templates import template_password_reset
 
@@ -57,6 +58,14 @@ def _resolve_backend(settings: Settings) -> EmailBackend:
             )
             return ConsoleEmailBackend()
         return SmtpEmailBackend(settings)
+    if name == "resend_api":
+        if not settings.resend_api_key:
+            logger.warning(
+                "EMAIL_BACKEND=resend_api but RESEND_API_KEY is empty — falling back to console backend. "
+                "Set RESEND_API_KEY to enable real delivery.",
+            )
+            return ConsoleEmailBackend()
+        return ResendApiEmailBackend(settings)
     if name == "console":
         return ConsoleEmailBackend()
     if name == "noop":
