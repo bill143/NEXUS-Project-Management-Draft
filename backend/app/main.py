@@ -601,6 +601,18 @@ async def _seed_demo_account() -> None:
                     logger.warning("  %s: %s", email, pw)
 
             # 2. Install 5 demo projects if user has none
+            if demo is None:
+                # demo@openestimator.io is the first entry in demo_account_specs,
+                # so under normal operation `demo` is always set by this point.
+                # We still defend against the case where the account-creation
+                # path raised before reaching `demo = user` — better to skip
+                # the demo-project install than crash the lifespan with an
+                # AttributeError ("'NoneType' object has no attribute 'id'").
+                logger.warning(
+                    "Demo user not established; skipping demo-project install. "
+                    "Check earlier log lines for an exception during demo-account creation."
+                )
+                return
             count = (
                 await session.execute(select(func.count()).select_from(Project).where(Project.owner_id == demo.id))
             ).scalar() or 0
@@ -1180,7 +1192,7 @@ def create_app() -> FastAPI:
 
                 repo = CatalogResourceRepository(session)
                 region_stats = await repo.stats_by_region()
-                loaded_catalog_regions = {r["region"] for r in region_stats if r.get("region")}
+                loaded_catalog_regions = {str(r["region"]) for r in region_stats if r.get("region")}
         except Exception:
             pass  # Graceful degradation: show all as uninstalled
 
