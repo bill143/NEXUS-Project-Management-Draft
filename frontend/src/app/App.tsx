@@ -2,7 +2,7 @@ import { Suspense, lazy, useState, useCallback, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { AppLayout } from './layout';
 import { DashboardPage } from '@/features/dashboard';
-import { LoginPage, RegisterPage, ForgotPasswordPage } from '@/features/auth';
+import { LoginPage, RegisterPage, ForgotPasswordPage, ResetPasswordPage } from '@/features/auth';
 import { ProjectsPage, CreateProjectPage, ProjectDetailPage, ProjectSettingsPage } from '@/features/projects';
 import { BOQListPage, CreateBOQPage, TemplatesPage } from '@/features/boq';
 import { syncCustomUnitsFromServer } from '@/features/boq/boqHelpers';
@@ -373,6 +373,10 @@ export default function App() {
         <Route path="/login" element={isAuthenticated ? <Navigate to="/" replace /> : <LoginPage />} />
         <Route path="/register" element={isAuthenticated ? <Navigate to="/" replace /> : <RegisterPage />} />
         <Route path="/forgot-password" element={isAuthenticated ? <Navigate to="/" replace /> : <ForgotPasswordPage />} />
+        {/* Backend reset emails link to /auth/reset?token=… (see backend/app/modules/users/service.py).
+            Always render the reset page even when authenticated — an admin doing a reset for their
+            own account from a different tab shouldn't get bounced off the page. */}
+        <Route path="/auth/reset" element={<ResetPasswordPage />} />
 
         {/* Onboarding — full-screen, no layout */}
         <Route path="/onboarding" element={
