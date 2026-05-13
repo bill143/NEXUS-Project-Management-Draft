@@ -171,6 +171,10 @@ dev = [
     "mypy>=1.13.0",
     "pre-commit>=4.0.0",
     "pyinstaller>=6.0.0",
+    # JSON-Schema Draft 2020-12 validator used by tests/unit/eac/test_schema_jsonschema.py
+    # to assert the EAC block-schema output round-trips through a real validator.
+    # Not needed at runtime — the EAC engine itself validates via Pydantic.
+    "jsonschema>=4.0.0",
 ]
 
 [build-system]
