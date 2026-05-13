@@ -634,6 +634,82 @@ async def update_user(
     return UserResponse.model_validate(user)
 
 
+@router.delete(
+    "/{user_id}",
+    status_code=204,
+    dependencies=[Depends(RequirePermission("users.delete"))],
+)
+async def delete_user(
+    user_id: uuid.UUID,
+    actor_id: CurrentUserId,
+    service: UserService = Depends(_get_service),
+) -> None:
+    """Hard-delete a user (admin only).
+
+    Refuses self-deletion and refuses to remove the last active admin —
+    leaving the tenant without an admin would lock everyone out of user
+    management.
+    """
+    await service.delete_user(user_id, actor_id=uuid.UUID(actor_id))
+
+
+class UserProfilePayload(BaseModel):
+    """Extended profile fields stored in user metadata.
+
+    These are not first-class columns on the User model — they live under
+    ``user.metadata_["profile"]`` so we can iterate on the schema without
+    Alembic migrations. Promote to columns if/when they become hot data.
+    """
+
+    first_name: str | None = None
+    last_name: str | None = None
+    phone: str | None = None
+    title: str | None = None
+    department: str | None = None
+    date_of_commencement: str | None = None  # ISO date string
+    avatar_url: str | None = None
+    notes: str | None = None
+
+
+@router.get(
+    "/{user_id}/profile/",
+    response_model=UserProfilePayload,
+    dependencies=[Depends(RequirePermission("users.read"))],
+)
+async def get_user_profile(
+    user_id: uuid.UUID,
+    service: UserService = Depends(_get_service),
+) -> UserProfilePayload:
+    """Get extended profile fields (stored in user metadata)."""
+    user = await service.get_user(user_id)
+    metadata = user.metadata_ if hasattr(user, "metadata_") else (user.metadata or {})
+    return UserProfilePayload(**(metadata.get("profile") or {}))
+
+
+@router.patch(
+    "/{user_id}/profile/",
+    response_model=UserProfilePayload,
+    dependencies=[Depends(RequirePermission("users.update"))],
+)
+async def set_user_profile(
+    user_id: uuid.UUID,
+    data: UserProfilePayload,
+    service: UserService = Depends(_get_service),
+) -> UserProfilePayload:
+    """Patch extended profile fields (stored in user metadata).
+
+    Only fields present in the request body are updated; unset fields are
+    preserved.
+    """
+    user = await service.get_user(user_id)
+    metadata = dict(user.metadata_ if hasattr(user, "metadata_") else (user.metadata or {}))
+    profile = dict(metadata.get("profile") or {})
+    profile.update(data.model_dump(exclude_unset=True))
+    metadata["profile"] = profile
+    await service.update_profile(user_id, metadata=metadata)
+    return UserProfilePayload(**profile)
+
+
 class ModuleAccessLevel(BaseModel):
     """Per-module access level for a user."""
 

@@ -2,7 +2,7 @@
  * API helpers for User Management.
  */
 
-import { apiGet, apiPatch, apiPost } from '@/shared/lib/api';
+import { apiDelete, apiGet, apiPatch, apiPost } from '@/shared/lib/api';
 
 export type UserRole = 'admin' | 'manager' | 'editor' | 'viewer';
 export type ModuleAccessLevel = 'none' | 'view' | 'edit' | 'full';
@@ -44,6 +44,17 @@ export interface UserModuleAccessPayload {
   custom_role_name?: string | null;
 }
 
+export interface UserProfile {
+  first_name?: string | null;
+  last_name?: string | null;
+  phone?: string | null;
+  title?: string | null;
+  department?: string | null;
+  date_of_commencement?: string | null;
+  avatar_url?: string | null;
+  notes?: string | null;
+}
+
 export async function fetchUsers(params?: {
   is_active?: boolean;
   limit?: number;
@@ -74,4 +85,20 @@ export async function setUserModuleAccess(
   data: UserModuleAccessPayload,
 ): Promise<UserModuleAccessPayload> {
   return apiPatch<UserModuleAccessPayload>(`/v1/users/${userId}/module-access/`, data);
+}
+
+export async function deleteUser(id: string): Promise<void> {
+  await apiDelete(`/v1/users/${id}`);
+}
+
+export async function getUserProfile(userId: string): Promise<UserProfile> {
+  return apiGet<UserProfile>(`/v1/users/${userId}/profile/`);
+}
+
+export async function setUserProfile(userId: string, data: UserProfile): Promise<UserProfile> {
+  return apiPatch<UserProfile>(`/v1/users/${userId}/profile/`, data);
+}
+
+export async function requestPasswordResetForUser(email: string): Promise<void> {
+  await apiPost('/v1/users/auth/forgot-password/', { email });
 }

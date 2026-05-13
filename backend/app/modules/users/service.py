@@ -17,6 +17,7 @@ from datetime import UTC, datetime, timedelta
 import bcrypt
 from fastapi import HTTPException, status
 from jose import jwt
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.config import Settings
@@ -692,6 +693,40 @@ class UserService:
     ) -> tuple[list[User], int]:
         """List users with pagination."""
         return await self.user_repo.list_all(offset=offset, limit=limit, is_active=is_active)
+
+    async def delete_user(self, user_id: uuid.UUID, *, actor_id: uuid.UUID) -> None:
+        """Hard-delete a user. Refuses self-deletion and the last active admin."""
+        if user_id == actor_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="You cannot delete your own account.",
+            )
+        user = await self.get_user(user_id)
+        user_email = user.email
+        if user.role == "admin" and user.is_active:
+            other_admin_stmt = (
+                select(User.id)
+                .where(
+                    User.role == "admin",
+                    User.is_active.is_(True),
+                    User.id != user_id,
+                )
+                .limit(1)
+            )
+            other_admin = (
+                await self.user_repo.session.execute(other_admin_stmt)
+            ).scalar_one_or_none()
+            if other_admin is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot delete the last active admin.",
+                )
+        await self.user_repo.delete(user_id)
+        await _safe_publish(
+            "users.user.deleted",
+            {"user_id": str(user_id), "email": user_email, "actor_id": str(actor_id)},
+            source_module="users",
+        )
 
     # ── API Keys ───────────────────────────────────────────────────────
 

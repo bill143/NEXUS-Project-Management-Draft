@@ -7,7 +7,7 @@ No business logic — pure data access.
 import uuid
 from datetime import UTC
 
-from sqlalchemy import select, update
+from sqlalchemy import delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.modules.users.models import APIKey, User
@@ -66,6 +66,13 @@ class UserRepository:
         await self.session.execute(stmt)
         await self.session.flush()
         # Expire cached ORM instances so the next get_by_id re-reads from DB
+        self.session.expire_all()
+
+    async def delete(self, user_id: uuid.UUID) -> None:
+        """Hard-delete a user. Cascades to API keys via FK."""
+        stmt = delete(User).where(User.id == user_id)
+        await self.session.execute(stmt)
+        await self.session.flush()
         self.session.expire_all()
 
     async def email_exists(self, email: str) -> bool:
