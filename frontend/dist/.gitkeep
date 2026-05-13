@@ -1,0 +1,10 @@
+# Placeholder so `frontend/dist/` exists on a fresh clone.
+#
+# `backend/pyproject.toml` has a hatchling `[tool.hatch.build.targets.wheel.force-include]`
+# rule that maps `../frontend/dist` into the wheel as `app/_frontend_dist`.
+# Without this directory existing, `pip install -e backend/.[server,dev]`
+# fails before frontend has ever been built.
+#
+# This file is tracked in git; the rest of `frontend/dist/` is gitignored
+# (see `.gitignore`). When `npm run build` runs, it overwrites everything
+# in this directory except this `.gitkeep` itself.

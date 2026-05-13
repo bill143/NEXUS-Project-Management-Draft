@@ -11,7 +11,15 @@ venv/
 
 # Node
 node_modules/
-frontend/dist/
+# Vite build output. We keep ONE file (.gitkeep) tracked so the directory
+# exists on a fresh clone — backend/pyproject.toml has a hatch
+# `force-include ../frontend/dist` rule that errors out if the dir is
+# missing, blocking `pip install -e backend/.` before frontend has been
+# built. The .gitkeep is overwritten by `npm run build` only if it
+# happens to be removed; vite normally leaves it alone.
+!frontend/dist/
+frontend/dist/*
+!frontend/dist/.gitkeep
 
 # IDE
 .vscode/
