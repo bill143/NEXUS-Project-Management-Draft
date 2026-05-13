@@ -145,6 +145,14 @@ cv = [
     "pymupdf>=1.25.0",
     "Pillow>=12.1.1",
 ]
+# LangGraph state-machine library — required by app/pipelines/text_to_cost_estimate
+# (the free-text → cost-estimate AI pipeline). Optional because the pipeline
+# is one feature, langgraph pulls a non-trivial dep tree, and the rest of the
+# app's AI surface uses direct httpx calls to provider REST APIs.
+# app/pipelines/__init__.py degrades gracefully when this isn't installed.
+langgraph = [
+    "langgraph>=0.2.0,<1",
+]
 # Deprecated alias since v2.5.0 — `duckdb` is in base deps now.
 # Kept so existing `pip install nexus[analytics]` commands
 # continue to work without failing.
@@ -157,7 +165,7 @@ s3 = [
 ]
 # Everything
 all = [
-    "nexus[server,vector,semantic,cv,s3,analytics]",
+    "nexus[server,vector,semantic,cv,s3,langgraph,analytics]",
 ]
 # Development tools
 dev = [
