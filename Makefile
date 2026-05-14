@@ -64,11 +64,15 @@ test-backend-cov: ## Run backend tests with coverage
 test-frontend: ## Run frontend tests
 	cd $(FRONTEND_DIR) && npm run test
 
+# NOTE: tests are organised by *directory* (tests/unit/, tests/integration/),
+# not by @pytest.mark.unit / @pytest.mark.integration decorators. Only one
+# @pytest.mark.slow exists in the whole repo. Using `pytest -m unit` would
+# select 0 tests; using the directory paths gives us what we actually want.
 test-unit: ## Run only unit tests (no DB required)
-	cd $(BACKEND_DIR) && pytest -x -v -m unit
+	cd $(BACKEND_DIR) && pytest -x -v tests/unit/
 
 test-integration: ## Run integration tests (requires DB)
-	cd $(BACKEND_DIR) && pytest -x -v -m integration
+	cd $(BACKEND_DIR) && pytest -x -v tests/integration/
 
 # ─── Code Quality ───────────────────────────────────────────────────────────
 lint: ## Lint all code

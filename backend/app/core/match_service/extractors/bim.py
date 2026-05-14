@@ -75,7 +75,8 @@ def _synthesise_description(raw: dict[str, Any]) -> str:
     if category:
         parts.append(category)
 
-    properties = raw.get("properties") if isinstance(raw.get("properties"), dict) else {}
+    _props = raw.get("properties")
+    properties: dict[str, Any] = _props if isinstance(_props, dict) else {}
     name = str(raw.get("name") or "").strip()
     description = str(raw.get("description") or "").strip()
 
@@ -92,7 +93,8 @@ def _synthesise_description(raw: dict[str, Any]) -> str:
 
     # Surface a few high-signal properties commonly used in CWICR
     # descriptions: thickness, fire rating, U-value.
-    geometry = raw.get("geometry") if isinstance(raw.get("geometry"), dict) else {}
+    _geom = raw.get("geometry")
+    geometry: dict[str, Any] = _geom if isinstance(_geom, dict) else {}
     thickness = geometry.get("thickness_m") or properties.get("thickness_m")
     if thickness:
         parts.append(f"thickness {thickness}m")
@@ -115,7 +117,8 @@ def extract(raw: dict[str, Any]) -> ElementEnvelope:
     material via :func:`enrich_classification` so the matcher's
     classifier boost has something to anchor on for fresh imports.
     """
-    properties = raw.get("properties") if isinstance(raw.get("properties"), dict) else {}
+    _props = raw.get("properties")
+    properties: dict[str, Any] = _props if isinstance(_props, dict) else {}
     description = _synthesise_description(raw)
 
     # Prefer an explicit classification block on the raw dict (existing
