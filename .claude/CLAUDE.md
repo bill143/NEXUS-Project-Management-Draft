@@ -1,193 +1,220 @@
-# CLAUDE.md — OpenEstimate Platform
+# CLAUDE.md — NEXUS
 
-## Идентичность проекта
+## Project identity
 
-**OpenEstimate** — open-source модульная платформа для строительной калькуляции и управления стоимостью.
-Замена iTWO, HeavyBid, Sage Estimating. Глобальный рынок. AI-first подход.
-Лицензия: AGPL-3.0 (community) + Commercial (enterprise).
+**NEXUS** is the open-source modular platform for construction cost estimation and project management — the federal-pivot fork of OpenEstimate that consolidates DDC tooling (CO₂ embodied carbon, ML price prediction, federal-compliance helpers). Branding was changed from `OpenConstructionERP` (and the older `OpenEstimate` lineage) in commit `bc0222e` (2026-04). Some artefacts still carry the old name — see "Known branding drift" below.
 
-**Основатель**: Artem — 10+ лет опыта в строительной смете, автор CWICR (55 000+ позиций, 9 языков), cad2db pipeline, DDC.
-
----
-
-## Философия разработки
-
-### Принципы (нарушение = блокер PR)
-
-1. **LIGHTWEIGHT & SIMPLE** — минимум зависимостей, быстрый старт (`docker compose up` или `pip install openestimate`). Никаких тяжёлых фреймворков. Core должен запускаться на VPS с 2GB RAM.
-2. **i18n EVERYWHERE** — 20 языков вшиты в ядро. Все строки UI, validation messages, cost database labels — через i18n. Новый язык = JSON-файл. Zero hardcoded strings.
-3. **CAD-agnostic через конвертацию** — мы НЕ используем IfcOpenShell и нативный IFC parsing. Все CAD-форматы (DWG, DGN, RVT, IFC) конвертируются в наш canonical формат через DDC cad2data pipeline. **BCF (BIM Collaboration Format) — разрешён** (как I/O формат для issues / validation reports / viewpoints), потому что это XML over data, без runtime-зависимости на IfcOpenShell.
-4. **Data validation as first-class citizen** — каждый импорт проходит validation pipeline с configurable rule sets (DIN, NRM, MasterFormat, custom). Validation НЕ optional — это часть core workflow.
-5. **Modules = plugins** — скачал → положил в папку → перезагрузил → работает. Как npm install. Каждый модуль = zip с manifest. Marketplace для поиска и установки.
-6. **Open data standards** — GAEB XML 3.3, DIN 276, NRM, MasterFormat нативно. Проприетарные форматы — через модули.
-7. **AI-augmented, human-confirmed** — AI предлагает, человек подтверждает. Confidence scores. Никаких авто-действий без review.
-8. **Single-database simplicity** — PostgreSQL единственная обязательная зависимость. SQLite для локальной разработки. Redis optional.
-
-### Языки и стек
-
-| Слой | Технология | Обоснование |
-|------|-----------|------------|
-| Backend API | **Python 3.12+ / FastAPI** | Async, Pydantic v2, прямой доступ к ML/CV стеку |
-| Background tasks | **Celery + Redis** (optional: in-process для dev) | Heavy async: CAD conversion, CV processing, AI inference |
-| Frontend | **React 18+ / TypeScript** | AG Grid (BOQ), Three.js (3D viewer), PDF.js (takeoff), Yjs (collab) |
-| Database | **PostgreSQL 16+** | OLTP + pg_duckdb (OLAP) + pgvector (AI) + PostGIS (geo) |
-| CAD conversion | **DDC cad2data** pipeline | Все форматы → canonical JSON/Parquet |
-| CV/OCR | **PaddleOCR 3.0 + YOLOv11** | PDF takeoff, symbol detection |
-| Vector search | **Qdrant** (production) / **pgvector** (simple deploy) | Semantic search по cost database |
-| File storage | **MinIO** (S3-compatible) / local filesystem (dev) | Чертежи, модели |
-| Real-time | **Yjs + y-websocket** | CRDT-based collaborative editing |
-
-### Конвенции кода
-
-**Python (Backend)**:
-- Formatter: `ruff format` (line-length=100)
-- Linter: `ruff check` с `select = ["E", "F", "W", "I", "N", "UP", "ANN", "B", "A", "COM", "C4", "PT", "RET", "SIM", "ARG"]`
-- Type hints: обязательны для всех public функций и методов
-- Docstrings: Google style, обязательны для модулей и public API
-- Tests: pytest, минимум 80% coverage для core, 60% для modules
-- Async: `async def` для всех endpoint handlers, sync допустим в domain logic
-- Imports: absolute imports, группировка stdlib → third-party → local
-
-**TypeScript (Frontend)**:
-- Strict mode: `"strict": true` в tsconfig
-- Formatter: Prettier (printWidth=100, singleQuote=true)
-- Linter: ESLint с `@typescript-eslint/recommended`
-- State: Zustand для global state, React Query для server state
-- Styling: Tailwind CSS + CSS variables для theming
-- Components: functional only, named exports, co-located tests
-
-**Общее**:
-- Commits: Conventional Commits (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`)
-- Branch naming: `feat/OE-123-short-description`, `fix/OE-456-bug-name`
-- PR: squash merge, linked issue, minimum 1 approval
-- Всё на английском (код, комменты, docs). README/user-facing docs — EN + DE + RU.
+- License: **AGPL-3.0-or-later** (community) + Commercial (enterprise).
+- Maintainer / founder: Artem (10+ years construction estimating, author of CWICR / cad2db / DDC).
+- Current package versions: backend `2.8.8` (`backend/pyproject.toml`), frontend `2.8.8` (`frontend/package.json`). **The in-app changelog (`frontend/src/features/about/Changelog.tsx`) is stuck at `2.5.0` — that's a known drift caught by `scripts/check_version_sync.py`.**
 
 ---
 
-## Архитектура
+## Reality check (2026-05-13)
 
-### Монорепозиторий
+This file used to describe a Phase-0 greenfield project. The repo is far past that. As of this rewrite:
+
+- **91 backend modules** under `backend/app/modules/` (not the ~10 the old doc listed)
+- **58 frontend feature directories** under `frontend/src/features/` + **41 frontend module directories** under `frontend/src/modules/`
+- **45 Alembic migrations**, currently converging to a single head (`v2i0_null_not_distinct`) via the explicit `v2h0_merge_heads` merge
+- A working Tauri desktop app under `desktop/` (sidecar architecture; package name still says `openestimate-desktop` — branding drift)
+- A working Vite/React frontend that builds cleanly (`vite build` ≈ 3 min) and a FastAPI backend that boots cleanly against SQLite
+- 51 Playwright e2e specs, 243 backend test files (3454 collectible tests), 111 frontend test files (1604 vitest tests)
+
+So the development phase is not "Foundation — 2 weeks." It's "established product with active feature work and known tech debt." See `docs/audits/2026-05-13-full-pass-baseline.md` for the most recent measured state.
+
+The architectural principles below are still the project's North Star. Where the code currently disagrees with a principle, the disagreement is called out inline.
+
+---
+
+## Principles (PR-blocking when violated)
+
+1. **LIGHTWEIGHT & SIMPLE** — minimal dependencies, fast start (`make quickstart` or `pip install nexus`). Core boots against SQLite with no external services. *Reality note*: the frontend bundle is heavyweight (8 chunks > 500 KB; `VisualBimPage` at 4.87 MB, `i18n-data` at 4.74 MB) — those are tracked for code-splitting work. The "VPS with 2GB RAM" target is realistic for SQLite-only mode; the full Postgres/Redis/MinIO/Qdrant compose stack wants more.
+2. **i18n EVERYWHERE** — 20 languages baked into the core. All UI strings, validation messages, cost-database labels go through i18n. New language = JSON file. Zero hardcoded strings. *Reality note*: the auto-generated `frontend/src/app/i18n-fallbacks.ts` is 5.45 MB; the ESLint ignore in `eslint.config.js` points at the wrong filename (`src/app/i18n.ts`). Fix tracked.
+3. **CAD-agnostic through conversion** — we do **NOT** use IfcOpenShell or native IFC parsing. All CAD formats (DWG, DGN, RVT, IFC) flow through the DDC cad2data pipeline into our canonical format. **BCF is allowed** as an I/O format (issues / validation reports / viewpoints) because it's XML over data with no IfcOpenShell runtime dependency. Decision last reviewed 2026-04-26.
+4. **Data validation as a first-class citizen** — every import passes a validation pipeline with configurable rule sets (DIN, NRM, MasterFormat, custom). Validation is **NOT** optional — it's part of the core workflow.
+5. **Modules = plugins** — download, drop into a directory, restart, it works. Each module has a `manifest.py`. Marketplace for discovery and install. *Reality note*: 90 of 91 backend modules ship `manifest.py`; only `precon` is missing one and is special-cased.
+6. **Open data standards** — GAEB XML 3.3, DIN 276, NRM, MasterFormat are natively supported. Proprietary formats go through modules.
+7. **AI-augmented, human-confirmed** — AI proposes, the human confirms. Confidence scores. No auto-actions without review.
+8. **SQLite-first** — SQLite is the default backend storage (it's in `backend/pyproject.toml` base deps as `aiosqlite`). PostgreSQL + Redis + MinIO + Celery are **optional** server extras (`pip install nexus[server]`). The Makefile's `make infra` brings them up via `docker compose` for production-shape dev work.
+
+---
+
+## Stack (as actually installed)
+
+| Layer | Tech | Notes |
+|-------|------|-------|
+| Backend API | **Python 3.12+ / FastAPI** | `backend/pyproject.toml` requires `python>=3.12`. Pydantic v2, async SQLAlchemy. |
+| Database (default) | **SQLite via aiosqlite** | Base dep. App boots with no external service. |
+| Database (server) | **PostgreSQL 16+** (`pgduckdb/pgduckdb:16-main`) | Optional, via `[server]` extras: asyncpg + psycopg2-binary. Docker image bundles DuckDB FDW for OLAP. |
+| Background jobs | **Celery + Redis** | Optional, via `[server]` extras. In-process job runner is the dev default. |
+| Object storage | **MinIO** (S3-compatible) | Optional, via `[s3]` extras (aioboto3). Local filesystem otherwise. |
+| Vector search | **Qdrant** (server) / **LanceDB** (embedded) | Optional, via `[semantic]` / `[vector]` extras. |
+| CV / OCR | **PaddleOCR + Ultralytics YOLO** | Optional, via `[cv]` extras. PDF takeoff + symbol detection. |
+| LLM access | **direct HTTP via `httpx`** | **No vendor SDKs in deps** — `app/modules/ai/ai_client.py` talks to provider REST APIs directly to avoid 800 MB of dead wheels. Keys live in the DB + `~/.openestimate/config.json`. |
+| Email | **Resend HTTP API** + SMTP fallback | `resend>=2.0` is a base dep because Railway and most PaaS hosts block outbound SMTP. Backend selection in `app/core/email/`. |
+| CAD conversion | **DDC cad2data** pipeline | `backend/data/ddc_templates/` + `services/cad-converter/`. **Not IfcOpenShell.** |
+| Frontend | **React 18 / TypeScript 5.9 / Vite 6** | AG Grid Community (BOQ), Three.js + online-3d-viewer (BIM), pdf.js (takeoff), Yjs + y-webrtc + y-websocket (collab). MapLibre + Leaflet for geo. |
+| Frontend state | **Zustand** (global) + **React Query** (server state) | 24 Zustand stores in `frontend/src/stores/`. |
+| Frontend styling | **Tailwind 3** + CSS variables | PostCSS + Autoprefixer. |
+| Desktop | **Tauri 2** + PyInstaller sidecar | `desktop/src-tauri/` (Rust shell) + `desktop/pyinstaller.spec` (Python sidecar). |
+
+---
+
+## Code conventions
+
+### Python (backend)
+
+- Formatter / linter: **ruff** (line-length **120**, not the 100 the old doc claimed)
+- `[tool.ruff.lint] select`: `E, F, W, I, N, UP, B, A, C4, PT, RET, SIM` — **no `ANN` / `COM` / `ARG`** (FastAPI DI patterns conflict with strict arg checking)
+- Long list of `ignore` entries — see `backend/pyproject.toml`. Don't add new ignores without justification in the same commit.
+- Type hints: present in most public APIs; **mypy is configured `strict = true` but currently reports 1830 errors across 276 of 813 files**. Treat mypy as an aspirational guardrail today, not a merge gate. Some of those 1830 are real null-deref bugs; they get fixed in the relevant module's batch.
+- Docstrings: prevalent on modules and public functions; no enforced style yet.
+- Tests: **pytest**. 243 files, ~3454 tests. Tests are organised by **directory** (`tests/unit/`, `tests/integration/`, `tests/perf/`, `tests/eval/`), not by `@pytest.mark.unit` decorators — only 1 `@pytest.mark.slow` exists in the whole repo. The Makefile targets `make test-unit` / `make test-integration` currently use `pytest -m …` and therefore select 0 tests — known bug, fix tracked.
+- Async: `async def` on all FastAPI handlers. Sync allowed in domain logic when there's no I/O.
+- Imports: absolute, grouped stdlib → third-party → local, isort-managed via ruff `I`.
+
+### TypeScript (frontend)
+
+- `tsconfig`: strict mode on. `noUnusedLocals: true` is honoured (build catches violations).
+- Formatter: **Prettier** (printWidth=100, singleQuote=true, via `npm run format`)
+- Linter: **ESLint 9 flat config** in `frontend/eslint.config.js`. *Reality note*: the config imports `@eslint/js` but doesn't declare it in `package.json`; works under `npm` (hoists transitives) but fails under `pnpm`. Fix tracked.
+- State: **Zustand** for global state, **React Query** for server state.
+- Styling: **Tailwind** + CSS variables for theming.
+- Components: functional only, named exports, co-located tests (`Component.tsx` + `Component.test.tsx`).
+- API client: auto-generated from OpenAPI via `npm run api:generate` (`src/shared/lib/api-types.ts`).
+
+### Universal
+
+- Commits: **Conventional Commits** (`feat:`, `fix:`, `refactor:`, `docs:`, `test:`, `chore:`).
+- Branch naming (current repo practice): `feat/short-description`, `fix/short-description`, `docs/short-description`, `audit/YYYY-MM-DD-description`. (The old "OE-123" Jira-prefix convention from the previous CLAUDE.md is not used in current commit history.)
+- PR: prefer **squash merge**, linked issue or audit reference, at least 1 review.
+- All code, comments, and docs are written in **English**. README has multiple-language sections; user-facing docs may add DE / RU.
+
+---
+
+## Monorepo layout (actual)
 
 ```
-openestimate/
-├── CLAUDE.md                    # ← ВЫ ЗДЕСЬ
-├── LICENSE                      # AGPL-3.0
+NEXUS-Project-Management-Draft/
+├── .claude/CLAUDE.md          # ← you are here
+├── LICENSE                    # AGPL-3.0
 ├── README.md
-├── docker-compose.yml           # Dev environment
-├── docker-compose.prod.yml      # Production
-├── Makefile                     # Common commands
+├── CHANGELOG.md               # 273 KB — large history; release-please managed
+├── Makefile
+├── docker-compose.yml         # Dev stack: postgres + redis + minio + qdrant + worker
+├── docker-compose.prod.yml
+├── docker-compose.quickstart.yml   # Single-command launch
+├── Dockerfile, docker-entrypoint.sh
+├── pyproject.toml             # Root-level for tooling only (real package is backend/)
 │
-├── packages/                    # Shared packages
-│   ├── oe-schema/               # Canonical data models (Pydantic + TypeScript)
-│   ├── oe-sdk/                  # Module SDK (Python)
-│   └── oe-ui-kit/               # Shared UI components (React)
-│
-├── backend/                     # FastAPI application
-│   ├── CLAUDE.md                # Backend-specific instructions
-│   ├── pyproject.toml
-│   ├── alembic/                 # DB migrations
+├── backend/                   # FastAPI application
+│   ├── pyproject.toml         # The Python package "nexus" v2.8.8
+│   ├── alembic.ini
+│   ├── alembic/versions/      # 45 migration files, head v2i0_null_not_distinct
 │   ├── app/
-│   │   ├── main.py              # FastAPI app factory
-│   │   ├── config.py            # Settings (pydantic-settings)
-│   │   ├── database.py          # SQLAlchemy async engine + session
-│   │   ├── dependencies.py      # DI container
-│   │   ├── middleware/           # Auth, CORS, rate limiting, tenant
-│   │   ├── core/                # Framework: events, hooks, module loader
-│   │   │   ├── events.py        # Event bus (publish/subscribe)
-│   │   │   ├── hooks.py         # Hook registry (filter/action)
-│   │   │   ├── module_loader.py # Dynamic module discovery & loading
-│   │   │   ├── permissions.py   # RBAC engine
-│   │   │   └── validation/      # Validation framework
-│   │   │       ├── engine.py    # Rule engine (configurable)
-│   │   │       ├── rules/       # Built-in rule registry
-│   │   │       │   └── __init__.py  # All rules colocated in one file
-│   │   │       │                    # (boq_quality, din276, gaeb, nrm,
-│   │   │       │                    # masterformat, onorm, dpgf, cpwd,
-│   │   │       │                    # birimfiyat, gbt50500, gesn,
-│   │   │       │                    # sekisan, sinapi). Third-party
-│   │   │       │                    # rules register via rule_registry.
-│   │   │       └── messages/    # i18n templates: en.json / de.json / ru.json
-│   │   │                        # (+ __init__.py with translate())
-│   │   │
-│   │   └── modules/             # Business modules (each = self-contained)
-│   │       ├── projects/        # Project management
-│   │       ├── boq/             # Bill of Quantities (core estimation)
-│   │       ├── takeoff/         # Quantity takeoff (manual + AI)
-│   │       ├── costs/           # Cost databases & rate management
-│   │       ├── cad/             # CAD import/conversion pipeline
-│   │       ├── validation/      # Data validation & compliance checking
-│   │       ├── tendering/       # Bid management & tender workflows
-│   │       ├── reporting/       # Reports, exports, dashboards
-│   │       ├── users/           # Auth, teams, permissions
-│   │       └── ai/              # AI services (CV, LLM, predictions)
-│   │
-│   └── tests/
-│       ├── conftest.py
-│       ├── unit/
-│       ├── integration/
-│       └── fixtures/
+│   │   ├── main.py            # 87 KB FastAPI app factory + lifespan
+│   │   ├── config.py          # pydantic-settings
+│   │   ├── database.py        # async engine + session factory
+│   │   ├── dependencies.py    # DI
+│   │   ├── cli.py             # CLI entrypoint (`nexus` / `openestimate` commands)
+│   │   ├── schemas.py
+│   │   ├── middleware/
+│   │   ├── core/              # Framework: events, hooks, module loader, validation
+│   │   │   ├── module_loader.py
+│   │   │   ├── events.py / hooks.py
+│   │   │   ├── permissions.py
+│   │   │   ├── validation/    # Rule engine + colocated rule registry
+│   │   │   ├── email/         # Resend + SMTP backends
+│   │   │   ├── match_service/ # CWICR / RSMeans semantic match
+│   │   │   ├── workflow_engine.py
+│   │   │   ├── i18n.py        # 142 KB
+│   │   │   ├── storage.py
+│   │   │   └── …
+│   │   ├── pipelines/         # text_to_cost_estimate (LangGraph); see "Known bugs"
+│   │   ├── modules/           # 91 business modules (see inventory below)
+│   │   └── scripts/           # seed_catalog, demo data, etc.
+│   ├── data/ddc_templates/    # DDC cad2data templates
+│   ├── locales/               # i18n source files
+│   └── tests/{unit,integration,perf,eval,fixtures}/
 │
-├── frontend/                    # React SPA
-│   ├── CLAUDE.md                # Frontend-specific instructions
-│   ├── package.json
+├── frontend/                  # React SPA
+│   ├── package.json           # nexus-frontend v2.8.8
 │   ├── vite.config.ts
+│   ├── eslint.config.js
+│   ├── tailwind.config.js
+│   ├── playwright.config.ts
+│   ├── public/
 │   ├── src/
-│   │   ├── app/                 # App shell, routing, providers
-│   │   ├── features/            # Feature modules (mirror backend modules)
-│   │   │   ├── projects/
-│   │   │   ├── boq/             # BOQ editor (AG Grid, block-based)
-│   │   │   ├── takeoff/         # Takeoff viewer (PDF.js + Canvas overlay)
-│   │   │   ├── cad/             # 3D viewer (Three.js)
-│   │   │   ├── costs/           # Cost database browser
-│   │   │   ├── validation/      # Validation dashboard
-│   │   │   ├── tendering/
-│   │   │   └── reporting/
-│   │   ├── shared/              # Shared components, hooks, utils
-│   │   │   ├── ui/              # Design system components
-│   │   │   ├── hooks/           # Custom hooks
-│   │   │   └── lib/             # Utilities
-│   │   └── stores/              # Zustand stores
-│   └── tests/
+│   │   ├── app/               # Shell, layout, i18n, App.tsx (96 routes)
+│   │   ├── features/          # 58 feature dirs (mirror backend modules)
+│   │   ├── modules/           # 41 plugin-style modules (regional BOQ-exchange, viewers, etc.)
+│   │   ├── shared/{ui,hooks,lib,types}/
+│   │   ├── stores/            # 24 Zustand stores
+│   │   └── tests/             # cross-cutting test setup
+│   ├── e2e/                   # 51 Playwright specs
+│   └── login-variants/        # Auth-screen design alternates
 │
-├── services/                    # Standalone services
-│   ├── cad-converter/           # DDC cad2data CAD/BIM converter
-│   │   ├── CLAUDE.md
-│   │   └── pipeline/            # DDC cad2data bridges
-│   │
-│   ├── cv-pipeline/             # Computer Vision for takeoff
-│   │   ├── CLAUDE.md
-│   │   ├── models/              # YOLO + PaddleOCR configs
-│   │   └── pipeline/            # Processing stages
-│   │
-│   └── ai-service/              # LLM integration service
-│       ├── CLAUDE.md
-│       └── agents/              # AI agents (BOQ generation, classification, etc.)
+├── desktop/                   # Tauri 2 desktop app
+│   ├── src-tauri/             # Rust shell (Cargo.toml — package still "openestimate-desktop")
+│   ├── pyinstaller.spec
+│   └── build-sidecar.sh
 │
-├── modules/                     # Community/third-party modules (examples)
-│   ├── oe-module-template/      # Cookiecutter template
-│   ├── oe-gaeb-extended/        # Extended GAEB features
-│   └── oe-rsmeans-connector/    # RSMeans API integration
+├── modules/                   # Module-development scaffolding
+│   └── oe-module-template/
 │
-├── data/                        # Seed data & migrations
-│   ├── cwicr/                   # CWICR database (CSV/Parquet)
-│   ├── classifications/         # DIN 276, NRM, MasterFormat mappings
-│   └── seeds/                   # Demo project data
+├── deploy/
+│   ├── docker/                # Dockerfile.{backend,frontend,unified}
+│   ├── railway/railway.toml
+│   ├── render/render.yaml
+│   └── terraform/digitalocean/
 │
-├── docs/                        # Documentation
-│   ├── architecture/
-│   ├── api/
-│   ├── module-development/
-│   └── user-guide/
-│
-└── deploy/                      # Deployment configs
-    ├── docker/
-    ├── kubernetes/
-    └── terraform/
+├── data/                      # Seed data, dashboards, BIM samples
+├── docs/                      # ADRs, RFCs, audits, install guides
+├── scripts/                   # Cross-cutting scripts (check_version_sync.py, etc.)
+├── tools/                     # watermark and other utilities
+├── signatures/                # CLA signatures DB
+└── website-marketing/         # 17 marketing-site design variants — out of scope for app fixes
 ```
 
-### Модульная система
+The old CLAUDE.md described a `packages/` shared-libraries directory and a `services/` separate top level. Neither exists in this tree — `services/` is implied inside `backend/app/` (e.g. `core/match_service/`) and `packages/` content lives under `backend/app/core/` and `frontend/src/shared/`.
 
-Каждый модуль — Python package с `manifest.py`:
+### Backend module inventory (91 modules)
+
+Grouped roughly by domain (this mapping drives the per-batch fix order in `docs/audits/2026-05-13-full-pass-baseline.md`):
+
+- **Phase-1 estimation core**: `projects`, `costs`, `boq`, `takeoff`, `validation`, `assemblies`, `dashboards`, `catalog` (the last lives in `data/catalog/`, not as a backend module)
+- **CAD/BIM**: `cad`, `bim_hub`, `bim_requirements`, `dwg_takeoff`, `viewer3d`, `visualbim`, `ddc_pdf_excel`, `ddc_profiling`, `ddc_qto`, `ddc_revit_export`, `opencde_api`
+- **Construction workflow**: `rfi`, `submittals`, `transmittals`, `changeorders`, `ncr`, `punchlist`, `inspections`, `safety`, `meetings`, `fieldreports`, `correspondence`, `markups`, `rfq_bidding`, `tendering`, `procurement`, `contacts`
+- **Planning / control**: `schedule`, `eac`, `full_evm`, `risk`, `project_intelligence`, `sustainability`, `ml_price_prediction`
+- **Cross-cutting**: `search`, `jobs`, `notifications`, `integrations`, `reporting`, `finance`, `compliance`, `compliance_ai`, `enterprise_workflows`, `erp_chat`, `ai`, `cost_match`, `match`, `costmodel`, `backup`, `uploads`, `documents`, `cde`, `tasks`, `teams`, `requirements`, `precon`
+- **Regional packs**: `us_pack`, `uk_pack`, `dach_pack`, `asia_pac_pack`, `latam_pack`, `india_pack`, `middle_east_pack`, `russia_pack`
+- **Stragglers / templates**: `hello_world`, `my_module`, `i18n_foundation`, `admin`, `architecture_map`, `collaboration`, `collaboration_locks`, `users`
+
+32 of these modules have a `router.py` that isn't directly imported in `backend/app/main.py` — most are mounted dynamically via `app/core/module_loader.py`; a small number may be dead. Confirm per-module before deleting anything.
+
+---
+
+## Module conventions
+
+A module is a Python package under `backend/app/modules/<name>/` with these files. Not every file is mandatory, but if a module needs the responsibility, that's where it goes:
+
+```
+backend/app/modules/<name>/
+├── manifest.py          # ModuleManifest declaration (recommended, missing on precon)
+├── models.py            # SQLAlchemy ORM models (auto-registered)
+├── schemas.py           # Pydantic request/response schemas
+├── router.py            # FastAPI router — mounted by module_loader at /api/v1/<name>/
+├── service.py           # Business logic (stateless)
+├── repository.py        # Data access layer (often inlined into service.py in practice)
+├── hooks.py / events.py # Event-bus + hook subscriptions
+├── validators.py        # Module-specific validation rules
+├── permissions.py       # RBAC permission definitions
+├── tests/               # Module-local tests (in addition to top-level tests/)
+└── migrations/          # Module-scoped Alembic migrations (rare; most live at backend/alembic/versions/)
+```
+
+Example manifest:
 
 ```python
 # backend/app/modules/boq/manifest.py
@@ -198,189 +225,143 @@ manifest = ModuleManifest(
     version="1.0.0",
     display_name="Bill of Quantities",
     description="Core BOQ editor with hierarchical structure and assembly support",
-    author="OpenEstimate Core Team",
+    author="NEXUS Core Team",
     category="core",
-    depends=["oe_projects", "oe_costs"],  # Module dependencies
-    auto_install=True,                     # Installed by default
-    # Routes, models, hooks автоматически discovered по конвенции
+    depends=["oe_projects", "oe_costs"],
+    auto_install=True,
 )
 ```
 
-**Module conventions**:
-```
-modules/boq/
-├── manifest.py          # Required: metadata & dependencies
-├── models.py            # SQLAlchemy models (auto-registered)
-├── schemas.py           # Pydantic schemas (request/response)
-├── router.py            # FastAPI router (auto-mounted at /api/v1/{module_name}/)
-├── service.py           # Business logic (stateless)
-├── repository.py        # Data access layer
-├── hooks.py             # Hook definitions & handlers
-├── events.py            # Event definitions & handlers
-├── validators.py        # Module-specific validation rules
-├── permissions.py       # Permission definitions
-├── migrations/          # Alembic migrations (module-scoped)
-└── tests/               # Module tests
-```
+---
 
-### Validation Pipeline (КРИТИЧЕСКИ ВАЖНО)
+## Validation pipeline (CRITICAL)
 
-Validation — first-class citizen. Каждый импорт/изменение данных проходит configurable validation:
+Validation is a first-class workflow step. Every import / data change runs through configurable rules:
 
 ```python
-# Validation rule interface
 class ValidationRule(ABC):
-    """Base class for all validation rules."""
-    
-    rule_id: str           # Unique ID, e.g. "din276.cost_group_required"
-    name: str              # Human-readable name
+    rule_id: str
+    name: str
     standard: str          # "DIN276", "NRM", "MasterFormat", "GAEB", "custom"
     severity: Severity     # ERROR (blocks), WARNING (flags), INFO (suggests)
     category: str          # "structure", "completeness", "consistency", "compliance"
-    
+
     @abstractmethod
-    async def validate(self, context: ValidationContext) -> ValidationResult:
-        """Execute validation logic. Return pass/fail with details."""
-        ...
-
-# Validation is part of the core workflow pipeline:
-# Import → Parse → VALIDATE → Enrich → Store
-#                    ↓
-#           ValidationReport (
-#               passed: list[RuleResult],
-#               warnings: list[RuleResult],
-#               errors: list[RuleResult],
-#               score: float  # 0.0 - 1.0
-#           )
+    async def validate(self, context: ValidationContext) -> ValidationResult: ...
 ```
 
-**Built-in rule sets** (enabled per project/tenant configuration):
+```
+Import → Parse → VALIDATE → Enrich → Store
+              ↓
+   ValidationReport (passed / warnings / errors / score 0.0-1.0)
+```
 
-| Rule Set | Scope | Examples |
-|----------|-------|---------|
-| `din276` | DACH cost structure | Cost group hierarchy, allowed KG codes, completeness per level |
-| `gaeb` | DACH tender format | GAEB XML schema validation, LV structure, Einheitspreise checks |
-| `nrm` | UK measurement | NRM 1/2 element compliance, measurement rules, BCIS compatibility |
-| `masterformat` | US classification | Division structure, code format, description requirements |
-| `boq_quality` | Universal | Missing quantities, zero prices, duplicate positions, unrealistic unit rates |
-| `bim_compliance` | CAD/BIM data | Required properties present, geometry validity, classification mapped |
-| `project_completeness` | Universal | All trades covered, total cost benchmarks, missing scope detection |
-| `custom` | User-defined | Custom rules via Python scripting or rule builder UI |
+Built-in rule sets (toggleable per project/tenant):
 
-Validation results visible in UI as traffic-light dashboard: 🟢 Passed / 🟡 Warnings / 🔴 Errors.
-Each result links back to the source element (BOQ position, drawing area, cost item).
+| Rule set | Scope | Examples |
+|----------|-------|----------|
+| `din276` | DACH cost structure | KG hierarchy, allowed codes, level completeness |
+| `gaeb` | DACH tender format | GAEB XML schema, LV structure, Einheitspreise |
+| `nrm` | UK measurement | NRM 1/2 element compliance, measurement rules, BCIS |
+| `masterformat` | US classification | Division structure, code format, descriptions |
+| `boq_quality` | Universal | Missing quantities, zero prices, duplicates, unrealistic rates |
+| `bim_compliance` | CAD/BIM data | Required properties present, geometry valid, classification mapped |
+| `project_completeness` | Universal | All trades covered, benchmark deviations, missing scope |
+| `custom` | User-defined | Python scripts or rule-builder UI |
 
-### CAD Conversion Pipeline (DDC cad2data, NO IfcOpenShell)
+All rule classes are colocated in `backend/app/core/validation/rules/__init__.py`. Third-party rules register via the rule registry. UI shows results as 🟢 / 🟡 / 🔴 traffic-light dashboard.
+
+---
+
+## CAD conversion pipeline (DDC cad2data — NOT IfcOpenShell)
 
 ```
-Input (any CAD format)
+Any CAD input
     ↓
-┌─────────────────────────────────┐
-│  CAD Converter Service          │
-│                                 │
-│  DWG → DDC cad2data → Canon JSON │
-│  DGN → DDC cad2data → Canon JSON │
-│  RVT → DDC cad2data → Canon JSON │  ← DDC pipeline
-│  IFC → DDC cad2data → Canon JSON │  ← Через DDC, НЕ через IfcOpenShell
-│  PDF → PyMuPDF → Raster/Vector  │
-│  Photos → CV pipeline → Elements│
-│                                 │
-│  Output: Canonical Format (JSON)│
-│  + DuckDB/Parquet (analytics)   │
-│  + Metadata extraction          │
-└─────────────────────────────────┘
+DDC cad2data converter (DWG / DGN / RVT / IFC) → canonical JSON
+PDF                    → PyMuPDF vector + raster extraction → canonical
+Photos                 → CV pipeline (YOLO + OCR)            → canonical
     ↓
 VALIDATION (structure, completeness, required properties)
     ↓
-Enrichment (classification mapping, cost matching via Qdrant)
+Enrichment (classification, cost matching via Qdrant)
     ↓
-Storage (PostgreSQL + files in MinIO)
+Storage (PostgreSQL / SQLite + blobs in MinIO / filesystem)
 ```
 
-**Canonical format** — единый JSON-формат для всех CAD-источников:
+Canonical format (one JSON shape for every CAD source):
+
 ```json
 {
   "format_version": "1.0",
-  "source": {"type": "rvt", "filename": "project.rvt", "converter": "oe-rvt-parser/0.3.0"},
+  "source": {"type": "rvt", "filename": "project.rvt", "converter": "ddc-cad2data/0.3.0"},
   "metadata": {"project_name": "...", "units": "metric", "coordinate_system": "..."},
   "elements": [
     {
       "id": "elem_001",
       "category": "wall",
       "classification": {"din276": "330", "masterformat": "04 20 00"},
-      "geometry": {
-        "type": "extrusion",
-        "length_m": 12.5,
-        "height_m": 3.0,
-        "thickness_m": 0.24,
-        "area_m2": 37.5,
-        "volume_m3": 9.0
-      },
+      "geometry": {"type": "extrusion", "length_m": 12.5, "height_m": 3.0, "thickness_m": 0.24, "area_m2": 37.5, "volume_m3": 9.0},
       "properties": {"material": "concrete_c30_37", "fire_rating": "F90"},
       "quantities": {"area": 37.5, "volume": 9.0, "length": 12.5},
       "relations": {"level": "level_01", "zone": "zone_a", "parent": null}
     }
   ],
-  "levels": [...],
-  "zones": [...],
-  "spatial_structure": {...}
+  "levels": [...], "zones": [...], "spatial_structure": {...}
 }
 ```
 
-### Целевой Workflow (полный)
+---
+
+## End-to-end workflow
 
 ```
 1. IMPORT
-   ├── Upload PDF / Photo / CAD file (drag-and-drop или API)
+   ├── Upload PDF / Photo / CAD (drag-and-drop or API)
    ├── Auto-detect format (magic bytes + extension)
-   └── Route to appropriate converter
+   └── Route to the appropriate converter
 
 2. CONVERT
-   ├── CAD → Canonical JSON (DDC cad2data)
-   ├── PDF → Vector extraction + OCR (PyMuPDF + PaddleOCR)
+   ├── CAD → canonical JSON (DDC cad2data)
+   ├── PDF → vector + OCR (PyMuPDF + PaddleOCR)
    ├── Photo → CV pipeline (YOLO + OCR)
    └── Output: structured elements with quantities
 
-3. ✅ VALIDATE (NEW — обязательный шаг)
-   ├── Structural validation (format correctness, required fields)
-   ├── Classification validation (DIN 276 / NRM / MasterFormat compliance)
-   ├── Completeness check (all trades covered? missing scope?)
-   ├── Consistency check (quantities vs geometry, unit rate ranges)
-   ├── Custom rules (project-specific / client-specific)
+3. ✅ VALIDATE (mandatory)
+   ├── Structural / classification / completeness / consistency / custom checks
    ├── Generate ValidationReport with traffic-light dashboard
-   └── User reviews & resolves issues before proceeding
+   └── User reviews and resolves issues before proceeding
 
 4. ENRICH
-   ├── AI classification (auto-assign cost codes via ML)
-   ├── Cost matching (vector search CWICR/RSMeans via Qdrant)
+   ├── AI classification (auto-assign cost codes)
+   ├── Cost matching (vector search in CWICR / RSMeans via Qdrant)
    ├── Assembly suggestion (similar historical assemblies)
-   └── Confidence scores on each AI suggestion
+   └── Confidence scores on every AI suggestion
 
 5. ESTIMATE
    ├── BOQ editor (block-based, AG Grid, assemblies)
    ├── Rate application (manual + AI-suggested)
    ├── What-if scenarios (material substitution, regional adjustment)
-   ├── Real-time cost rollup with live totals
+   ├── Real-time cost rollup
    └── Collaborative editing (Yjs multiplayer)
 
-6. ✅ VALIDATE ESTIMATE (второй validation pass)
-   ├── BOQ quality rules (zero prices, missing quantities, duplicates)
-   ├── Benchmark comparison (cost/m² vs historical)
-   ├── Anomaly detection (AI flags outliers)
-   ├── Completeness vs original scope (coverage %)
-   └── Client-specific rules (budget limits, preferred suppliers)
+6. ✅ VALIDATE ESTIMATE (second pass)
+   ├── BOQ-quality rules (zero prices, missing quantities, duplicates)
+   ├── Benchmark comparison vs historical
+   ├── Anomaly detection
+   ├── Coverage % vs original scope
+   └── Client-specific rules
 
 7. TENDER
    ├── Generate tender documents (GAEB X83, PDF, Excel)
    ├── Distribute to subcontractors
    ├── Collect & compare bids
-   ├── Bid analysis (price spread, coverage, anomalies)
    └── Award recommendation
 
 8. REPORT & EXPORT
    ├── Executive summary (PDF)
    ├── Detailed BOQ (GAEB XML, Excel, CSV)
-   ├── Cost breakdown by KG/NRM/Division
+   ├── Cost breakdown by KG / NRM / Division
    ├── Validation report (compliance certificate)
    ├── API export (JSON, Parquet)
    └── Integration push (SAP, Procore, MS Project via n8n)
@@ -388,201 +369,171 @@ Storage (PostgreSQL + files in MinIO)
 
 ---
 
-## Пошаговый план разработки
+## Roadmap (current state, not a fresh plan)
 
-### Фаза 0: Foundation (Текущая задача — 2 недели)
-**Цель**: рабочий monorepo со всей инфраструктурой, без бизнес-логики.
+The original CLAUDE.md described five sequential phases starting from a Phase 0 "Foundation — 2 weeks." That plan is historical. As of 2026-05-13 the project is past Phase 4-equivalent feature work (see `PHASE_7_*.md` at the repo root). Active development tracks:
 
-- [ ] Инициализация monorepo (структура директорий, git, .gitignore)
-- [ ] `pyproject.toml` с ruff, pytest, dependencies
-- [ ] FastAPI app factory (`main.py`, `config.py`, `database.py`)
-- [ ] Docker Compose (PostgreSQL 16 + Redis + MinIO)
-- [ ] Alembic setup с multi-module migration support
-- [ ] Module loader (dynamic discovery, dependency resolution, lifecycle)
-- [ ] Event bus (sync + async publish/subscribe)
-- [ ] Hook system (filters + actions)
-- [ ] Validation framework (rule engine, rule registry, ValidationResult)
-- [ ] Auth module (JWT + API keys, basic RBAC)
-- [ ] Frontend: Vite + React + TypeScript + Tailwind + Zustand + React Query
-- [ ] API client auto-generation (openapi-typescript)
-- [ ] Health check endpoint, OpenAPI docs, CORS
-- [ ] CI: GitHub Actions (lint + test + build)
-- [ ] README с quickstart (docker compose up)
+| Track | Status | Notes |
+|-------|--------|-------|
+| Foundation (auth, RBAC, modules, validation framework, i18n) | Shipped | RBAC enforced (see 2026-05-09 QA audit); 91 modules autoloaded |
+| Core estimation (projects, costs, BOQ, takeoff, validation) | Shipped | BOQ editor in production use; CWICR catalogue seeded |
+| CAD integration | Shipped | DDC cad2data bridge live; 3D viewer (Three.js + online-3d-viewer) live |
+| AI takeoff (PDF) | Shipped (PaddleOCR + YOLO behind `[cv]` extra) | DWG-takeoff page is one of the largest TS files (202 KB) |
+| Collaboration / Enterprise (Yjs, multi-tenant, SSO, audit) | Partial | Yjs deps installed; tendering module exists; multi-tenant work in progress |
+| Marketplace / ecosystem | Backlog | Module SDK exists; marketplace registry not yet shipped |
+| Federal pivot | Active | Precon module, EAC engine, federal compliance helpers — recent commits in `bill143/` fork |
+| Email (Railway compatibility) | Shipped | Resend HTTP backend added in `067fb7f` to bypass blocked SMTP |
+| Branding rename | Mostly shipped | `bc0222e` renamed OpenConstructionERP → NEXUS; remaining drift listed below |
 
-### Фаза 1: Core Estimation (4 недели)
-**Цель**: можно создать проект и вручную составить BOQ.
+What needs attention (from the baseline audit and the 2026-05-09 QA report):
 
-- [ ] Module: `projects` (CRUD, settings, team members)
-- [ ] Module: `costs` (cost database CRUD, CWICR import, rate management)
-- [ ] Module: `boq` (BOQ editor — hierarchical positions, assemblies, calculations)
-- [ ] Module: `validation` (built-in rule sets: DIN 276, GAEB, boq_quality)
-- [ ] Frontend: Project dashboard
-- [ ] Frontend: BOQ editor (AG Grid, keyboard navigation, inline editing)
-- [ ] Frontend: Cost database browser (search, filter, apply to BOQ)
-- [ ] Frontend: Validation dashboard (traffic-light, drill-down)
-- [ ] GAEB XML import/export (X83 Angebotsabgabe)
-- [ ] Excel/CSV import/export
-- [ ] Basic reporting (PDF summary)
-- [ ] CWICR seed data (all 55K positions)
-- [ ] DIN 276 classification tree
-
-### Фаза 2: CAD Integration (4 недели)
-**Цель**: загрузка DWG/RVT/IFC → автоматические объёмы.
-
-- [ ] Service: `cad-converter` (DDC cad2data bridge for DWG/DGN/IFC/RVT)
-- [ ] Canonical format implementation
-- [ ] Validation rules for CAD data (structure, completeness, classification)
-- [ ] Frontend: 3D viewer (Three.js, load canonical format)
-- [ ] Frontend: Element selection → BOQ position linking
-- [ ] Auto quantity extraction from geometry
-- [ ] Classification auto-mapping (element category → DIN 276 / NRM)
-
-### Фаза 3: AI Takeoff (4 недели)
-**Цель**: загрузка PDF → AI распознаёт элементы → предлагает объёмы.
-
-- [ ] Service: `cv-pipeline` (PaddleOCR + YOLO)
-- [ ] PDF page zone detection (drawing area, legend, title block, tables)
-- [ ] Symbol detection (doors, windows, MEP symbols)
-- [ ] Area/length measurement from vector PDF
-- [ ] OCR for dimension strings and annotations
-- [ ] Frontend: Takeoff viewer (PDF.js + Canvas overlay)
-- [ ] Frontend: Click-to-measure, AI suggestion overlay
-- [ ] Confidence scores UI (green/yellow/red)
-- [ ] Validation: takeoff results vs manual checks
-
-### Фаза 4: Collaboration & Enterprise (4 недели)
-- [ ] Yjs integration (real-time BOQ editing)
-- [ ] Multi-user cursors, presence awareness
-- [ ] Comment system (threaded, on BOQ positions)
-- [ ] Version history & compare
-- [ ] Module: `tendering` (bid packages, distribution, collection, comparison)
-- [ ] Multi-tenant support (RLS in PostgreSQL)
-- [ ] SSO (SAML, OIDC)
-- [ ] Audit logging
-
-### Фаза 5: Marketplace & Ecosystem (ongoing)
-- [ ] Module SDK v1.0 (documentation, CLI scaffolding)
-- [ ] Module marketplace (registry, install, update)
-- [ ] NRM rule set, MasterFormat rule set
-- [ ] RSMeans connector module
-- [ ] BKI/BCIS connector modules
-- [ ] n8n integration nodes
-- [ ] Mobile PWA
-- [ ] Data API (CWICR public API)
+- Schema drift (38 events from `alembic check` on SQLite; the QA report saw more on Postgres)
+- `frontend/eslint.config.js` missing `@eslint/js` devDep (breaks under pnpm)
+- `app/pipelines/__init__.py` eagerly imports `text_to_cost_estimate.graph`, which needs an undeclared `langgraph` dep
+- `tests/unit/eac/test_schema_jsonschema.py` needs `jsonschema` in `[dev]` extras
+- `make test-unit` / `make test-integration` Makefile targets select 0 tests (no `pytest.mark.unit` decorators in code)
+- 1 unit-test failure (`test_default_role_is_editor`) and 69 vitest failures
+- `docker-compose.quickstart.yml:34` has an unquoted `${VAR:?error: msg}` containing a colon (strict YAML invalid)
+- 8 bundle chunks > 500 KB; `VisualBimPage` and `i18n-data` are the two outliers
+- `Changelog.tsx` stuck at 2.5.0 while everything else is 2.8.8
 
 ---
 
-## Инструкции для Claude Code
+## Instructions for Claude Code
 
-### При генерации кода
+### Code generation
 
-1. **Всегда проверяй текущую фазу** — не прыгай вперёд. Если мы на фазе 0, не пиши бизнес-логику фазы 1.
-2. **Один модуль за раз** — полностью завершай модуль (models → schemas → repository → service → router → tests) прежде чем переходить к следующему.
-3. **Tests first для core** — validation engine, module loader, event bus ОБЯЗАТЕЛЬНО с тестами. Business modules — tests после основной реализации.
-4. **Читай CLAUDE.md модуля** перед работой с ним — каждый модуль и сервис имеет свой CLAUDE.md с контекстом.
-5. **Canonical format — источник истины** — все конверсии CAD → canonical. BOQ работает с canonical. Validation проверяет canonical.
-6. **Validation всегда** — при добавлении нового модуля, добавь соответствующие validation rules. Нет модуля без validation.
+1. **Match scope to the request** — this is a working app, not a greenfield project. Don't write Phase-0 scaffolding when fixing a Phase-7+ bug. Match the change to what the user asked for.
+2. **One module at a time when refactoring** — complete a module's chain (`models → schemas → service → router → tests`) before moving to the next. For bug fixes, touch only the affected file plus what's necessary to keep tests green.
+3. **Tests first for core** — `validation/`, `module_loader.py`, `events.py`, `hooks.py` get TDD treatment. Business modules can land tests alongside or after.
+4. **Read each module's CLAUDE.md** before working on it — some modules have their own context file. Honour module-local conventions.
+5. **Canonical format is the source of truth** — all CAD conversions land in the canonical shape; BOQ / validation read canonical.
+6. **Don't break validation** — when adding a feature that creates data, add corresponding validation rules. Validation isn't optional.
+7. **Don't reintroduce IfcOpenShell** — under any circumstances. BCF is allowed; IfcOpenShell is not. Decision last reviewed 2026-04-26.
+8. **Don't auto-apply AI suggestions** — confidence score + human review, always.
 
-### При решении проблем
+### Problem solving
 
-1. Предлагай решение → жди подтверждения → реализуй
-2. Если задача неоднозначна — предложи 2–3 варианта с trade-offs
-3. Не удаляй существующий код без объяснения и подтверждения
-4. Не добавляй зависимости без обоснования (проверь: есть ли stdlib-решение?)
+1. Propose a solution → wait for confirmation → implement (for non-trivial work).
+2. When the problem is ambiguous, propose 2-3 options with trade-offs.
+3. Don't delete code without explaining why and getting confirmation — some apparently dead modules are loaded dynamically.
+4. Don't add dependencies without justification (check: is there a stdlib or already-installed alternative?).
 
-### Стиль ответов
+### Answer style
 
-- Код — на английском (переменные, комменты, docs)
-- Обсуждение — на русском (если я пишу на русском)
-- Технические термины — оставляй на английском (не переводи "validation", "canonical format", "hook")
-- Будь конкретен: вместо "нужно добавить validation" → "добавлю ValidationRule `DIN276CostGroupHierarchy` в `backend/app/core/validation/rules/__init__.py` (все rule-классы колокированы в одном файле)"
+- Code, comments, docs: **English**.
+- Conversation: English.
+- Keep technical terms in English (don't translate "validation", "canonical format", "hook").
+- Be concrete: not "add validation," but "add `DIN276CostGroupHierarchy` to `backend/app/core/validation/rules/__init__.py`."
 
-### Команды для разработки
+### Development commands (matches the real `Makefile`)
 
 ```bash
-# Development
-make dev              # docker compose up + backend + frontend
-make test             # Run all tests
-make test-backend     # Run backend tests only
-make test-frontend    # Run frontend tests only
-make lint             # Ruff + ESLint
-make format           # Ruff format + Prettier
-make migrate          # Alembic upgrade head
-make seed             # Load CWICR + demo data
+# First-time setup
+make setup            # pip install backend[server] + npm install frontend
+                      # NOTE: requires frontend/dist to exist — see Known bug §"force-include"
 
-# Module development
-make module-new NAME=oe_tendering    # Scaffold new module
-make module-test NAME=oe_boq         # Test specific module
-make module-migrate NAME=oe_boq      # Generate module migration
+# Day-to-day dev (two terminals)
+make infra            # docker compose up -d postgres redis minio
+make dev-backend      # uvicorn app.main:create_app --factory --reload --port 8000
+make dev-frontend     # vite dev server on port 5173
 
-# Build & Deploy
-make build            # Docker build all services
-make deploy-staging   # Deploy to staging
-make deploy-prod      # Deploy to production
+# Or: single-command launch
+make quickstart       # docker compose -f docker-compose.quickstart.yml up --build → http://localhost:8080
+
+# Testing
+make test             # backend pytest + frontend vitest
+make test-backend     # pytest -x -v
+make test-backend-cov # pytest --cov=app --cov-report=term --cov-report=html
+make test-frontend    # npm run test
+# NOTE: `make test-unit` / `make test-integration` use pytest -m, currently select 0 tests
+# Use `pytest tests/unit/` / `pytest tests/integration/` directly.
+
+# Quality
+make lint             # ruff check + npm run lint
+make format           # ruff format + prettier
+make typecheck        # mypy app/ + tsc --noEmit
+                      # NOTE: mypy strict mode currently reports ~1830 errors — aspirational
+
+# Database
+make migrate          # alembic upgrade head
+make seed             # python -m app.scripts.seed_catalog
+make migrate-new MSG="..."   # alembic revision --autogenerate
+
+# Module scaffolding
+make module-new NAME=oe_tendering    # create skeleton
+
+# Build
+make build            # docker build all three deploy images
+make build-wheel      # build frontend first, then python wheel (correct install order)
 ```
 
 ---
 
-## Ключевые модели данных (Canonical)
+## Key data models (canonical)
 
 ### Project
+
 ```
-Project → has many → BOQs → has many → Sections → has many → Positions
-Project → has many → Documents (PDFs, CAD files)
-Project → has many → ValidationReports
-Project → has one → ProjectConfig (enabled standards, rules, regional settings)
+Project → many BOQ → many Section → many Position
+Project → many Document (PDFs, CAD files)
+Project → many ValidationReport
+Project → one ProjectConfig (enabled standards, rule sets, regional settings)
 ```
 
-### BOQ Position (core entity)
+### BOQ Position
+
 ```
 Position:
   - id: UUID
   - boq_id: FK
-  - parent_id: FK (nullable, for hierarchy)
+  - parent_id: FK (nullable — hierarchy)
   - ordinal: str ("01.02.003")
   - description: text
   - unit: enum (m, m2, m3, kg, pcs, lsum, ...)
   - quantity: Decimal
-  - unit_rate: Decimal
+  - unit_rate: Decimal (Numeric, money-safe; see migration v258_money_numeric)
   - total: Decimal (computed: quantity × unit_rate)
   - classification: JSONB {din276: "330", nrm: "2.6.1", masterformat: "03 30 00"}
   - source: enum (manual, cad_import, ai_takeoff, gaeb_import)
-  - confidence: float (0.0-1.0, nullable — only for AI-sourced)
-  - assembly_id: FK (nullable — link to assembly template)
-  - cad_element_ids: list[str] (links to canonical format elements)
+  - confidence: float (0.0-1.0, only for AI-sourced rows)
+  - assembly_id: FK (nullable — assembly template link)
+  - cad_element_ids: list[str] (links into the canonical-format elements array)
   - validation_status: enum (pending, passed, warnings, errors)
-  - metadata: JSONB (flexible, module-extensible)
+  - metadata: JSONB (module-extensible)
 ```
 
-### Assembly (сборная расценка / recipe)
+### Assembly (recipe / Stahlbetonwand-style composite)
+
 ```
 Assembly:
   - id: UUID
-  - name: str ("Stahlbetonwand C30/37, 24cm, Schalung, Bewehrung")
+  - name: str
   - category: str
   - components: list[AssemblyComponent]
     - cost_item_id: FK to CostDatabase
-    - factor: Decimal (e.g., 1.0 for concrete, 0.12 for rebar per m3)
+    - factor: Decimal
     - unit: str
-  - total_rate: Decimal (computed from components)
-  - regional_factors: JSONB (Berlin: 1.05, München: 1.12, ...)
+  - total_rate: Decimal (computed)
+  - regional_factors: JSONB
 ```
 
-### Validation
+### Validation report
+
 ```
 ValidationReport:
   - id: UUID
   - project_id: FK
   - target_type: enum (boq, document, cad_import, tender)
   - target_id: UUID
-  - rule_set: str ("din276+gaeb+boq_quality")
+  - rule_set: str
   - status: enum (passed, warnings, errors)
   - score: float (0.0-1.0)
   - results: list[ValidationResult]
     - rule_id: str
     - status: enum (pass, warning, error)
     - message: str
-    - element_ref: str (link to specific BOQ position / CAD element / document page)
+    - element_ref: str (links to a specific BOQ position / CAD element / page)
     - details: JSONB
   - created_at: datetime
   - created_by: FK
@@ -590,17 +541,24 @@ ValidationReport:
 
 ---
 
-## Переменные окружения (.env.example)
+## Environment variables (`.env.example`)
 
 ```env
-# Database
-DATABASE_URL=postgresql+asyncpg://oe:oe@localhost:5432/openestimate
-DATABASE_SYNC_URL=postgresql://oe:oe@localhost:5432/openestimate
+# Database — defaults to SQLite, no external service needed
+DATABASE_URL=sqlite+aiosqlite:///./openestimate.db
+DATABASE_SYNC_URL=sqlite:///./openestimate.db
+# For production:
+# DATABASE_URL=postgresql+asyncpg://oe:oe@localhost:5432/openestimate
+# DATABASE_SYNC_URL=postgresql://oe:oe@localhost:5432/openestimate
 
-# Redis (optional for dev — falls back to in-memory)
+# Redis (optional — in-memory fallback for dev)
 REDIS_URL=redis://localhost:6379/0
 
-# MinIO / S3
+# Celery (only if running background workers)
+OE_CELERY_BROKER_URL=redis://localhost:6379/1
+OE_CELERY_RESULT_BACKEND=redis://localhost:6379/1
+
+# MinIO / S3 (optional — local FS fallback)
 S3_ENDPOINT=http://localhost:9000
 S3_ACCESS_KEY=minioadmin
 S3_SECRET_KEY=minioadmin
@@ -611,16 +569,19 @@ JWT_SECRET=change-me-in-production
 JWT_ALGORITHM=HS256
 JWT_EXPIRE_MINUTES=60
 
-# AI Services (optional — features degrade gracefully)
+# AI (optional — features degrade gracefully)
 QDRANT_URL=http://localhost:6333
-OPENAI_API_KEY=             # For LLM features
-ANTHROPIC_API_KEY=          # For LLM features
+OPENAI_API_KEY=
+ANTHROPIC_API_KEY=
 
-# CAD Converter
-# CAD converter uses DDC cad2data (no separate license key needed)
+# Email (Resend HTTP API — Railway-compatible)
+RESEND_API_KEY=
+EMAIL_BACKEND=resend   # or "smtp" / "console"
+
+# CAD converter sidecar
 CAD_CONVERTER_URL=http://localhost:8001
 
-# CV Pipeline
+# CV pipeline sidecar
 CV_PIPELINE_URL=http://localhost:8002
 
 # App
@@ -632,12 +593,27 @@ ALLOWED_ORIGINS=http://localhost:5173
 
 ---
 
-## Важные ограничения
+## Hard constraints
 
-1. **НЕ используем IfcOpenShell** — весь BIM/CAD через DDC cad2data pipeline
-2. **BCF — разрешён как I/O формат** (issues / viewpoints / validation reports). Hand-rolled XML или AGPL-совместимая библиотека (без IfcOpenShell-зависимости). Решение пересмотрено 2026-04-26.
-3. **НЕ используем natively IFC** — IFC это просто ещё один CAD формат для конвертации в canonical
-4. **НЕ монолитная архитектура** — каждая функция = модуль с manifest
-5. **НЕ optional validation** — validation pipeline обязателен в workflow
-6. **НЕ auto-apply AI results** — всегда human review с confidence scores
-7. **НЕ vendor lock-in** — все данные exportable, все форматы open
+1. **NO IfcOpenShell** — all BIM/CAD goes through DDC cad2data.
+2. **BCF is allowed** as an I/O format (issues / viewpoints / validation reports). Hand-rolled XML or an AGPL-compatible library, no IfcOpenShell-dependent stack. Decision last reviewed 2026-04-26.
+3. **No native IFC parser** — IFC is just one more CAD format that flows through the canonical converter.
+4. **No monolithic architecture** — every feature is a module with a manifest. Don't merge separate modules into shared mega-files.
+5. **Validation is mandatory** — no module ships without validation rules; no workflow skips the validation step.
+6. **No auto-applied AI results** — every AI suggestion needs a confidence score and a human confirm.
+7. **No vendor lock-in** — all data is exportable; all formats are open.
+8. **No `git push --force`** to `main` or any shared branch.
+
+---
+
+## Known branding drift
+
+These artefacts still carry the old names. Each will be cleaned up in its corresponding batch:
+
+- `desktop/src-tauri/Cargo.toml` — package name `openestimate-desktop`, description "OpenEstimate Desktop" (Batch 18)
+- `backend/openestimate.db` and `s3 bucket = openestimate` in `.env.example` (intentional — the on-disk filename is back-compat)
+- `frontend/cli.py` demo login: `demo@openestimator.io / DemoPass1234!` (low priority, demo creds)
+- `pyproject.toml [project.scripts]` exposes both `openestimate` and `nexus` CLIs (intentional — back-compat)
+- `data/init.sql` and seed scripts reference `openestimate` as the Postgres database name (intentional — back-compat)
+
+If you find more drift, surface it in the relevant batch and either fix it inline or list it for follow-up.
