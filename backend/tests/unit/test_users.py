@@ -370,13 +370,19 @@ class TestUserCreateSchema:
         assert data.password == "StrongP@ss1"
         assert data.full_name == "Test User"
 
-    def test_default_role_is_editor(self):
+    def test_default_role_is_viewer(self):
+        # UserCreate is the public self-registration schema. Its default role
+        # is `viewer` (least privilege) per `app/modules/users/schemas.py:UserCreate`
+        # docstring — "Never `admin`". An admin can promote later via
+        # AdminUserCreate / AdminUserUpdate. Changing this default to anything
+        # higher-privilege than viewer is a security regression — keep the
+        # assertion strict.
         data = UserCreate(
             email="user@example.com",
             password="StrongP@ss1",
             full_name="Test User",
         )
-        assert data.role == "editor"
+        assert data.role == "viewer"
 
     def test_default_locale_is_en(self):
         data = UserCreate(
