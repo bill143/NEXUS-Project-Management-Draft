@@ -19,13 +19,23 @@ from typing import Any
 from unittest.mock import patch
 
 import pytest
-from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
-from app.core.job_run import JobRun
-from app.core.pipelines import LLMDispatcher, LLMTier
-from app.database import Base
-from app.pipelines.text_to_cost_estimate.graph import build_graph
-from app.pipelines.text_to_cost_estimate.nodes import (
+# Skip the whole module if langgraph isn't installed. The pipeline is an
+# optional [langgraph] extras install; on a base install the deep import
+# below would fail with ModuleNotFoundError and break `pytest --collect-only`
+# for everyone, not just devs working on this pipeline.
+pytest.importorskip(
+    "langgraph",
+    reason="text_to_cost_estimate pipeline requires langgraph (pip install nexus[langgraph])",
+)
+
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine  # noqa: E402
+
+from app.core.job_run import JobRun  # noqa: E402
+from app.core.pipelines import LLMDispatcher, LLMTier  # noqa: E402
+from app.database import Base  # noqa: E402
+from app.pipelines.text_to_cost_estimate.graph import build_graph  # noqa: E402
+from app.pipelines.text_to_cost_estimate.nodes import (  # noqa: E402
     classify_items,
     estimate_total,
     parse_description,
