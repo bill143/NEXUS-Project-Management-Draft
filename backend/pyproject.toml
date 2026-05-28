@@ -36,7 +36,7 @@ dependencies = [
     "uvicorn[standard]>=0.32.0,<1",
     "python-multipart>=0.0.26",  # CVE-2026-40347: request smuggling via malformed multipart
     # Database (SQLite — works out of the box, no external DB needed)
-    "sqlalchemy[asyncio]>=2.0.36,<2.1",
+    "sqlalchemy[asyncio]>=2.0.49,<2.1",
     "aiosqlite>=0.20.0",
     "alembic>=1.14.0,<2",
     # Validation & serialization
