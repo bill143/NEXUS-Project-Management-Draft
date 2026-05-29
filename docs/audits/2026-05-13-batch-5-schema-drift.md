@@ -3,7 +3,79 @@
 Pre-fix audit: do not add an index/column unless evidence shows it's
 queried. User directive: "measure index hit before fixing."
 
-## TL;DR
+> ## ⚠ Correction (2026-05-13, same day)
+>
+> **The audit below is structurally wrong and was kept only as an
+> honest record of the mistake.** Read this section first.
+>
+> When I started writing the catch-up migration on a fresh branch off
+> updated `main`, re-running `alembic check` produced **328 events**
+> (42 added tables + 151 added indexes + 25 added FKs + 7 added cols +
+> 24 removed tables + 76 removed indexes + 3 removed cols), not 78.
+> Investigating the gap surfaced the real cause:
+>
+> - `backend/alembic/versions/129188e46db8_init_create_all_tables.py`
+>   is a deliberate no-op marker. Its `upgrade()` body is `pass`.
+> - `backend/app/main.py:1561` calls `await
+>   conn.run_sync(Base.metadata.create_all)` at boot.
+> - The schema source-of-truth in this codebase is **`Base.metadata.
+>   create_all()` running at app startup**, not the migration chain.
+> - `alembic check` is comparing model metadata against migration ops
+>   — two different sources of truth here. The "drift" it reports is
+>   the gap between "what migrations create" (mostly nothing) and
+>   "what create_all() creates at boot" (everything). It's not real
+>   drift.
+> - This was already documented correctly in
+>   [`docs/audits/QA_REPORT.md` item 6 (lines 145–176)](./QA_REPORT.md),
+>   which also explains the original v260c migration's warning
+>   ("oe_projects_project missing — Base.metadata.create_all() handles
+>   it at boot"). I missed that prior documentation when I wrote this
+>   audit.
+> - The CI workflow `.github/workflows/ci.yml:69-87` already runs
+>   `alembic check` as advisory (`continue-on-error: true`) with a
+>   comment explaining the situation. The team has been carrying this
+>   knowingly.
+>
+> **Why the original numbers were 78, not 328:** the first `alembic
+> check` run captured stale output (only the first batch of events
+> made it into `/tmp/alembic-drift-raw.txt` before my command was
+> truncated by a pipe to `head`). I built the entire classification
+> table on that truncated sample without verifying its length. The
+> systematic-evidence section below (status filter in 23/30 modules,
+> project_id filter in 25/30 modules) remains true and useful — but
+> the framing of "78 events to close with a catch-up migration" was
+> wrong.
+>
+> **Decision (user, 2026-05-13):** Path 1 — keep `Base.metadata.
+> create_all()` as the schema source-of-truth. This is a conscious
+> deviation from QA_REPORT.md item 6's recommendation #6.2 ("stop
+> relying on create_all()"). Trade-offs accepted:
+>
+> - Safe rolling upgrades of an existing customer DB require per-change
+>   delta migrations (no automatic snapshot-based upgrade path).
+> - `alembic check` stays in CI as advisory — it remains useful as a
+>   forcing function if we ever revisit the architecture, but its
+>   output should not be read as a bug list.
+> - Future "schema drift" investigations should compare model metadata
+>   against an actual running DB schema (post-`create_all()`), not
+>   against the migration chain alone.
+>
+> **No migration written.** Batch 5b (catch-up migration) is
+> cancelled. The audit content below is preserved as a record of the
+> wrong path, but should not be treated as a work item. Lessons for
+> future audits in `docs/audits/`:
+>
+> 1. Always check `wc -l` on captured tool output before building a
+>    table from it — pipes to `head` lie silently.
+> 2. Before classifying "drift" events, verify what the init migration
+>    actually creates. A no-op init is a strong signal that
+>    `create_all()` is involved somewhere.
+> 3. Read prior audits in the same directory before starting a new one
+>    — QA_REPORT.md had the answer and I didn't read it.
+>
+> ---
+
+## TL;DR (original, wrong — preserved for the record)
 
 **78 drift events from `alembic check` against SQLite.** Every event is
 **justified by code that already exists in the models / repositories /
