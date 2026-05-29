@@ -66,25 +66,15 @@ jobs:
       - name: Run tests with pytest
         run: pytest
 
-      - name: Alembic drift check (advisory)
-        # Detects drift between SQLAlchemy models and the migration-applied
-        # schema. `alembic upgrade head` builds the schema migration-by-
-        # migration into a fresh SQLite file (the path in alembic.ini's
-        # `sqlalchemy.url`); `alembic check` then compares Base.metadata
-        # against that schema and exits non-zero if the autogenerator
-        # would produce a non-empty diff.
-        #
-        # Currently advisory (continue-on-error) due to pre-existing drift
-        # documented in QA_REPORT.md item 6 (29 orphan tables, 88 indexes
-        # the DB has but models don't define, 52 indexes the reverse, 3
-        # extra columns). The drift survives because boot calls
-        # Base.metadata.create_all() to fill migration gaps — see the
-        # warning in migration v260c. Flip to hard-fail (remove the
-        # `continue-on-error: true` line below) once item 6 is resolved.
-        continue-on-error: true
-        run: |
-          alembic upgrade head
-          alembic check
+      # `alembic check` was dropped here on 2026-05-13. The schema
+      # source-of-truth in this codebase is `Base.metadata.create_all()`
+      # at app boot (app/main.py), not the migration chain — so
+      # `alembic check` was comparing two different sources of truth
+      # and producing a 328-event diff that did not represent real
+      # drift. See docs/audits/2026-05-13-batch-5-schema-drift.md for
+      # the investigation, and QA_REPORT.md item 6 for prior context.
+      # If the architectural choice ever changes (i.e. we move to
+      # migrations as the source-of-truth), restore this step.
 
   frontend:
     name: Frontend CI
