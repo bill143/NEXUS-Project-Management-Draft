@@ -104,6 +104,28 @@ class CostItemRepository:
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
 
+    async def get_code_region_pairs(
+        self, codes: list[str]
+    ) -> set[tuple[str, str | None]]:
+        """Return the set of existing (code, region) pairs for the given codes.
+
+        Used by bulk_import for an O(1)-per-row existence check, replacing
+        the previous N+1 ``get_by_code`` loop. Chunks the IN clause at 5000
+        to stay under asyncpg's ~32k parameter cap on large imports.
+        """
+        if not codes:
+            return set()
+        pairs: set[tuple[str, str | None]] = set()
+        chunk_size = 5000
+        for start in range(0, len(codes), chunk_size):
+            chunk = codes[start : start + chunk_size]
+            stmt = select(CostItem.code, CostItem.region).where(
+                CostItem.code.in_(chunk)
+            )
+            result = await self.session.execute(stmt)
+            pairs.update(result.tuples().all())
+        return pairs
+
     async def list_all(
         self,
         *,
