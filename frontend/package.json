@@ -44,7 +44,7 @@
     "plotly.js-dist-min": "^3.5.1",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-i18next": "^15.1.0",
+    "react-i18next": "^17.0.6",
     "react-is": "^18.3.1",
     "react-leaflet": "^4.2.1",
     "react-map-gl": "^8.1.1",
