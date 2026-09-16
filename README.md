@@ -1,3 +1,13 @@
+> [!IMPORTANT]
+> **📦 ARCHIVED RESEARCH FORK — not the O'Neill Contractors platform.**
+> The company's single system of record is
+> [`bill143/nexus-est-app`](https://github.com/bill143/nexus-est-app); all
+> application work happens there (see its `PLATFORM.md` charter). This fork is
+> kept read-only as research reference — its ideas (CO₂ / Buy Clean reporting,
+> ML bid-price prediction, DDC validation) may be harvested as specs, but its
+> AGPL-3.0 code must never be copied into the company's proprietary
+> repositories. Do not build here.
+
 <div align="center">
 
 # NEXUS-Project-Management-Draft
